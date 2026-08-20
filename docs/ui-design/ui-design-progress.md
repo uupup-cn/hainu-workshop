@@ -23,6 +23,19 @@
 
 ---
 
+## 页面设计记录（详细归档）
+
+| 文件 | 内容 | 状态 |
+|:----|:----|:----|
+| [00-design-system.md](records/00-design-system.md) | 设计系统 Tokens | ✅ 已确认 |
+| [01-component-library.md](records/01-component-library.md) | 核心组件库 | ✅ 已确认 |
+| [02-wireframes-batch-01.md](records/02-wireframes-batch-01.md) | 第一批线框 · 框架页 | ✅ 已完成 |
+| [03-wireframes-batch-02.md](records/03-wireframes-batch-02.md) | 第二批线框 · 新生/社区/课表 | ✅ 已完成 |
+| [04-wireframes-batch-03.md](records/04-wireframes-batch-03.md) | 第三批线框 · 智慧海大真实页面 | ✅ 已完成 |
+| [05-wireframes-batch-04.md](records/05-wireframes-batch-04.md) | 第四批线框 · 出行/数据库/社区 | ✅ 已完成 |
+| [06-wireframes-batch-05.md](records/06-wireframes-batch-05.md) | 第五批线框 · 社区/课表/工具箱/个人 | ✅ 已完成 |
+| [07-wireframes-batch-06.md](records/07-wireframes-batch-06.md) | 第六批线框 · 账号/设置 | ✅ 已完成 |
+
 ## 二、线框进度
 
 ### 第一批 · 框架页（已完成 ✅）
