@@ -206,26 +206,99 @@ src/api/
 - 新增 views/system/app-user：小程序用户管理（UID/身份/认证状态/积分）
 - 新增 views/system/auth-review：认证审核列表（待审核/已通过/已驳回 + 审核操作）
 
-### 步骤 6：站点设置改造
+### 步骤 6：系统管理改造
 
-在模板 site-setting 基础上增加项目特有配置项：
+#### 6.1 功能管理（菜单管理）
 
-| 配置项 | setting_key | 说明 |
-|:------|:-----------|:-----|
-| 缴费小程序路径 | payment_miniprogram_path | 新生缴费跳转 |
-| 缴费说明文案 | payment_description | 缴费页展示 |
-| 客服联系方式 | customer_service_contact | 微信/QQ/电话 |
-| 主题色 | theme_color | 小程序主题色 |
-| 启动页背景图 | launch_bg_image | 前置导航页背景 |
-| 关于我们 | about_us | 关于文案 |
-| 小程序版本号 | app_version | 版本展示 |
-| 开学/假期模式 | campus_mode | school/holiday |
-| 假期类型 | holiday_type | winter/summer |
-| 开学日期 | semester_start | 假期模式倒计时 |
-| 找室友修改次数 | roommate_max_modify_count | 默认 3 |
-| 海报分享模板 | poster_template | 工具箱测试结果海报模板样式 |
+- 使用 Element Plus 的 el-tree 组件展示菜单树
+- 支持拖拽排序（vuedraggable-plus）
+- 新增/编辑使用 el-dialog + el-form，菜单类型选择 el-radio-group（目录/页面）
+- 目录类型：只需填写名称和图标
+- 页面类型：需填写名称、路径、组件路径、图标
+- 是否可见使用 el-switch
+- 删除时检查是否有子级，有则提示"请先删除子菜单"
 
----
+#### 6.2 角色管理
+
+- 角色列表使用 ArtTable + ArtSearchBar
+- 权限分配：el-dialog 左侧 el-tree（菜单树，含按钮级权限），右侧展示已选权限
+- 支持全选/半选（el-tree 的 indeterminate 状态）
+- 保存时调用 PUT /api/v1/admin/roles/:id/permissions 全量覆盖
+- 用户关联：el-dialog 展示用户列表，支持添加/移除
+
+#### 6.3 用户管理
+
+- 小程序用户列表：展示 UID、昵称、身份、认证状态、积分、注册时间
+- 认证审核：待审核列表，点击审核弹出详情（姓名、学号、专业、证明图片）
+- 审核通过/驳回使用 el-popconfirm 确认，驳回需填写原因
+- 后台用户管理：标准 CRUD，支持角色分配（el-select multiple）
+- 密码重置：生成随机密码并通过邮件/短信发送（可选）
+
+#### 6.4 字典管理
+
+- 左侧 el-tree 展示字典类型，右侧 ArtTable 展示字典数据
+- 字典类型 CRUD 使用 el-dialog
+- 字典数据 CRUD 使用 el-dialog，字典类型选择 el-select（从左侧树中选取）
+- 启停使用 el-switch，切换时调用 PUT /api/v1/admin/dicts/:id
+- 缓存刷新：变更时调用 POST /api/v1/admin/cache/refresh-dict
+
+#### 6.5 通知管理
+
+- 通知类型管理：标准 CRUD
+- 通知列表：ArtTable，支持按类型、推送对象筛选
+- 新增通知：选择类型 → 填写标题/内容（el-input type=textarea）→ 选择推送对象（el-checkbox-group）→ 点击发送
+- 发送调用 POST /api/v1/admin/notifications/push
+- 撤回使用 el-popconfirm 确认
+
+#### 6.6 站点设置改造
+
+在模板 site-setting 基础上增加项目特有配置项，按分组展示：
+
+**系统配置组（basic）：**
+- 站点名称（el-input）
+- 登录验证码（el-switch）
+- 密码最小长度（el-input-number，min=4，max=20）
+- 登录失败锁定次数（el-input-number，min=1，max=10）
+- 登录锁定时长（el-input-number，单位：分钟）
+- JWT有效期（el-input-number，单位：小时）
+- 默认分页大小（el-input-number，min=10，max=100）
+
+**前端配置组（frontend / 小程序配置）：**
+- 小程序名称（el-input）
+- 小程序版本号（el-input）
+- 主题色（el-color-picker）
+- 启动页背景图（el-upload，accept=image/*）
+- 导航页背景图（el-upload，accept=image/*）
+- 关于我们（wangEditor 富文本）
+- 客服微信（el-input）
+- 客服QQ（el-input）
+- 客服电话（el-input）
+- 缴费小程序路径（el-input）
+- 缴费说明文案（wangEditor 富文本）
+
+**文件中心配置组（file）：**
+- 允许上传类型（el-input，placeholder="如 jpg,png,pdf"）
+- 单文件最大尺寸（el-input-number，单位：MB，min=1，max=50）
+- 同时上传数量（el-input-number，min=1，max=20）
+- 文件保留天数（el-input-number，0=永久）
+
+**假期/开学配置组（holiday）：**
+- 开学/假期模式（el-radio-group：school / holiday）
+- 假期类型（el-radio-group：winter / summer，仅假期模式可用）
+- 开学日期（el-date-picker，type=date）
+- 找室友修改次数（el-input-number，min=1，max=10）
+- 找室友开放时间（el-date-picker，type=datetimerange）
+- 海报分享模板（el-select，选项从 poster_templates 表获取）
+
+#### 6.7 文件中心
+
+- 文件列表：ArtTable，展示文件名、大小（格式化）、类型、上传者、上传时间
+- 上传：el-upload，支持拖拽，multiple，accept 根据配置动态设置
+- 下载：window.open 打开 /api/v1/admin/files/:id/download
+- 删除：el-popconfirm 确认后调用 DELETE
+- 预览：图片类型直接预览，其他类型提示下载
+- 统计：顶部展示文件总数和总存储空间
+
 
 ## 6. 模板组件复用清单
 

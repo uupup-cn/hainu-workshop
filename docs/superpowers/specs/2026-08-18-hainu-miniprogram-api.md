@@ -720,3 +720,62 @@ UID + 密码登录（网页端/小程序端通用）
 | GET / POST / PUT / DELETE | /api/v1/admin/notifications[/:id] | 通知 CRUD |
 | GET | /api/v1/admin/system/settings | 获取系统设置 |
 | PUT | /api/v1/admin/system/settings | 更新系统设置 |
+
+### 10.11 菜单/功能管理
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v1/admin/menus | 获取菜单树（含权限标识） |
+| POST | /api/v1/admin/menus | 新增菜单 |
+| PUT | /api/v1/admin/menus/:id | 更新菜单 |
+| DELETE | /api/v1/admin/menus/:id | 删除菜单 |
+| PUT | /api/v1/admin/menus/sort | 批量更新排序 |
+
+### 10.12 角色权限分配
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v1/admin/roles/:id/permissions | 获取角色已分配权限 |
+| PUT | /api/v1/admin/roles/:id/permissions | 分配权限（全量覆盖） |
+| GET | /api/v1/admin/roles/:id/users | 获取角色下用户 |
+| POST | /api/v1/admin/roles/:id/users | 添加用户到角色 |
+| DELETE | /api/v1/admin/roles/:id/users/:userId | 从角色移除用户 |
+
+### 10.13 字典类型管理
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v1/admin/dict-types | 获取字典类型列表 |
+| POST | /api/v1/admin/dict-types | 新增字典类型 |
+| PUT | /api/v1/admin/dict-types/:id | 更新字典类型 |
+| DELETE | /api/v1/admin/dict-types/:id | 删除字典类型 |
+| GET | /api/v1/admin/dicts/by-type/:type | 按类型获取字典数据 |
+
+### 10.14 通知推送
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| POST | /api/v1/admin/notifications/push | 推送通知（按类型+推送对象） |
+| GET | /api/v1/admin/notifications | 通知列表（分页+筛选） |
+| PUT | /api/v1/admin/notifications/:id | 更新通知 |
+| DELETE | /api/v1/admin/notifications/:id | 删除通知 |
+
+### 10.15 站点设置（细分配置）
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v1/admin/settings/group/:group | 按分组获取配置 |
+| PUT | /api/v1/admin/settings/group/:group | 按分组更新配置 |
+| GET | /api/v1/admin/settings/all | 获取所有配置（含分组） |
+
+> 配置分组：`basic`（基本设置）/ `frontend`（前端配置）/ `file`（文件中心）/ `holiday`（假期开学）
+
+### 10.16 文件中心
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v1/admin/files | 文件列表（分页+筛选） |
+| POST | /api/v1/admin/files/upload | 上传文件 |
+| GET | /api/v1/admin/files/:id/download | 下载文件 |
+| DELETE | /api/v1/admin/files/:id | 删除文件 |
+| GET | /api/v1/admin/files/stats | 文件统计（总大小/数量） |

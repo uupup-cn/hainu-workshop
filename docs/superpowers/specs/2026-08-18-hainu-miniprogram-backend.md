@@ -798,3 +798,75 @@
 ## 5. 文件存储
 
 地图图片、校历图片、商品图片等均存储在服务器文件系统，通过 URL 访问。
+
+**menus** — 菜单/功能管理
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| parent_id | INT | 父级菜单ID（一级菜单为0） |
+| menu_name | VARCHAR(50) | 菜单名称 |
+| menu_key | VARCHAR(50) UNIQUE | 菜单标识（路由/权限标识） |
+| menu_type | ENUM | 目录(menu) / 页面(button) |
+| icon | VARCHAR(100) | 菜单图标（为空则不显示） |
+| path | VARCHAR(200) | 路由路径（页面菜单必填） |
+| component | VARCHAR(200) | 组件路径（页面菜单必填） |
+| sort_order | INT | 排序（升序） |
+| is_visible | TINYINT(1) | 是否可见（1=显示 / 0=隐藏） |
+| created_at | DATETIME | 创建时间 |
+| updated_at | DATETIME | 更新时间 |
+
+> 菜单数据与 `permissions` 表共用同一棵树结构。`permissions.perm_key` 与 `menus.menu_key` 一一对应。后台通过菜单树自动生成前端路由和按钮权限。
+
+**role_permissions** — 角色权限关联（多对多）
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| role_id | INT FK | 关联角色 |
+| permission_id | INT FK | 关联权限 |
+
+> 角色可分配多个权限（菜单+按钮）。`authList` 前端指令根据当前用户的权限树过滤可见按钮。
+
+**role_users** — 后台用户角色关联（多对多）
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| admin_user_id | INT FK | 关联后台用户 |
+| role_id | INT FK | 关联角色 |
+
+> 一个后台用户可拥有多个角色。登录时合并所有角色权限去重。
+
+**dict_types** — 字典类型管理
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| type_name | VARCHAR(50) | 类型名称 |
+| type_key | VARCHAR(50) UNIQUE | 类型标识（如 identity_type / auth_status） |
+| description | VARCHAR(200) | 描述 |
+| sort_order | INT | 排序 |
+| is_active | TINYINT(1) | 是否启用 |
+| created_at | DATETIME | 创建时间 |
+| updated_at | DATETIME | 更新时间 |
+
+> dicts 表通过 dict_type 字段关联 dict_types.type_key，实现字典分类管理。
+
+**files** — 文件管理
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| original_name | VARCHAR(255) | 原始文件名 |
+| stored_name | VARCHAR(255) | 存储文件名（UUID） |
+| file_path | VARCHAR(500) | 存储路径 |
+| file_size | BIGINT | 文件大小（字节） |
+| mime_type | VARCHAR(100) | MIME 类型 |
+| uploader_id | INT FK | 上传者（后台用户） |
+| related_type | VARCHAR(50) | 关联业务类型（如 auth_application / tool_result） |
+| related_id | INT | 关联业务ID |
+| created_at | DATETIME | 创建时间 |
+
+> 文件保留天数为 0 时永久保留。定时任务每天清理过期文件。
+
