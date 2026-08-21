@@ -140,8 +140,8 @@ column	4(默认) | 5
 onClick	func
 3.3 工具卡片 <Card.Tool>
 ┌──────────────────────────────┐
-│ ▣ [橙底]   校园 GPA 计算器  › │
-│            实用工具日常必备     │   caption
+│ ▣ [橙底]   工具箱积分工具 › │
+│            积分工具示例        │
 └──────────────────────────────┘
    图标容器:bg orange-50,圆角 radius-md,内图 orange-500
    卡片:bg bg-card, radius-lg 12, shadow-card

@@ -7,8 +7,8 @@
 状态栏 + NavBar	44 + 44 = 88
 TabBar 高度	56 + 34(安全区)= 90
 数字	所有时间/节次/价格开 tnum 等宽
-1. 新生专题主页 <FreshmanHub>
-进入路径:TabBar 中间位「新生专题」/ 首页「必办 4 项 → 更多」 页面用途:新生独立模块入口聚合,所有新生相关功能在这里聚合展开
+1. 新生模块主页（真实 TabBar「新生」首页；原 Ardot “新生专题”命名已废弃） <FreshmanHub>
+进入路径:新生 Tab 首页/ 首页「必办 4 项 → 更多」 页面用途:新生独立模块入口聚合,所有新生相关功能在这里聚合展开
 
 布局说明
 从上到下 5 个区块:
@@ -37,7 +37,7 @@ NavBar(gradient)
 │  │   📋         │   🚆       │        │
 │  │  primary-50│ primary-50 │        │  Grid 4 列
 │  ├────────────┼────────────┤        │
-│  │  报到流程   │  来校路线   │        │  H4 16/24
+│  │  报到流程   │  生活攻略   │        │  H4 16/24
 │  │            │            │        │
 │  ├────────────┼────────────┤        │
 │  │  🏠 找室友  │  ❓ 新生问答 │        │
@@ -79,14 +79,14 @@ Tag「找组织」	<Tag variant="orange">	orange-50 + orange-700
 交互路径
 触发	跳转
 Grid 报到流程	→ 报到流程页(本批 #2)
-Grid 来校路线	→ 来校路线页(本批 #3)
+Grid 生活攻略	→ 生活攻略（交通）
 Grid 找室友	→ 找室友列表 / 发布(本批 #4)
 Grid 新生问答	→ 新生 FAQ(本批 #5)
 副入口 / 公告	对应详情页
 备注
 NavBar 选 gradient 是因为这是「品牌子模块入口」,作为整页情绪延伸;如果觉得与首页太接近,可在第二轮末尾切换为 default 配顶部条带 banner。
 2. 报到流程页 <EnrollmentFlow>
-进入路径:新生专题主页 / 个人中心 / 推送 页面用途:6 步入学流程的可视化跟踪,完成态自动同步学校数据
+进入路径:新生模块主页 / 个人中心 / 推送 页面用途:6 步入学流程的可视化跟踪,完成态自动同步学校数据
 
 布局说明
 从上到下 4 个区块:
@@ -169,8 +169,8 @@ NavBar	<NavBar default>	bg bg-card
 点击底部 CTA	继续下一步或跳转新生指南详情
 备注
 步骤条 竖排版本:由 <Cell> + 自定义图标组合而成,未在组件库新增 Steps 组件,只组合既有元素。
-3. 来校路线页 <Route>
-进入路径:新生专题主页 Grid / 首页倒计时卡 页面用途:不同校区不同出发点的交通指引
+3. 【已剔除】来校路线页（真实对应：「生活攻略 → 交通」内容，不作为独立页面）
+进入路径:新生模块主页 Grid / 首页倒计时卡 页面用途:不同校区不同出发点的交通指引
 
 布局说明
 从上到下 5 个区块:
@@ -246,7 +246,7 @@ Tag「适合夜班机」	<Tag variant="orange">	orange-50 + orange-700
 路线卡 → 查看详细	地图模式 + 详细步骤
 小贴士 → 智慧海大	跳转「智慧海大」主页(本批 #6)
 4. 找室友 · 发布表单页 <RoommatePost>
-进入路径:新生专题主页 Grid / 找室友列表悬浮按钮 FAB / 个人中心 页面用途:新生填写找室友需求,可被其他同学查看并申请
+进入路径:新生模块主页 Grid / 找室友列表悬浮按钮 FAB / 个人中心 页面用途:新生填写找室友需求,可被其他同学查看并申请
 
 布局说明
 从上到下 4 个区块:
@@ -352,7 +352,7 @@ ImageUpload	自定义(图片 + 文字),不新增组件	radius-md 8
 性格 / 期望	至少各选 1 项
 图片	≤ 6 张,单张 ≤ 5MB
 5. 新生 FAQ 搜索列表页 <FreshmanFAQ>
-进入路径:新生专题主页 Grid / 入学流程页内链 页面用途:常见问题聚合 + 全文搜索
+进入路径:新生模块主页 Grid / 入学流程页内链 页面用途:常见问题聚合 + 全文搜索
 
 布局说明
 从上到下 5 个区块:
@@ -525,9 +525,6 @@ NavBar default
 │  │       💬 5   👍 78   ⭐         │
 │  └────────────────────────────────┘ │
 │                                      │
-│  ┌─ 智能助手小卡 ─┐                   │ ← 浮动小卡(可选)
-│  │  💡  给新生推荐你想加的版块吧      │  Card.Tool 风格
-│  │      [选一个 ›]                   │
 │  └─────────────────┘                 │
 │                                      │ space-3
 │  ┌────────────────────────────────┐ │ ← 浮动发布条
@@ -548,7 +545,6 @@ PostItem	<Card> + <Cell> 混合(详见 5.3)	头像 40 + caption text-tertiary
 Tag「#新生」	<Tag variant="primary">	primary-50 + primary-500
 Tag「自习」「求学长」	<Tag variant="mint"> 或 primary	mint-50 / primary-50
 互动图标	16,数字 caption	text-tertiary
-智能助手小卡	<Card.Tool>	orange-50 + orange-500
 浮动发布条	文字 + primary 装饰条	bg bg-card, radius-full, shadow-card
 颜色配比自检
 颜色	占比
@@ -654,7 +650,7 @@ orange-500(实验 1 条)	~ 2%
 
 第二批页面与组件对照表
 页面	区块	组件	Token 引用
-新生专题主页	NavBar	NavBar gradient	primary-700→500
+新生模块主页（原新生专题更名）	NavBar	NavBar gradient	primary-700→500
 欢迎卡	Card 自定义	bg-card, radius-xl
 Badge 3	Badge	danger + radius-full
 主入口 4 项	Card.Grid × 4	primary-50, primary-500
@@ -666,7 +662,7 @@ Tag 找组织	Tag orange	orange-50 + orange-700
 步骤条	Cell + 自定义组合	primary-500 / neutral-300
 「催办」「上传」	weak / text button	primary-50 / transparent
 底部固定	Button large + shadow-tab	primary-500
-来校路线页	NavBar	NavBar default	bg-card
+【已剔除】来校路线页	NavBar	NavBar default	bg-card
 校区 Segment	Segment 横向 + 滑动	active primary-500
 校区介绍	Card	bg-card, radius-lg
 路线列表	Cell 多行	bg-card, border-light
@@ -700,7 +696,6 @@ Banner 轮播	Card + 圆点指示器	orange-50, primary-500 选中
 PostItem	Card + Cell 混合	头像 40, caption text-tertiary
 Tag #新生	Tag primary	primary-50 + primary-500
 Tag 自习	Tag mint	mint-50 + mint-700
-智能助手小卡	Card.Tool	orange-50
 浮动发布条	自定义 radius-full	bg-card, primary-500
 课表主页(周视图)	周次切换	Card + weak button	bg-card, radius-lg
 周次数字	H4 tnum	primary-500
