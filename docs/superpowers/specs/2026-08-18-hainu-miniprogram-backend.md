@@ -569,7 +569,15 @@
 | setting_value | VARCHAR(500) | 设置值 |
 | updated_at | DATETIME | 更新时间 |
 
-预定义设置键：campus_mode, holiday_type, semester_start, payment_miniprogram_path, payment_description, customer_service_contact, theme_color, launch_bg_image, about_us, app_version
+预定义设置键（按分组）：
+
+**系统配置（basic）：** site_name, login_captcha, password_min_length, login_lock_threshold, lock_duration_minutes, jwt_expires_hours, page_size_default
+
+**前端配置 / 小程序配置（frontend）：** app_name, app_version, theme_color, launch_bg_image, nav_bg_image, about_us, customer_service_wechat, customer_service_qq, customer_service_phone, payment_miniprogram_path, payment_description
+
+**文件中心配置（file）：** allowed_upload_types, max_file_size_mb, max_upload_count, file_retention_days, storage_path
+
+**假期/开学配置（holiday）：** campus_mode, holiday_type, semester_start, roommate_max_modify_count, roommate_start_time, roommate_end_time, poster_template
 
 **users** — 小程序用户
 
