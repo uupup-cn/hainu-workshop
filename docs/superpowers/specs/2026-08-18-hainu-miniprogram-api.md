@@ -1,6 +1,6 @@
 # 海大工坊 · 微信小程序 — API 文档
 
-> 版本：v1.14
+> 版本：v2.0
 > 日期：2026-08-19
 > 状态：初稿
 
@@ -422,6 +422,36 @@ UID + 密码登录（网页端/小程序端通用）
 举报评论（举报理由同上）
 
 ---
+### 5.6 抽奖
+
+#### GET /api/v1/lottery/activities
+获取上架活动列表（需登录）
+
+#### GET /api/v1/lottery/activities/:id
+获取活动详情（含奖品+概率，需登录）
+
+#### POST /api/v1/lottery/activities/:id/draw
+抽奖（检查时间/次数/积分，返回结果，需登录）
+
+响应：
+```json
+{
+  "code": 0,
+  "data": {
+    "is_win": true,
+    "prize": {
+      "name": "奖品名称",
+      "image": "https://..."
+    },
+    "points_consumed": 0
+  }
+}
+```
+
+#### GET /api/v1/lottery/my-records
+我的抽奖记录（需登录）
+
+---
 ## 6. 工具箱接口
 
 ### 6.1 工具分类与列表
@@ -656,6 +686,17 @@ UID + 密码登录（网页端/小程序端通用）
 | PUT | /api/v1/admin/alumni/posts/:id/pin | 帖子置顶/取消置顶 |
 | DELETE | /api/v1/admin/alumni/posts/:id | 删除帖子/表白墙 |
 | DELETE | /api/v1/admin/alumni/comments/:id | 删除评论 |
+| POST | /api/v1/admin/lottery/activities | 创建活动（基础信息） |
+| GET | /api/v1/admin/lottery/activities | 活动列表 |
+| GET | /api/v1/admin/lottery/activities/:id | 活动详情 |
+| PUT | /api/v1/admin/lottery/activities/:id/list | 上架 |
+| DELETE | /api/v1/admin/lottery/activities/:id | 删除（仅未上架/已下架） |
+| POST | /api/v1/admin/lottery/activities/:id/prizes | 添加奖品 |
+| PUT | /api/v1/admin/lottery/prizes/:id | 编辑奖品 |
+| DELETE | /api/v1/admin/lottery/prizes/:id | 删除奖品 |
+| PUT | /api/v1/admin/lottery/activities/:id/description | 编辑活动说明 |
+| GET | /api/v1/admin/lottery/activities/:id/winners | 中奖数据 |
+| GET | /api/v1/admin/lottery/activities/:id/winners/export | 导出中奖数据（Excel） |
 | GET | /api/v1/admin/reports | 举报列表（支持按 target_type 筛选：商品/帖子/表白墙/评论） |
 | PUT | /api/v1/admin/reports/:id | 处理举报（下架/删除/忽略 + 备注）；处理完成后自动发送站内信通知举报者和被举报者双方 |
 

@@ -39,3 +39,6 @@ server/prisma/*.db-journal
 # 临时文件
 tmp/
 temp/
+
+# 服务器连接信息（敏感）
+SERVER_INFO.md

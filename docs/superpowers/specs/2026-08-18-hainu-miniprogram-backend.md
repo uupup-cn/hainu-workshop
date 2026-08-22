@@ -1,6 +1,6 @@
 # 海大工坊 · 微信小程序 — 后端设计文档
 
-> 版本：v1.14
+> 版本：v2.0
 > 日期：2026-08-19
 > 状态：初稿
 
@@ -10,14 +10,17 @@
 
 | 项 | 选型 |
 |:--|:-----|
-| 运行时 | Node.js |
-| 框架 | Express.js / Koa.js |
-| 语言 | TypeScript |
+| 运行时 | Node.js 20+ |
+| 框架 | Koa.js |
+| 语言 | TypeScript（严格模式） |
 | 数据库 | MySQL 8.0 |
-| ORM | Prisma / TypeORM |
-| 文件存储 | 本地文件系统 |
-| 认证 | JWT（后台管理登录） |
-| 部署环境 | Linux 服务器 |
+| ORM | Prisma |
+| 缓存 | Redis（在线用户/缓存管理/Token 管理） |
+| 文件存储 | 本地文件系统（生产可转对象存储） |
+| 认证 | JWT（Access Token + Refresh Token） |
+| 图片处理 | sharp（自动压缩，最大 1920px，质量 80%） |
+| 日志 | winston + daily-rotate-file（保留 30 天） |
+| 部署环境 | Linux 服务器（最低 2核4G + 40G SSD + 5M 带宽） |
 
 ---
 
@@ -300,6 +303,48 @@
 | user_id | INT FK | 点赞用户 |
 | created_at | DATETIME | 创建时间 |
 
+**lottery_activities** — 抽奖活动
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| name | VARCHAR(100) | 活动名称 |
+| type | ENUM(free, points) | 抽奖类型（免费/积分） |
+| start_time | DATETIME | 抽奖开始时间 |
+| end_time | DATETIME | 抽奖结束时间 |
+| description | TEXT | 活动说明（富文本） |
+| points_cost | INT | 每次消耗积分数（免费抽奖为0） |
+| max_draws_per_user | INT | 每人抽奖次数限制 |
+| status | ENUM(unlisted, listed, active, ended) | 状态（未上架/上架/进行中/已下架） |
+| created_at | DATETIME | 创建时间 |
+| updated_at | DATETIME | 更新时间 |
+
+**lottery_prizes** — 抽奖奖品
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| activity_id | INT FK | 关联活动 |
+| name | VARCHAR(100) | 奖品名称 |
+| image | VARCHAR(500) | 奖品图片 |
+| quantity | INT | 奖品数量 |
+| remaining | INT | 剩余数量（抽中后递减） |
+| probability | DECIMAL(5,4) | 中奖概率（自动计算） |
+| sort_order | INT | 排序 |
+| created_at | DATETIME | 创建时间 |
+
+**lottery_records** — 抽奖记录
+
+| 字段 | 类型 | 说明 |
+|:----|:----|:------|
+| id | INT PK AUTO | 主键 |
+| activity_id | INT FK | 关联活动 |
+| user_id | INT FK | 抽奖用户 |
+| prize_id | INT FK NULL | 中奖奖品ID（未中奖为空） |
+| is_win | TINYINT(1) | 是否中奖 |
+| points_consumed | INT | 消耗积分（免费为0） |
+| created_at | DATETIME | 抽奖时间 |
+
 **community_modules** — 社区模块功能启停
 
 | 字段 | 类型 | 说明 |
@@ -398,7 +443,7 @@
 | created_at | DATETIME | 创建时间 |
 | updated_at | DATETIME | 更新时间 |
 
-### 2.3b 工具相关表
+### 2.4 工具相关表
 
 **tool_categories** — 工具分类
 
@@ -467,7 +512,7 @@
 | created_at | DATETIME | 创建时间 |
 | updated_at | DATETIME | 更新时间 |
 
-### 2.4 找室友相关表
+### 2.5 找室友相关表
 
 **roommate_settings** — 找室友功能配置
 
@@ -558,7 +603,7 @@
 | created_at | DATETIME | 创建时间 |
 | updated_at | DATETIME | 更新时间 |
 
-### 2.5 系统管理相关表
+### 2.6 系统管理相关表
 
 **system_settings** — 系统设置
 
@@ -718,7 +763,7 @@
 | notification_id | INT FK | 关联通知 |
 | read_at | DATETIME | 已读时间 |
 
-### 2.6 日志与监控相关表
+### 2.7 日志与监控相关表
 
 **user_feedback** — 用户反馈
 
@@ -765,7 +810,7 @@
 | ip | VARCHAR(50) | 操作IP |
 | created_at | DATETIME | 创建时间 |
 
-### 2.7 数据层级关系
+### 2.8 数据层级关系
 
 ```
 校区 (campuses)
@@ -803,7 +848,118 @@
 
 ---
 
-## 5. 文件存储
+## 5. 项目目录结构
+
+```
+server/
+  src/
+    routes/           # 路由定义
+    controllers/      # 请求处理
+    services/         # 业务逻辑
+    middlewares/      # 中间件（auth/error/ratelimit）
+    utils/            # 工具函数
+    config/           # 配置加载
+    types/            # TypeScript 类型定义
+  prisma/             # Prisma Schema 与迁移
+  .env.development    # 开发环境
+  .env.test           # 测试环境
+  .env.production     # 生产环境
+```
+
+---
+
+## 6. 环境变量配置
+
+| 变量 | 说明 |
+|:----|:------|
+| DATABASE_URL | MySQL 连接字符串 |
+| REDIS_URL | Redis 连接字符串 |
+| JWT_SECRET | JWT 签名密钥 |
+| JWT_ACCESS_EXPIRES | Access Token 有效期（用户 7d / 后台 24h） |
+| JWT_REFRESH_EXPIRES | Refresh Token 有效期（用户 30d / 后台 7d） |
+| WX_APPID | 微信小程序 AppID |
+| WX_APP_SECRET | 微信小程序 AppSecret |
+| FILE_UPLOAD_DIR | 文件上传目录 |
+| FILE_BASE_URL | 文件访问基础 URL |
+| CORS_ORIGIN | CORS 允许来源 |
+| PORT | 服务端口 |
+| RATE_LIMIT_GENERAL | 普通接口频率限制（60次/分钟） |
+| RATE_LIMIT_LOGIN | 登录接口频率限制（10次/分钟） |
+| RATE_LIMIT_LOTTERY | 抽奖接口频率限制（5次/分钟） |
+
+---
+
+## 7. API 规范
+
+### 7.1 分页规范
+
+请求参数：page（默认 1）+ size（默认 20）
+
+响应格式：
+```json
+{
+  "code": 0,
+  "data": {
+    "list": [],
+    "total": 100,
+    "page": 1,
+    "size": 20,
+    "hasMore": true
+  }
+}
+```
+
+### 7.2 文件上传响应
+
+```json
+{
+  "code": 0,
+  "data": {
+    "url": "https://.../uploads/xxx.jpg",
+    "file_id": 123
+  }
+}
+```
+
+### 7.3 错误处理
+
+- 定义 ApiError 类（code + message），业务层 throw new ApiError(40010, "需要登录")
+- 全局错误中间件捕获所有异常，统一格式化为 { code, message, data: null }
+- 未捕获异常统一返回 50000
+- 错误自动写入 system_logs 表
+
+### 7.4 JWT 认证机制
+
+**用户端（小程序/网页端）：**
+- Access Token：有效期 7 天
+- Refresh Token：有效期 30 天
+- Access Token 过期后前端自动用 Refresh Token 换取新 Token，用户无感
+- Refresh Token 过期后需重新登录
+
+**管理后台：**
+- 复用 Art Design Pro X 模板自带机制（Access Token + Refresh Token HttpOnly Cookie）
+- Access Token 过期前 30 秒自动刷新
+- 刷新失败重试最多 3 次
+
+---
+
+## 8. 数据库迁移规范
+
+- npx prisma migrate dev --name <英文描述> 生成迁移
+- 命名规范：动词+名词（如 add_lottery_tables）
+- 迁移文件提交到 Git，团队成员 npx prisma migrate deploy 同步
+- 回滚通过新建反向迁移，不手动删文件
+- 生产环境只用 migrate deploy，不用 migrate dev
+
+---
+
+## 9. 文件存储
+
+地图图片、校历图片、商品图片等均存储在服务器文件系统，通过 URL 访问。
+上传图片自动压缩（sharp），限制最大 1920px 宽 + 质量 80%。
+数据库备份：每日凌晨自动 mysqldump + 保留 7 天。
+日志轮转：winston + daily-rotate-file，保留 30 天。
+
 
 地图图片、校历图片、商品图片等均存储在服务器文件系统，通过 URL 访问。
 
