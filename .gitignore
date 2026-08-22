@@ -42,3 +42,6 @@ temp/
 
 # 服务器连接信息（敏感）
 SERVER_INFO.md
+
+# 测试环境变量
+.env.test

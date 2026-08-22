@@ -7,3 +7,7 @@ export async function getTool(ctx: Context) { ctx.body = success(await svc.getTo
 export async function useTool(ctx: Context) { ctx.body = success(await svc.useTool(ctx.params.key, ctx.state.user.userId, ctx.state.user.identity, (ctx.request.body as any)?.params)); }
 export async function shareTool(ctx: Context) { ctx.body = success(await svc.shareTool(ctx.params.key, ctx.state.user.userId, ctx.request.body)); }
 export async function getVideoParseLines(ctx: Context) { ctx.body = success(await svc.getVideoParseLines()); }
+export async function videoParse(ctx: Context) {
+  const b = ctx.request.body as any;
+  ctx.body = success(await svc.videoParse(ctx.state.user.userId, b.video_url, Number(b.line_id)));
+}
