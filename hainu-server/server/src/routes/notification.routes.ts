@@ -1,0 +1,12 @@
+import Router from 'koa-router';
+import { authMiddleware, optionalAuthMiddleware } from '../middlewares/auth.middleware';
+import * as ctrl from '../controllers/notification.controller';
+const router = new Router();
+router.get('/api/v1/notifications', authMiddleware, ctrl.getNotifications);
+router.get('/api/v1/notifications/:id', authMiddleware, ctrl.getNotificationDetail);
+router.put('/api/v1/notifications/:id/read', authMiddleware, ctrl.markAsRead);
+router.get('/api/v1/notifications/unread-count', authMiddleware, ctrl.getUnreadCount);
+router.post('/api/v1/user/feedback', authMiddleware, ctrl.submitFeedback);
+router.get('/api/v1/user/feedback', authMiddleware, ctrl.getMyFeedback);
+router.get('/api/v1/system/settings', optionalAuthMiddleware, ctrl.getSettings);
+export default router;

@@ -1,0 +1,14 @@
+import Router from 'koa-router';
+import { authMiddleware } from '../middlewares/auth.middleware';
+import * as ctrl from '../controllers/user.controller';
+const router = new Router({ prefix: '/api/v1/user' });
+router.get('/profile', authMiddleware, ctrl.getProfile);
+router.put('/profile', authMiddleware, ctrl.updateProfile);
+router.put('/password', authMiddleware, ctrl.changePassword);
+router.get('/public/:uid', authMiddleware, ctrl.getPublicProfile);
+router.get('/privacy', authMiddleware, ctrl.getPrivacy);
+router.put('/privacy', authMiddleware, ctrl.updatePrivacy);
+router.post('/auth-apply', authMiddleware, ctrl.submitAuthApply);
+router.get('/auth-status', authMiddleware, ctrl.getAuthStatus);
+router.get('/points', authMiddleware, ctrl.getPoints);
+export default router;

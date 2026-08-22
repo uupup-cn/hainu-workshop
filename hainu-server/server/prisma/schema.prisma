@@ -1,0 +1,924 @@
+// 海大工坊 Prisma Schema
+// 生成日期：2026-08-21
+// 基于 后端设计文档 v1.16
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ========== 用户系统 ==========
+
+model User {
+  id                 Int                @id @default(autoincrement())
+  openid             String             @unique @db.VarChar(100)
+  uid                String             @unique @db.VarChar(20)
+  nickname           String             @db.VarChar(50)
+  avatar             String             @db.VarChar(500)
+  email              String?            @db.VarChar(100)
+  qq                 String?            @db.VarChar(50)
+  wechat             String?            @db.VarChar(50)
+  passwordHash       String             @db.VarChar(255)
+  identity           String             @db.VarChar(20)
+  pointsEnabled      Boolean            @default(false)
+  points             Int                @default(0)
+  authStatus         String             @default("unverified") @db.VarChar(20)
+  privacyEnabled     Boolean            @default(false)
+  privacyFields      Json?
+  lastIdentityChange DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  RoommatePost       RoommatePost?
+  MarketplaceItem    MarketplaceItem[]
+  AlumniPost         AlumniPost[]
+  AlumniComment      AlumniComment[]
+  AlumniLike         AlumniLike[]
+  LotteryRecord      LotteryRecord[]
+  Course             Course[]
+  ShareCode          ShareCode[]
+  ToolUsageLog       ToolUsageLog[]
+  ToolUnlock         ToolUnlock[]
+  NotificationRead   NotificationRead[]
+  UserFeedback       UserFeedback[]
+
+  @@map("users")
+}
+
+model AuthApplication {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  realName     String    @db.VarChar(50)
+  studentNo    String    @db.VarChar(50)
+  major        String    @db.VarChar(100)
+  proofImage   String    @db.VarChar(500)
+  status       String    @default("pending") @db.VarChar(20)
+  reviewRemark String?   @db.VarChar(200)
+  rejectCount  Int       @default(0)
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@map("auth_applications")
+}
+
+model UidLog {
+  id        Int      @id @default(autoincrement())
+  uid       String   @unique @db.VarChar(20)
+  userId    Int
+  createdAt DateTime @default(now())
+
+  @@map("uid_log")
+}
+
+model PointsLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  points    Int
+  reason    String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+
+  @@map("points_log")
+}
+
+// ========== 内容管理 ==========
+
+model GuideEntry {
+  id         Int      @id @default(autoincrement())
+  entryKey   String   @unique @db.VarChar(50)
+  entryTitle String   @db.VarChar(100)
+  content    String   @db.Text
+  summary    String?  @db.VarChar(200)
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("guide_entries")
+}
+
+model LifeTopic {
+  id         Int      @id @default(autoincrement())
+  campus     String   @db.VarChar(20)
+  topicKey   String   @db.VarChar(50)
+  topicTitle String   @db.VarChar(100)
+  content    String   @db.Text
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("life_topics")
+}
+
+model FaqCategory {
+  id           Int           @id @default(autoincrement())
+  categoryName String        @db.VarChar(50)
+  sortOrder    Int           @default(0)
+  createdAt    DateTime      @default(now())
+  questions    FaqQuestion[]
+
+  @@map("faq_categories")
+}
+
+model FaqQuestion {
+  id         Int         @id @default(autoincrement())
+  categoryId Int
+  question   String      @db.VarChar(200)
+  answer     String      @db.Text
+  sortOrder  Int         @default(0)
+  isActive   Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  category   FaqCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("faq_questions")
+}
+
+model IntroEntry {
+  id         Int      @id @default(autoincrement())
+  entryKey   String   @unique @db.VarChar(50)
+  entryTitle String   @db.VarChar(100)
+  content    String   @db.Text
+  images     Json?
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("intro_entries")
+}
+
+model PhonebookCategory {
+  id           Int              @id @default(autoincrement())
+  campusId     Int
+  categoryName String           @db.VarChar(50)
+  sortOrder    Int              @default(0)
+  createdAt    DateTime         @default(now())
+  entries      PhonebookEntry[]
+  Campus       Campus           @relation(fields: [campusId], references: [id])
+
+  @@map("phonebook_categories")
+}
+
+model PhonebookEntry {
+  id             Int               @id @default(autoincrement())
+  categoryId     Int
+  departmentName String            @db.VarChar(100)
+  phoneNumber    String            @db.VarChar(50)
+  description    String?           @db.VarChar(200)
+  sortOrder      Int               @default(0)
+  isActive       Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  category       PhonebookCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("phonebook_entries")
+}
+
+model CalendarSetting {
+  id           Int      @id @default(autoincrement())
+  viewMode     String   @db.VarChar(20) // image/calendar
+  imageUrl     String?  @db.VarChar(500)
+  calendarData Json?
+  updatedAt    DateTime @updatedAt
+
+  @@map("calendar_settings")
+}
+
+model MapSetting {
+  id          Int         @id @default(autoincrement())
+  campus      String      @db.VarChar(20)
+  mapImageUrl String      @db.VarChar(500)
+  updatedAt   DateTime    @updatedAt
+  markers     MapMarker[]
+
+  @@map("map_settings")
+}
+
+model MapMarker {
+  id           Int        @id @default(autoincrement())
+  mapId        Int
+  buildingName String     @db.VarChar(100)
+  description  String?    @db.Text
+  positionX    Decimal    @db.Decimal(5, 3)
+  positionY    Decimal    @db.Decimal(5, 3)
+  sortOrder    Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  map          MapSetting @relation(fields: [mapId], references: [id])
+
+  @@map("map_markers")
+}
+
+model BusSchedule {
+  id             Int      @id @default(autoincrement())
+  lineName       String   @db.VarChar(100)
+  departureTime  String   @db.VarChar(20)
+  departurePlace String   @db.VarChar(100)
+  destination    String   @db.VarChar(100)
+  notes          String?  @db.VarChar(200)
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("bus_schedules")
+}
+
+model BusStation {
+  id           Int      @id @default(autoincrement())
+  stationName  String   @db.VarChar(100)
+  locationDesc String?  @db.VarChar(200)
+  lines        String?  @db.VarChar(200)
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("bus_stations")
+}
+
+model BusGuide {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("bus_guide")
+}
+
+// ========== 校园数据库 ==========
+
+model Campus {
+  id            Int                 @id @default(autoincrement())
+  campusName    String              @db.VarChar(50)
+  sortOrder     Int                 @default(0)
+  isActive      Boolean             @default(true)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  colleges      College[]
+  departments   Department[]
+  phonebookCats PhonebookCategory[]
+
+  @@map("campuses")
+}
+
+model College {
+  id          Int        @id @default(autoincrement())
+  campusId    Int
+  collegeName String     @db.VarChar(100)
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  campus      Campus     @relation(fields: [campusId], references: [id])
+  buildings   Building[]
+
+  @@map("colleges")
+}
+
+model Department {
+  id             Int      @id @default(autoincrement())
+  campusId       Int
+  departmentName String   @db.VarChar(100)
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  campus         Campus   @relation(fields: [campusId], references: [id])
+  majors         Major[]
+
+  @@map("departments")
+}
+
+model Major {
+  id           Int        @id @default(autoincrement())
+  departmentId Int
+  majorName    String     @db.VarChar(100)
+  sortOrder    Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  @@map("majors")
+}
+
+model Building {
+  id           Int      @id @default(autoincrement())
+  collegeId    Int
+  buildingName String   @db.VarChar(100)
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  college      College  @relation(fields: [collegeId], references: [id])
+
+  @@map("buildings")
+}
+
+// ========== 找室友 ==========
+
+model RoommateSetting {
+  id             Int       @id @default(autoincrement())
+  isEnabled      Boolean   @default(true)
+  startDate      DateTime?
+  endDate        DateTime?
+  maxModifyCount Int       @default(3)
+  updatedAt      DateTime  @updatedAt
+
+  @@map("roommate_settings")
+}
+
+model RoommatePost {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(50)
+  contact      String   @db.VarChar(100)
+  campusId     Int
+  collegeId    Int
+  departmentId Int
+  majorId      Int
+  buildingId   Int
+  roomNumber   String   @db.VarChar(50)
+  userId       Int      @unique
+  isActive     Boolean  @default(true)
+  modifyCount  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("roommate_posts")
+}
+
+// ========== 社区模块 ==========
+
+model MarketplaceCategory {
+  id           Int               @id @default(autoincrement())
+  categoryName String            @db.VarChar(50)
+  sortOrder    Int               @default(0)
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  items        MarketplaceItem[]
+
+  @@map("marketplace_categories")
+}
+
+model MarketplaceItem {
+  id           Int                 @id @default(autoincrement())
+  title        String              @db.VarChar(100)
+  description  String?             @db.Text
+  price        Decimal             @db.Decimal(10, 2)
+  images       Json
+  contact      String              @db.VarChar(100)
+  categoryId   Int
+  status       String              @default("active") @db.VarChar(20)
+  publishedAt  DateTime            @default(now())
+  autoOffAt    DateTime?
+  expireAt     DateTime?
+  userId       Int
+  userIdentity String              @db.VarChar(20)
+  viewCount    Int                 @default(0)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  category     MarketplaceCategory @relation(fields: [categoryId], references: [id])
+  user         User                @relation(fields: [userId], references: [id])
+
+  @@map("marketplace_items")
+}
+
+model Report {
+  id             Int      @id @default(autoincrement())
+  targetType     String   @db.VarChar(20) // item/post/confession/comment
+  targetId       Int
+  reporterUserId Int
+  reason         String   @db.VarChar(100)
+  detail         String?  @db.Text
+  status         String   @default("pending") @db.VarChar(20)
+  handleResult   String?  @db.VarChar(200)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("reports")
+}
+
+model CommunityModule {
+  id         Int      @id @default(autoincrement())
+  moduleKey  String   @unique @db.VarChar(50)
+  moduleName String   @db.VarChar(100)
+  isEnabled  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("community_modules")
+}
+
+model News {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(200)
+  content     String    @db.Text
+  target      String    @db.VarChar(20) // all_student/freshman/undergrad/grad
+  status      String    @default("draft") @db.VarChar(20)
+  isPinned    Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("news")
+}
+
+model AlumniSection {
+  id          Int          @id @default(autoincrement())
+  sectionName String       @db.VarChar(50)
+  sortOrder   Int          @default(0)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  posts       AlumniPost[]
+
+  @@map("alumni_sections")
+}
+
+model AlumniPost {
+  id            Int             @id @default(autoincrement())
+  type          String          @db.VarChar(20) // post/confession
+  sectionId     Int?
+  userId        Int
+  title         String?         @db.VarChar(200)
+  content       String          @db.Text
+  images        Json?
+  isAnonymous   Boolean         @default(false)
+  isPinned      Boolean         @default(false)
+  likeCount     Int             @default(0)
+  commentCount  Int             @default(0)
+  lastCommentAt DateTime?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  section       AlumniSection?  @relation(fields: [sectionId], references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+  comments      AlumniComment[]
+  likes         AlumniLike[]
+
+  @@map("alumni_posts")
+}
+
+model AlumniComment {
+  id          Int        @id @default(autoincrement())
+  postId      Int
+  userId      Int
+  content     String     @db.Text
+  parentId    Int?
+  isAnonymous Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  post        AlumniPost @relation(fields: [postId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+
+  @@map("alumni_comments")
+}
+
+model AlumniLike {
+  id        Int        @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  createdAt DateTime   @default(now())
+  post      AlumniPost @relation(fields: [postId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+  @@map("alumni_likes")
+}
+
+model LotteryActivity {
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(100)
+  type            String          @db.VarChar(10) // free/points
+  startTime       DateTime
+  endTime         DateTime
+  description     String?         @db.Text
+  pointsCost      Int             @default(0)
+  maxDrawsPerUser Int             @default(1)
+  status          String          @default("unlisted") @db.VarChar(20)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  prizes          LotteryPrize[]
+  records         LotteryRecord[]
+
+  @@map("lottery_activities")
+}
+
+model LotteryPrize {
+  id          Int             @id @default(autoincrement())
+  activityId  Int
+  name        String          @db.VarChar(100)
+  image       String          @db.VarChar(500)
+  quantity    Int
+  remaining   Int
+  probability Decimal         @db.Decimal(5, 4)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  activity    LotteryActivity @relation(fields: [activityId], references: [id])
+
+  @@map("lottery_prizes")
+}
+
+model LotteryRecord {
+  id             Int             @id @default(autoincrement())
+  activityId     Int
+  userId         Int
+  prizeId        Int?
+  isWin          Boolean         @default(false)
+  pointsConsumed Int             @default(0)
+  createdAt      DateTime        @default(now())
+  activity       LotteryActivity @relation(fields: [activityId], references: [id])
+  user           User            @relation(fields: [userId], references: [id])
+
+  @@map("lottery_records")
+}
+
+// ========== 课表模块 ==========
+
+model Course {
+  id           Int      @id @default(autoincrement())
+  courseName   String   @db.VarChar(100)
+  teacher      String?  @db.VarChar(50)
+  location     String?  @db.VarChar(100)
+  weeks        String?  @db.VarChar(50)
+  dayOfWeek    Int?
+  startSection Int?
+  endSection   Int?
+  colorId      Int?
+  userId       Int
+  userIdentity String   @db.VarChar(20)
+  source       String   @default("diy") @db.VarChar(20)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("courses")
+}
+
+model CourseColor {
+  id         Int      @id @default(autoincrement())
+  colorName  String   @db.VarChar(50)
+  colorValue String   @db.VarChar(20)
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("course_colors")
+}
+
+model Semester {
+  id           Int        @id @default(autoincrement())
+  semesterName String     @db.VarChar(50)
+  startDate    DateTime
+  endDate      DateTime
+  sortOrder    Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  termWeeks    TermWeek[]
+
+  @@map("semesters")
+}
+
+model TermWeek {
+  id         Int      @id @default(autoincrement())
+  semesterId Int
+  weekNumber Int
+  startDate  DateTime
+  endDate    DateTime
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  semester   Semester @relation(fields: [semesterId], references: [id])
+
+  @@map("term_weeks")
+}
+
+model Section {
+  id            Int      @id @default(autoincrement())
+  sectionNumber Int
+  startTime     String   @db.VarChar(10)
+  endTime       String   @db.VarChar(10)
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("sections")
+}
+
+model ShareCode {
+  id            Int      @id @default(autoincrement())
+  shareCode     String   @unique @db.VarChar(20)
+  ownerUserId   Int
+  ownerIdentity String   @db.VarChar(20)
+  snapshot      Json
+  expireAt      DateTime
+  status        String   @default("active") @db.VarChar(20)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [ownerUserId], references: [id])
+
+  @@map("share_codes")
+}
+
+// ========== 工具箱 ==========
+
+model ToolCategory {
+  id           Int      @id @default(autoincrement())
+  categoryName String   @db.VarChar(50)
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tools        Tool[]
+
+  @@map("tool_categories")
+}
+
+model Tool {
+  id            Int            @id @default(autoincrement())
+  categoryId    Int
+  toolName      String         @db.VarChar(50)
+  toolKey       String         @unique @db.VarChar(50)
+  description   String?        @db.VarChar(200)
+  icon          String?        @db.VarChar(500)
+  pointsEnabled Boolean        @default(false)
+  pointsCost    Int            @default(0)
+  pointsMode    String         @default("per_use") @db.VarChar(20)
+  sortOrder     Int            @default(0)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  category      ToolCategory   @relation(fields: [categoryId], references: [id])
+  usageLogs     ToolUsageLog[]
+  unlocks       ToolUnlock[]
+
+  @@map("tools")
+}
+
+model ToolUsageLog {
+  id             Int      @id @default(autoincrement())
+  toolId         Int
+  userId         Int
+  pointsConsumed Int      @default(0)
+  resultData     Json?
+  isShared       Boolean  @default(false)
+  shareType      String   @default("none") @db.VarChar(20)
+  createdAt      DateTime @default(now())
+  tool           Tool     @relation(fields: [toolId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("tool_usage_log")
+}
+
+model ToolUnlock {
+  id             Int      @id @default(autoincrement())
+  toolId         Int
+  userId         Int
+  pointsConsumed Int
+  createdAt      DateTime @default(now())
+  tool           Tool     @relation(fields: [toolId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@unique([toolId, userId])
+  @@map("tool_unlocks")
+}
+
+model VideoParseLine {
+  id        Int      @id @default(autoincrement())
+  lineName  String   @db.VarChar(50)
+  apiUrl    String   @db.VarChar(500)
+  apiKey    String?  @db.VarChar(200)
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("video_parse_lines")
+}
+
+// ========== 系统管理 ==========
+
+model SystemSetting {
+  id           Int      @id @default(autoincrement())
+  settingKey   String   @unique @db.VarChar(50)
+  settingValue String?  @db.VarChar(500)
+  updatedAt    DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(50)
+  passwordHash String   @db.VarChar(255)
+  nickname     String?  @db.VarChar(50)
+  roleId       Int?
+  status       String   @default("active") @db.VarChar(20)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  roleName    String           @db.VarChar(50)
+  roleKey     String           @db.VarChar(50)
+  description String?          @db.VarChar(200)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  permissions RolePermission[]
+  users       RoleUser[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id        Int              @id @default(autoincrement())
+  permName  String           @db.VarChar(50)
+  permKey   String           @db.VarChar(50)
+  parentId  Int?
+  sortOrder Int              @default(0)
+  createdAt DateTime         @default(now())
+  roles     RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@map("role_permissions")
+}
+
+model RoleUser {
+  id          Int  @id @default(autoincrement())
+  adminUserId Int
+  roleId      Int
+  role        Role @relation(fields: [roleId], references: [id])
+
+  @@map("role_users")
+}
+
+model DictType {
+  id          Int      @id @default(autoincrement())
+  typeName    String   @db.VarChar(50)
+  typeKey     String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(200)
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  dicts       Dict[]
+
+  @@map("dict_types")
+}
+
+model Dict {
+  id        Int      @id @default(autoincrement())
+  dictType  String   @db.VarChar(50)
+  dictLabel String   @db.VarChar(50)
+  dictValue String   @db.VarChar(50)
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type      DictType @relation(fields: [dictType], references: [typeKey])
+
+  @@map("dicts")
+}
+
+model NotificationType {
+  id            Int            @id @default(autoincrement())
+  typeName      String         @db.VarChar(50)
+  sortOrder     Int            @default(0)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  notifications Notification[]
+
+  @@map("notification_types")
+}
+
+model Notification {
+  id          Int                @id @default(autoincrement())
+  typeId      Int
+  title       String             @db.VarChar(200)
+  content     String             @db.Text
+  target      String             @db.VarChar(20) // all/undergrad/grad/freshman
+  publishTime DateTime           @default(now())
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  type        NotificationType   @relation(fields: [typeId], references: [id])
+  reads       NotificationRead[]
+
+  @@map("notifications")
+}
+
+model NotificationRead {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  notificationId Int
+  readAt         DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [id])
+  notification   Notification @relation(fields: [notificationId], references: [id])
+
+  @@unique([userId, notificationId])
+  @@map("notification_reads")
+}
+
+model Menu {
+  id        Int      @id @default(autoincrement())
+  parentId  Int      @default(0)
+  menuName  String   @db.VarChar(50)
+  menuKey   String   @unique @db.VarChar(50)
+  menuType  String   @db.VarChar(20) // menu/button
+  icon      String?  @db.VarChar(100)
+  path      String?  @db.VarChar(200)
+  component String?  @db.VarChar(200)
+  sortOrder Int      @default(0)
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("menus")
+}
+
+model File {
+  id           Int      @id @default(autoincrement())
+  originalName String   @db.VarChar(255)
+  storedName   String   @db.VarChar(255)
+  filePath     String   @db.VarChar(500)
+  fileSize     BigInt
+  mimeType     String   @db.VarChar(100)
+  uploaderId   Int?
+  relatedType  String?  @db.VarChar(50)
+  relatedId    Int?
+  createdAt    DateTime @default(now())
+
+  @@map("files")
+}
+
+// ========== 日志与监控 ==========
+
+model UserFeedback {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  content   String   @db.Text
+  contact   String?  @db.VarChar(100)
+  status    String   @default("pending") @db.VarChar(20)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("user_feedback")
+}
+
+model SystemLog {
+  id        Int      @id @default(autoincrement())
+  level     String   @db.VarChar(20) // info/warn/error
+  module    String?  @db.VarChar(50)
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("system_logs")
+}
+
+model LoginLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  ip        String?  @db.VarChar(50)
+  userAgent String?  @db.VarChar(255)
+  status    String   @db.VarChar(20) // success/fail
+  createdAt DateTime @default(now())
+
+  @@map("login_logs")
+}
+
+model OperationLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  module    String?  @db.VarChar(50)
+  action    String?  @db.VarChar(100)
+  detail    Json?
+  ip        String?  @db.VarChar(50)
+  createdAt DateTime @default(now())
+
+  @@map("operation_logs")
+}

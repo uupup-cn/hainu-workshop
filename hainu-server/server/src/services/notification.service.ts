@@ -1,0 +1,7 @@
+import { prisma } from '../utils/prisma';
+import { ApiError } from '../utils/api-error';
+import { paginatedResult } from '../utils/pagination';
+export async function getNotifications(userId: number, identity: string, page = 1, size = 20) { const where = { isActive: true, OR: [{ target: 'all' }, { target: identity }] }; const [list, total] = await Promise.all([prisma.notification.findMany({ where, skip: (page-1)*size, take: size, orderBy: { publishTime: 'desc' } }), prisma.notification.count({ where })]); const reads = await prisma.notificationRead.findMany({ where: { userId } }); const rids = new Set(reads.map(r => r.notificationId)); return paginatedResult(list.map(n => ({ ...n, isRead: rids.has(n.id) })), total, page, size); }
+export async function getNotificationDetail(id: number) { const n = await prisma.notification.findUnique({ where: { id } }); if (!n || !n.isActive) throw new ApiError(40003, '通知不存在'); return n; }
+export async function markAsRead(userId: number, nid: number) { await prisma.notificationRead.upsert({ where: { userId_notificationId: { userId, notificationId: nid } }, create: { userId, notificationId: nid }, update: { readAt: new Date() } }); return true; }
+export async function getUnreadCount(userId: number, identity: string) { const where = { isActive: true, OR: [{ target: 'all' }, { target: identity }] }; const t = await prisma.notification.count({ where }); const r = await prisma.notificationRead.count({ where: { userId } }); return { unreadCount: t - r }; }

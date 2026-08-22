@@ -1,0 +1,17 @@
+import Router from 'koa-router';
+import { authMiddleware } from '../middlewares/auth.middleware';
+import * as ctrl from '../controllers/alumni.controller';
+const router = new Router({ prefix: '/api/v1/alumni' });
+router.get('/sections', authMiddleware, ctrl.getSections);
+router.get('/posts', authMiddleware, ctrl.getPosts);
+router.get('/posts/:id', authMiddleware, ctrl.getPost);
+router.post('/posts', authMiddleware, ctrl.createPost);
+router.delete('/posts/:id', authMiddleware, ctrl.deletePost);
+router.post('/posts/:id/like', authMiddleware, ctrl.likePost);
+router.delete('/posts/:id/like', authMiddleware, ctrl.unlikePost);
+router.get('/posts/:id/comments', authMiddleware, ctrl.getComments);
+router.post('/posts/:id/comments', authMiddleware, ctrl.createComment);
+router.delete('/comments/:id', authMiddleware, ctrl.deleteComment);
+router.post('/posts/:id/report', authMiddleware, ctrl.reportPost);
+router.post('/comments/:id/report', authMiddleware, ctrl.reportComment);
+export default router;

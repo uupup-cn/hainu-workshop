@@ -1,0 +1,11 @@
+import Router from 'koa-router';
+import { authMiddleware, optionalAuthMiddleware } from '../middlewares/auth.middleware';
+import * as ctrl from '../controllers/course.controller';
+const router = new Router({ prefix: '/api/v1/courses' });
+router.get('/', optionalAuthMiddleware, ctrl.getCourses);
+router.post('/', authMiddleware, ctrl.createCourse);
+router.put('/:id', authMiddleware, ctrl.updateCourse);
+router.delete('/:id', authMiddleware, ctrl.deleteCourse);
+router.post('/share', authMiddleware, ctrl.shareCourse);
+router.post('/replicate', authMiddleware, ctrl.replicateCourse);
+export default router;

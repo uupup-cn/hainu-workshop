@@ -1,0 +1,12 @@
+import Router from 'koa-router';
+import { authMiddleware } from '../middlewares/auth.middleware';
+import * as ctrl from '../controllers/roommate.controller';
+const router = new Router({ prefix: '/api/v1/roommate' });
+router.get('/status', authMiddleware, ctrl.getStatus);
+router.get('/posts', authMiddleware, ctrl.getPosts);
+router.get('/posts/:id', authMiddleware, ctrl.getPost);
+router.post('/posts', authMiddleware, ctrl.createPost);
+router.get('/posts/my', authMiddleware, ctrl.getMyPost);
+router.put('/posts/:id', authMiddleware, ctrl.updatePost);
+router.post('/posts/match', authMiddleware, ctrl.matchPosts);
+export default router;
