@@ -229,6 +229,25 @@ async function main() {
     await prisma.notification.create({ data: { typeId: nt.id, title: '欢迎使用海大工坊', content: '欢迎来到海大工坊，祝你校园生活愉快！', target: 'all' } });
   }
 
+  // ===== 管理后台菜单（动态路由 + 按钮权限）=====
+  if ((await prisma.menu.count()) === 0) {
+    const { buildMenuSeed } = await require('./menu-data');
+    const items = buildMenuSeed();
+    const idByKey = new Map<string, number>();
+    // 先插入根节点，再按父子两层遍历解析 parentId
+    for (const it of items.filter((i: any) => !i.parentId)) {
+      const row = await prisma.menu.create({ data: { menuName: it.menuName, menuKey: it.menuKey, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible } });
+      idByKey.set(it.menuKey, row.id);
+    }
+    for (let depth = 0; depth < 3; depth++) {
+      for (const it of items.filter((i: any) => i.parentId && !idByKey.has(i.menuKey) && idByKey.has(i.parentId))) {
+        const row = await prisma.menu.create({ data: { menuName: it.menuName, menuKey: it.menuKey, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible, parentId: idByKey.get(it.parentId as string)! } });
+        idByKey.set(it.menuKey, row.id);
+      }
+    }
+    console.log('[seed] 菜单已植入：' + idByKey.size + ' 项');
+  }
+
   console.log('[seed] 种子数据完成：管理员 admin/123456，测试用户 00001/00002（密码 123456）');
 }
 

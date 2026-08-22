@@ -10,7 +10,9 @@ let failCount = 0;
 const failures = [];
 
 async function call(method, path, body, token) {
-  const res = await fetch(BASE + path, {
+  // /api/ 开头为绝对路径（如 /api/v3/...），需补上 origin
+  const url = path.startsWith('/api/') ? BASE.replace(/\/api\/v1$/, '') + path : BASE + path;
+  const res = await fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
     body: body ? JSON.stringify(body) : undefined,
@@ -170,6 +172,33 @@ async function main() {
     await check('操作日志', 'GET', '/admin/operation-logs', undefined, adminToken);
     await check('用户反馈', 'GET', '/admin/feedback', undefined, adminToken);
     await check('无Token访问返回40002', 'GET', '/admin/users', undefined, undefined, 40002);
+
+    console.log('[管理端·模板集成]');
+    await check('图形验证码', 'GET', '/auth/captcha');
+    await check('管理员退出', 'POST', '/auth/logout');
+    const info = await check('当前管理员信息', 'GET', '/user/info', undefined, adminToken);
+    if (!(info && info.data && Array.isArray(info.data.roles))) { failCount++; failures.push('当前管理员信息 → 缺少 roles 数组'); }
+    const menus = await check('动态菜单树', 'GET', '/api/v3/system/menus', undefined, adminToken);
+    if (menus && menus.data) {
+      if (!Array.isArray(menus.data) || menus.data.length < 8) { failCount++; failures.push('动态菜单树 → 根节点数 ' + (Array.isArray(menus.data) ? menus.data.length : '非数组') + '（期望 ≥8）'); }
+      const first = menus.data && menus.data[0];
+      if (!first || !first.meta || !first.meta.title || !first.component) { failCount++; failures.push('动态菜单树 → 首节点缺少 meta/component'); }
+    }
+    await check('菜单管理树', 'GET', '/api/v3/system/menus/manage', undefined, adminToken);
+    await check('后台用户列表', 'GET', '/user', undefined, adminToken);
+    await check('角色列表(模板)', 'GET', '/roles', undefined, adminToken);
+    await check('权限目录', 'GET', '/api-permissions/catalog', undefined, adminToken);
+    await check('字典类型(模板)', 'GET', '/dicts/types', undefined, adminToken);
+    await check('站点设置(模板)', 'GET', '/site-settings/admin', undefined, adminToken);
+    await check('文件列表(模板)', 'GET', '/files', undefined, adminToken);
+    await check('监控概览(模板)', 'GET', '/monitor/overview', undefined, adminToken);
+    await check('在线用户(模板)', 'GET', '/monitor/online-users', undefined, adminToken);
+    await check('操作日志(模板)', 'GET', '/logs/operation', undefined, adminToken);
+    await check('登录日志(模板)', 'GET', '/logs/login', undefined, adminToken);
+    await check('反馈列表(模板)', 'GET', '/feedback', undefined, adminToken);
+    await check('反馈概览(模板)', 'GET', '/feedback/overview', undefined, adminToken);
+    await check('通知管理(模板)', 'GET', '/notifications/admin', undefined, adminToken);
+    await check('访客趋势(模板)', 'GET', '/monitor/visitor-analytics', undefined, adminToken);
   }
 
   // ===== 结果 =====

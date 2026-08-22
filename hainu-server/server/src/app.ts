@@ -10,6 +10,8 @@ app.use(cors({ origin: config.corsOrigin, credentials: true }));
 app.use(bodyParser());
 
 // 路由
+// 模板集成路由必须先挂载：其字面量路径（如 /notifications/admin）需优先于用户端参数路由（/notifications/:id）
+import integrationRoutes from './routes/admin/integration.routes';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import contentRoutes from './routes/content.routes';
@@ -33,6 +35,7 @@ import adminToolRoutes from './routes/admin/tool.routes';
 import adminSystemRoutes from './routes/admin/system.routes';
 import adminMonitorRoutes from './routes/admin/monitor.routes';
 
+app.use(integrationRoutes.routes()).use(integrationRoutes.allowedMethods());
 app.use(authRoutes.routes()).use(authRoutes.allowedMethods());
 app.use(userRoutes.routes()).use(userRoutes.allowedMethods());
 app.use(contentRoutes.routes()).use(contentRoutes.allowedMethods());
