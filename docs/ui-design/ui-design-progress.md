@@ -36,6 +36,7 @@
 | [06-wireframes-batch-05.md](records/06-wireframes-batch-05.md) | 第五批线框 · 社区/课表/工具箱/个人 | ✅ 已完成 |
 | [07-wireframes-batch-06.md](records/07-wireframes-batch-06.md) | 第六批线框 · 账号/设置 | ✅ 已完成 |
 | [component-review.md](component-review.md) | 组件审查结论与最终组件清单（28 个） | ✅ 已执行 |
+| [08-confession-moments-style.md](records/08-confession-moments-style.md) | 表白墙微信朋友圈样式设计规范 | ✅ 已确认 |
 
 ## 二、线框进度
 
