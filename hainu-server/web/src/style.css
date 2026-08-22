@@ -1,0 +1,88 @@
+/**
+ * 全局样式 — 引用 UI 设计系统 Design Tokens（docs/ui-design/records/00-design-system.md）
+ * 响应式断点：≤768px 手机（对齐小程序体验）/ >768px 电脑（完整网站布局）
+ */
+:root {
+  /* 色彩令牌 */
+  --primary-50: #eaf2fe; --primary-100: #d1e3fc; --primary-500: #1d6feb; --primary-700: #11448f; --primary-900: #08214d;
+  --mint-500: #16b3a3; --orange-500: #f59e0b;
+  --success: #10b981; --success-bg: #d1fae5; --warning: #f59e0b; --warning-bg: #fef3c7;
+  --danger: #ef4444; --danger-bg: #fee2e2; --info: #3b82f6;
+  --neutral-0: #ffffff; --neutral-50: #fafafa; --neutral-100: #f4f5f7; --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db; --neutral-400: #9ca3af; --neutral-500: #6b7280;
+  --neutral-600: #4b5563; --neutral-700: #374151; --neutral-800: #1f2937; --neutral-900: #111827;
+  /* 圆角 */
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-full: 999px;
+  /* 阴影 */
+  --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.06), 0 1px 3px rgba(17, 24, 39, 0.08);
+  --shadow-float: 0 4px 16px rgba(17, 24, 39, 0.12);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  background: var(--neutral-100); color: var(--neutral-900); font-size: 14px; line-height: 22px;
+}
+a { color: var(--primary-500); text-decoration: none; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* 布局 */
+.container { max-width: 1080px; margin: 0 auto; padding: 24px 16px 32px; }
+
+/* 卡片 */
+.card {
+  background: var(--neutral-0); border-radius: var(--radius-lg); padding: 20px;
+  margin-bottom: 16px; box-shadow: var(--shadow-card);
+}
+.card-title { font-size: 18px; font-weight: 600; line-height: 26px; margin: 0 0 12px; color: var(--neutral-900); }
+
+/* 按钮 */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
+  padding: 8px 20px; font-size: 16px; font-weight: 500; line-height: 24px;
+  border: none; border-radius: var(--radius-md); background: var(--primary-500); color: #fff;
+  transition: background 0.2s;
+}
+.btn:hover { background: var(--primary-700); }
+.btn-plain { background: var(--primary-50); color: var(--primary-500); }
+.btn-plain:hover { background: var(--primary-100); }
+.btn-sm { padding: 4px 12px; font-size: 14px; }
+.btn:disabled { background: var(--neutral-300); cursor: not-allowed; }
+
+/* 输入框 */
+.input, .select {
+  padding: 8px 12px; font-size: 14px; border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md); outline: none; background: var(--neutral-0); color: var(--neutral-900);
+}
+.input:focus, .select:focus { border-color: var(--primary-500); }
+
+/* 标签 */
+.tag {
+  display: inline-flex; align-items: center; padding: 1px 8px; font-size: 11px; font-weight: 500; line-height: 18px;
+  border-radius: var(--radius-full); background: var(--primary-50); color: var(--primary-500);
+}
+.tag-mint { background: rgba(22, 179, 163, 0.12); color: var(--mint-500); }
+.tag-orange { background: var(--warning-bg); color: var(--orange-500); }
+.tag-danger { background: var(--danger-bg); color: var(--danger); }
+
+/* 列表项 */
+.list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--neutral-100); }
+.list-item:last-child { border-bottom: none; }
+
+/* 空状态 / 加载 */
+.empty { padding: 48px 0; text-align: center; color: var(--neutral-400); font-size: 14px; }
+.loading { padding: 48px 0; text-align: center; color: var(--neutral-400); }
+
+/* 分页条 */
+.pager { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 12px 0; }
+
+/* 页面标题区 */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.page-title { font-size: 22px; font-weight: 600; line-height: 30px; margin: 0; }
+
+/* 手机端：页面容器贴边、底部留出 TabBar 高度 */
+@media (max-width: 768px) {
+  .container { padding: 12px 12px calc(64px + env(safe-area-inset-bottom)); }
+  .card { border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+}
