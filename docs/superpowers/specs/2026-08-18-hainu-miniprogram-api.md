@@ -1,8 +1,8 @@
 # 海大工坊 · 微信小程序 — API 文档
 
-> 版本：v2.0
-> 日期：2026-08-19
-> 状态：初稿
+> 版本：v2.1
+> 日期：2026-08-23
+> 状态：初稿（v2.1 补充管理后台模板集成接口）
 
 ---
 
@@ -820,3 +820,52 @@ UID + 密码登录（网页端/小程序端通用）
 | GET | /api/v1/admin/files/:id/download | 下载文件 |
 | DELETE | /api/v1/admin/files/:id | 删除文件 |
 | GET | /api/v1/admin/files/stats | 文件统计（总大小/数量） |
+
+### 10.17 管理后台模板集成接口
+
+> v2.1 新增。管理后台基于 Art Design Pro 模板，其系统管理/监控页面为模板原生实现，按模板约定的路径与响应格式调用以下接口。
+> 这些接口与 §10.10-§10.16 操作同一批数据表，属于管理后台专属的集成层；小程序端与网页端不使用。
+
+**登录引导链路（后台登录后必须）：**
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v1/auth/captcha | 图形验证码（公开） |
+| POST | /api/v1/auth/logout | 退出登录（公开） |
+| GET | /api/v1/user/info | 当前管理员信息（含角色/按钮/接口权限码） |
+| GET | /api/v3/system/menus | 动态菜单树（驱动后台侧边栏与路由，数据来自 menus 表） |
+
+**功能管理（菜单）：**
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET | /api/v3/system/menus/manage | 菜单管理树（含按钮节点） |
+| POST | /api/v3/system/menus | 新增菜单 |
+| PATCH | /api/v3/system/menus/:id | 更新菜单 |
+| PATCH | /api/v3/system/menus/sort | 批量排序 |
+| DELETE | /api/v3/system/menus/:id | 删除菜单（级联子节点） |
+| POST / PATCH / DELETE | /api/v3/system/menus/:parentId/auths[/:authMark] | 按钮权限维护 |
+
+**后台用户 / 角色 / 字典 / 站点设置 / 文件 / 监控 / 日志 / 反馈 / 通知（均为管理端模板页面服务）：**
+
+| 方法 | 路径 | 说明 |
+|:----|:-----|:-----|
+| GET / POST | /api/v1/user | 后台用户列表 / 新增 |
+| PUT / PATCH / DELETE | /api/v1/user/:id | 编辑 / 删除后台用户（AdminUser 表） |
+| GET / PATCH | /api/v1/user/profile/me | 当前管理员资料 |
+| GET / POST / PUT / PATCH / DELETE | /api/v1/roles[/:id] | 角色 CRUD |
+| GET / PUT / PATCH | /api/v1/roles/:id/permissions | 角色权限分配 |
+| GET | /api/v1/api-permissions/catalog | 权限目录树（来自菜单按钮） |
+| GET | /api/v1/roles/data-permissions/meta | 数据权限元数据 |
+| GET / POST / PUT / PATCH / DELETE | /api/v1/dicts/types[/:id] | 字典类型 CRUD |
+| GET / POST / PUT / PATCH / DELETE | /api/v1/dicts/data[/:id] | 字典数据 CRUD |
+| GET / PUT / PATCH | /api/v1/site-settings/public \| /admin | 站点设置读取/更新（分组） |
+| GET / POST / DELETE | /api/v1/files* | 文件列表/上传凭证/代理上传/删除（File 表） |
+| GET / DELETE / POST | /api/v1/monitor/overview \| /online-users* \| /cache | 监控概览/在线用户/缓存 |
+| GET | /api/v1/monitor/visitor-analytics | 访问趋势（登录日志聚合） |
+| GET / DELETE | /api/v1/logs/operation* / logs/login | 操作/登录日志（含导出与清理） |
+| GET / POST / PUT | /api/v1/feedback* / :id/status | 用户反馈列表/处理/统计 |
+| GET / POST / PUT / DELETE | /api/v1/notifications/admin[/:id] | 通知管理 CRUD |
+| POST | /api/v1/notifications/admin/:id/publish \| /revoke | 通知发布/撤回 |
+
+> 实现说明：集成路由需先于用户端路由挂载，保证字面量路径（如 `/notifications/admin`）优先于参数路由（`/notifications/:id`）匹配。

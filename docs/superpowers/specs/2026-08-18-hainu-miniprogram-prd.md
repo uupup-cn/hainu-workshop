@@ -1,8 +1,8 @@
 # 海大工坊 · 微信小程序 — 产品需求文档 (PRD)
 
-> 版本：v2.0
-> 日期：2026-08-19
-> 状态：初稿
+> 版本：v2.1
+> 日期：2026-08-23
+> 状态：初稿（v2.1 补充工具箱题库设计与外部题库调研结论）
 
 ---
 
@@ -673,6 +673,29 @@
 | 10 | 模式切换：每次->一次性，之前付费不累计，下次触发一次性扣费 |
 | 11 | 分享功能（链接/海报生成/二维码跳转） |
 | 12 | 舒尔特方格多难度海报区分 |
+
+#### 3.6.7 题库设计（v2.1 补充）
+
+测试类工具采用**题库无关的维度得分协议**：题目与选项由前端维护，前端按题库计分规则汇总为各维度得分后提交，后端按维度得分计算结果类型（POST /api/v1/tools/:key/use 的 params 携带维度得分）。这样题库可以独立更新与替换，无需后端发版。
+
+各工具的维度得分协议：
+
+| 工具 | params.scores 字段 | 后端输出 |
+|:----|:-----|:-----|
+| SBTI / MBTI | E/I/S/N/T/F/J/P 八键 | 四维倾向百分比 + 四字母类型（16 型中文名） |
+| 黑暗三角 | machiavellianism / psychopathy / narcissism（0-100） | 三维得分与等级（低/中/高）+ 总体均值 |
+| 七宗罪VS七美德 | pride/envy/wrath/sloth/greed/gluttony/lust（0-100） | 七维罪与美德得分 + 主导罪/美德 + 概述 |
+
+**外部题库引用候选（开源调研结论，2026-08-23）：**
+
+| 工具 | 候选来源 | 许可证/说明 |
+|:----|:-----|:-----|
+| MBTI | [vsme/mbti](https://github.com/vsme/mbti)（仿 16Personalities 中文版）；[luhuadong/mbti-test](https://github.com/luhuadong/mbti-test)（28/40/93 题三版本）；[MskTmi/MBTI](https://github.com/MskTmi/MBTI)（93 题标准版） | MIT；另有小程序实现 [Solar-Rain-Git/zhixun-mbti](https://github.com/Solar-Rain-Git/zhixun-mbti) 可参考界面交互 |
+| SBTI | [pingfanfan/SBTI](https://github.com/pingfanfan/SBTI)（30 题 15 维度 27 型，题库 JSON 与代码分离）；[lzwme/sbti-pro](https://github.com/lzwme/sbti-pro) | 仓库 MIT；**题库文案原创权归 B 站原作者**，引用时需在页面注明出处 |
+| 黑暗三角 | SD3 短版黑暗三角量表（Jones & Paulhus, 2014，27 题 5 点李克特），参考 [Open Source Psychometrics](https://openpsychometrics.org/tests/SD3.php) | 学术量表，研究/教育用途可自由使用；中文版需自行翻译并做本土化校对 |
+| 七宗罪VS七美德 | 暂无成熟开源仓库 | 需自建：可按 7 维度 × 5 题（35 题情境题）结构设计，参考 TestWhat 等在线版本的维度划分思路，题目文案自写避免版权问题 |
+
+> 引用外部题库时：逐题标注维度归属与计分方向，转换为前端题库 JSON；保留原项目许可证与作者署名；娱乐性质测试需在结果页标注"仅供娱乐，非专业心理测量"。
 
 ---
 
