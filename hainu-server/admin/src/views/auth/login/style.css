@@ -1,0 +1,103 @@
+@reference '@styles/core/tailwind.css';
+
+/* 授权页右侧区域 */
+.auth-right-wrap {
+  @apply absolute inset-0 w-[440px] h-[650px] py-[5px] m-auto overflow-hidden
+    max-sm:px-7 max-sm:w-full
+    animate-[slideInRight_0.6s_cubic-bezier(0.25,0.46,0.45,0.94)_forwards]
+    max-md:animate-none;
+
+  .form {
+    @apply flex h-full flex-col justify-center py-0 max-sm:py-10;
+  }
+
+  .title {
+    @apply text-g-900 text-4xl font-semibold max-md:text-3xl max-sm:pt-10;
+  }
+
+  .sub-title {
+    @apply mt-[10px] text-g-600 text-sm;
+  }
+
+  .custom-height {
+    @apply !h-[40px];
+  }
+
+  .captcha-row {
+    @apply flex w-full items-center gap-3;
+  }
+
+  .captcha-input {
+    @apply flex-1;
+  }
+
+  .captcha-image {
+    @apply flex h-[40px] w-[124px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border p-0 text-xs text-g-500 transition-all;
+
+    background: var(--default-box-color);
+    border-color: var(--el-border-color);
+  }
+
+  .captcha-image:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--main-color) 46%, var(--el-border-color));
+  }
+
+  .captcha-image:disabled {
+    @apply cursor-not-allowed opacity-70;
+  }
+
+  .captcha-loading {
+    @apply select-none;
+  }
+
+  .captcha-svg {
+    @apply flex h-full w-full items-center justify-center;
+  }
+
+  .captcha-svg svg {
+    @apply h-full w-full;
+  }
+
+  .captcha-svg svg rect:nth-of-type(2) {
+    stroke: transparent;
+  }
+}
+
+.dark .auth-right-wrap {
+  .captcha-image {
+    background:
+      linear-gradient(135deg, rgb(55 125 255 / 10%), transparent 45%),
+      color-mix(in srgb, var(--default-box-color) 82%, #05070c);
+    border-color: rgb(255 255 255 / 12%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+  }
+
+  .captcha-image:hover:not(:disabled) {
+    border-color: rgb(55 125 255 / 46%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 8%),
+      0 0 0 3px rgb(55 125 255 / 12%);
+  }
+
+  .captcha-svg svg rect:first-of-type {
+    fill: #151821;
+  }
+
+  .captcha-svg svg text {
+    stroke: rgb(12 14 20 / 70%);
+    stroke-width: 0.85px;
+  }
+}
+
+/* 滑入动画 */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

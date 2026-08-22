@@ -1,0 +1,305 @@
+.app-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--default-bg-color);
+
+  #app-sidebar {
+    flex-shrink: 0;
+  }
+
+  #app-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    height: 100vh;
+    overflow: auto;
+
+    #app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    #app-content {
+      flex: 1;
+
+      :deep(.layout-content) {
+        box-sizing: border-box;
+        width: calc(100% - 40px);
+        margin: auto;
+
+        // 子页面默认 style
+        .page-content {
+          position: relative;
+          box-sizing: border-box;
+          padding: 20px;
+          overflow: hidden;
+          background: var(--art-surface-bg);
+          border-radius: var(--art-radius-surface) !important;
+        }
+      }
+    }
+  }
+
+  &.app-layout--sidebar {
+    display: block;
+
+    // Header is 60px high plus its bottom border.
+    --sidebar-layout-header-height: 61px;
+    --sidebar-layout-content-gap: 16px;
+
+    #app-main {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      background: var(--default-box-color);
+    }
+
+    .app-body {
+      display: flex;
+      align-items: stretch;
+      height: calc(100vh - var(--sidebar-layout-header-height));
+      min-height: 0;
+    }
+
+    #app-sidebar {
+      position: sticky;
+      top: var(--sidebar-layout-header-height);
+      z-index: 40;
+      flex-shrink: 0;
+      height: calc(100vh - var(--sidebar-layout-header-height));
+    }
+
+    .app-content-shell {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    #app-worktab {
+      flex-shrink: 0;
+      background: var(--default-box-color);
+      border-bottom: 1px solid var(--default-border);
+
+      :deep(.art-work-tab) {
+        height: 48px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        margin-bottom: 0;
+        background: var(--default-box-color) !important;
+        border-top: 0 !important;
+        border-bottom: 0 !important;
+      }
+
+      :deep(.art-work-tab--tab-google) {
+        align-items: flex-end;
+        height: 40px;
+        padding-top: 8px;
+        padding-bottom: 0;
+      }
+    }
+
+    #app-content {
+      box-sizing: border-box;
+      flex: 1;
+      min-height: 0;
+      padding-top: var(--sidebar-layout-content-gap);
+      overflow: auto;
+    }
+  }
+
+  &.app-layout--content-full {
+    display: block;
+
+    --content-full-layout-content-gap: 16px;
+
+    #app-main {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #app-content {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100vh;
+      padding-top: var(--content-full-layout-content-gap);
+      overflow: auto;
+
+      :deep(.dashboard-page) {
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  .content-full-settings-entry {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    z-index: 1200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    color: #fff;
+    cursor: pointer;
+    background: var(--theme-color);
+    border: 0;
+    border-radius: var(--custom-radius) 0 0 var(--custom-radius);
+    transition:
+      width 0.2s ease,
+      height 0.2s ease,
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      opacity 0.2s ease;
+    transform: translateY(-50%);
+
+    &:hover {
+      background: var(--theme-color);
+    }
+
+    &.is-collapse-ready {
+      width: 34px;
+      color: var(--art-gray-500);
+      background: var(--default-box-color);
+      border: 1px solid var(--default-border);
+    }
+
+    &.is-collapsed {
+      width: 12px;
+      height: 44px;
+      color: var(--art-gray-400);
+      background: color-mix(in srgb, var(--default-box-color) 90%, transparent);
+      border: 1px solid var(--default-border);
+      border-right: 0;
+      border-radius: var(--custom-radius) 0 0 var(--custom-radius);
+      opacity: 0.72;
+
+      &:hover {
+        width: 18px;
+        color: var(--art-gray-600);
+        background: var(--default-box-color);
+        opacity: 1;
+      }
+    }
+
+    .art-svg-icon {
+      font-size: 18px;
+    }
+  }
+}
+
+[dir='rtl'] .app-layout {
+  .content-full-settings-entry {
+    right: auto;
+    left: 0;
+    border-radius: 0 var(--custom-radius) var(--custom-radius) 0;
+
+    &.is-collapsed {
+      border-right: 1px solid var(--default-border);
+      border-left: 0;
+      border-radius: 0 var(--custom-radius) var(--custom-radius) 0;
+    }
+
+    &:hover {
+      background: var(--theme-color);
+    }
+  }
+}
+
+@media only screen and (width <= 1180px) {
+  .app-layout {
+    #app-main {
+      height: 100dvh;
+    }
+  }
+}
+
+@media only screen and (width <= 800px) {
+  .app-layout {
+    position: relative;
+
+    #app-main {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+
+      #app-content {
+        :deep(.layout-content) {
+          width: calc(100% - 40px);
+        }
+      }
+    }
+
+    &.app-layout--sidebar {
+      #app-main {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+      }
+
+      .app-body {
+        display: block;
+        height: auto;
+        min-height: auto;
+      }
+
+      #app-sidebar {
+        position: static;
+        height: auto;
+      }
+
+      .app-content-shell {
+        display: block;
+        min-height: auto;
+      }
+
+      #app-content {
+        padding-top: 0;
+        padding-bottom: 0;
+        overflow: visible;
+      }
+    }
+
+    &.app-layout--content-full {
+      #app-main {
+        height: auto;
+        overflow: visible;
+      }
+
+      #app-content {
+        height: auto;
+        padding-top: 0;
+        padding-bottom: 0;
+        overflow: visible;
+      }
+    }
+  }
+}
+
+@media only screen and (width <= 640px) {
+  .app-layout {
+    #app-main {
+      #app-content {
+        :deep(.layout-content) {
+          width: calc(100% - 30px);
+        }
+      }
+    }
+  }
+}

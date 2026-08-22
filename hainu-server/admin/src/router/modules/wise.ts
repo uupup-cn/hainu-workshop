@@ -1,0 +1,17 @@
+import { AppRouteRecord } from '@/types/router'
+export const wiseRoutes: AppRouteRecord = {
+  path: '/wise', name: 'Wise', component: '/index/index',
+  meta: { title: '智慧海大', icon: 'ri:building-line' },
+  children: [
+    { path: 'intro', name: 'WiseIntro', component: '/wise/intro/index', meta: { title: '海大介绍', icon: 'ri:information-line', keepAlive: true } },
+    { path: 'phonebook', name: 'WisePhonebook', component: '/wise/phonebook/index', meta: { title: '电话簿', icon: 'ri:phone-line', keepAlive: true } },
+    { path: 'calendar', name: 'WiseCalendar', component: '/wise/calendar/index', meta: { title: '校历', icon: 'ri:calendar-line', keepAlive: true } },
+    { path: 'map', name: 'WiseMap', component: '/wise/map/index', meta: { title: '校园地图', icon: 'ri:map-2-line', keepAlive: true } },
+    { path: 'bus', name: 'WiseBus', component: '/wise/bus/index', meta: { title: '校园出行', icon: 'ri:bus-line', keepAlive: true } },
+    { path: 'campus-database/campus', name: 'CampusDB', component: '/wise/campus-database/campus/index', meta: { title: '校区管理', icon: 'ri:community-line', keepAlive: true } },
+    { path: 'campus-database/department', name: 'CampusDept', component: '/wise/campus-database/department/index', meta: { title: '学院管理', icon: 'ri:school-line', keepAlive: true } },
+    { path: 'campus-database/major', name: 'CampusMajor', component: '/wise/campus-database/major/index', meta: { title: '专业管理', icon: 'ri:book-line', keepAlive: true } },
+    { path: 'campus-database/college', name: 'CampusCollege', component: '/wise/campus-database/college/index', meta: { title: '书院管理', icon: 'ri:home-line', keepAlive: true } },
+    { path: 'campus-database/building', name: 'CampusBuilding', component: '/wise/campus-database/building/index', meta: { title: '楼栋管理', icon: 'ri:building-2-line', keepAlive: true } }
+  ]
+}

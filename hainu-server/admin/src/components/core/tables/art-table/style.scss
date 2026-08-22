@@ -1,0 +1,320 @@
+.art-table {
+  position: relative;
+  height: 100%;
+
+  .el-table {
+    height: 100%;
+    margin-top: 10px;
+  }
+
+  &.is-mobile-card {
+    height: auto !important;
+    min-height: 0;
+  }
+
+  .art-table-mobile {
+    position: relative;
+    min-height: 220px;
+    padding-top: 10px;
+  }
+
+  .art-table-mobile__list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .art-table-mobile__empty {
+    min-height: 240px;
+  }
+
+  .art-table-mobile-card {
+    padding: 14px;
+    cursor: pointer;
+    background: var(--default-box-color);
+    border: 1px solid var(--default-border);
+    border-radius: var(--custom-radius);
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease,
+      transform 0.18s ease;
+
+    &:active {
+      transform: scale(0.995);
+    }
+  }
+
+  .art-table-mobile-card__header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .art-table-mobile-card__checkbox {
+    display: inline-flex;
+    flex: 0 0 16px;
+    align-items: center;
+    width: 16px;
+    min-width: 16px;
+    height: 28px;
+    margin-right: 0;
+
+    :deep(.el-checkbox__label) {
+      display: none;
+      padding-left: 0;
+    }
+  }
+
+  .art-table-mobile-card__index {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 9px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-color);
+    background: color-mix(in srgb, var(--theme-color) 10%, transparent);
+    border-radius: 999px;
+  }
+
+  .art-table-mobile-card__title-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .art-table-mobile-card__title {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    min-height: 28px;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--art-gray-900);
+    overflow-wrap: anywhere;
+  }
+
+  .art-table-mobile-card__subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-top: 5px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--art-gray-500);
+  }
+
+  .art-table-mobile-card__subtitle-item {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .art-table-mobile-card__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding-top: 13px;
+    margin-top: 13px;
+    border-top: 1px solid var(--default-border);
+  }
+
+  .art-table-mobile-card__field {
+    display: grid;
+    grid-template-columns: minmax(72px, 34%) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    min-width: 0;
+  }
+
+  .art-table-mobile-card__field.is-full {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .art-table-mobile-card__label {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--art-gray-600);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .art-table-mobile-card__value {
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--art-gray-800);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .art-table-mobile-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+    padding-top: 12px;
+    margin-top: 12px;
+    border-top: 1px solid var(--default-border);
+
+    :deep(.el-button) {
+      min-height: 32px;
+      margin-left: 0;
+    }
+
+    :deep(.art-button-table) {
+      margin-right: 0 !important;
+      margin-left: 10px !important;
+    }
+
+    :deep(.art-button-table:first-child) {
+      margin-left: 0 !important;
+    }
+  }
+
+  :deep(.el-loading-mask) {
+    z-index: 100;
+    background-color: var(--default-box-color) !important;
+  }
+
+  :deep(.el-table__header-wrapper .art-table-header-draggable) {
+    cursor: grab;
+    user-select: none;
+  }
+
+  &.is-header-text-selecting {
+    :deep(.el-table__header-wrapper .art-table-header-draggable),
+    :deep(.el-table__header-wrapper .art-table-header-draggable .cell) {
+      cursor: text;
+      user-select: text;
+    }
+  }
+
+  :deep(.el-table__header-wrapper .art-table-header-drag-fixed) {
+    cursor: default;
+  }
+
+  :deep(.art-table-header-drag-chosen) {
+    background-color: transparent !important;
+  }
+
+  :deep(.art-table-header-drag-ghost) {
+    background-color: var(--el-fill-color) !important;
+    opacity: 0.58;
+  }
+
+  :deep(.art-table-header-drag-fallback),
+  :deep(.art-table-header-dragging) {
+    color: var(--art-gray-800);
+    cursor: grabbing;
+    background-color: var(--default-box-color) !important;
+    border: 1px solid color-mix(in srgb, var(--default-border) 80%, transparent);
+    box-shadow:
+      0 8px 20px rgb(15 23 42 / 12%),
+      0 2px 6px rgb(15 23 42 / 9.6%);
+    opacity: 1 !important;
+  }
+
+  &.is-header-dragging {
+    :deep(.art-table-header-drag-chosen) {
+      background-color: var(--el-fill-color-light) !important;
+    }
+
+    :deep(.el-table__header-wrapper .art-table-header-draggable) {
+      transition: background-color 0.18s ease;
+    }
+  }
+
+  // Loading 过渡动画 - 消失时淡出
+  .loading-fade-leave-active {
+    transition: opacity 0.3s ease-out;
+  }
+
+  .loading-fade-leave-to {
+    opacity: 0;
+  }
+
+  // 空状态垂直居中
+  &.is-empty {
+    :deep(.el-scrollbar__wrap) {
+      display: flex;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    padding-bottom: 16px;
+    margin-top: 13px;
+
+    :deep(.el-select) {
+      width: 102px !important;
+    }
+
+    // 分页对齐方式
+    &.left {
+      justify-content: flex-start;
+    }
+
+    &.center {
+      justify-content: center;
+    }
+
+    &.right {
+      justify-content: flex-end;
+    }
+
+    // 自定义分页组件样式
+    &.custom-pagination {
+      :deep(.el-pagination) {
+        .btn-prev,
+        .btn-next {
+          background-color: transparent;
+          border: 1px solid var(--art-gray-300);
+          transition: border-color 0.15s;
+
+          &:hover:not(.is-disabled) {
+            color: var(--theme-color);
+            border-color: var(--theme-color);
+          }
+        }
+
+        li {
+          box-sizing: border-box;
+          font-weight: 400 !important;
+          background-color: transparent;
+          border: 1px solid var(--art-gray-300);
+          transition: border-color 0.15s;
+
+          &.is-active {
+            font-weight: 400;
+            color: #fff;
+            background-color: var(--theme-color);
+            border: 1px solid var(--theme-color);
+          }
+
+          &:hover:not(.is-disabled) {
+            border-color: var(--theme-color);
+          }
+        }
+      }
+    }
+  }
+}
+
+// 移动端分页
+@media (width <= 640px) {
+  :deep(.el-pagination) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px 0;
+    align-items: center;
+    justify-content: center;
+  }
+}

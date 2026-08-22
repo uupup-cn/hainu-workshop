@@ -1,0 +1,462 @@
+{
+  "sidebarUpsell": {
+    "title": "Buy a license",
+    "desc": "Full-stack commercial solution. Buy a license to access the source code and continuous updates.",
+    "primary": "Product overview",
+    "secondary": "View pricing",
+    "close": "Minimize license card",
+    "restore": "Restore license card"
+  },
+  "httpMsg": {
+    "unauthorized": "Unauthorized access, please login again",
+    "sessionExpired": "Session expired, please login again",
+    "forbidden": "Access to this resource is forbidden",
+    "notFound": "The requested resource does not exist",
+    "methodNotAllowed": "Request method not allowed",
+    "requestTimeout": "Request timeout, please try again later",
+    "internalServerError": "Internal server error, please try again later",
+    "badGateway": "Service is starting. Please refresh and try again shortly",
+    "serviceUnavailable": "Service is starting. Please try again shortly",
+    "gatewayTimeout": "Service is starting. Please try again shortly",
+    "requestCancelled": "Request cancelled",
+    "networkError": "Network connection error, please check your connection",
+    "backendUnavailable": "Service is not ready or restarting. Please try again shortly",
+    "requestFailed": "Request failed",
+    "requestConfigError": "Request configuration error"
+  },
+  "topBar": {
+    "search": {
+      "title": "Search"
+    },
+    "user": {
+      "userCenter": "User center",
+      "docs": "Document",
+      "github": "Github",
+      "lockScreen": "Lock screen",
+      "logout": "Log out",
+      "upgrade": "Buy license"
+    }
+  },
+  "common": {
+    "tips": "Prompt",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "logOutTips": "Do you want to log out?"
+  },
+  "search": {
+    "placeholder": "Search pages, pinyin, initials, or actions like Add user",
+    "historyTitle": "Search history",
+    "recentTitle": "Recent",
+    "frequentTitle": "Frequent",
+    "matchHint": "Matched by",
+    "emptyState": "Search page names, pinyin, initials, or quick actions like Add user",
+    "noResult": "No matching results",
+    "noResultTip": "Try pinyin, initials, or a shorter keyword",
+    "removeRecent": "Remove from recent",
+    "removeFrequent": "Remove from frequent",
+    "clearRecent": "Clear recent",
+    "clearFrequent": "Clear frequent",
+    "switchKeydown": "Navigate",
+    "selectKeydown": "Select",
+    "exitKeydown": "Close"
+  },
+  "setting": {
+    "menuType": {
+      "title": "Menu Layout",
+      "list": ["Dual", "Vertical", "Horizontal", "Mixed", "Hover", "Sidebar", "Content Full"]
+    },
+    "theme": {
+      "title": "Theme Style",
+      "list": ["Light", "Dark", "System"]
+    },
+    "box": {
+      "title": "Box Style",
+      "list": ["Border", "Shadow"]
+    },
+    "container": {
+      "title": "Container Width",
+      "list": ["Full", "Boxed"]
+    },
+    "direction": {
+      "title": "Layout Direction",
+      "list": ["LTR", "RTL"]
+    },
+    "basics": {
+      "title": "Basic Config",
+      "list": {
+        "multiTab": "Show work tab",
+        "accordion": "Sidebar opens accordion",
+        "collapseSidebar": "Show sidebar button",
+        "reloadPage": "Show reload page button",
+        "fastEnter": "Show fast enter",
+        "breadcrumb": "Show crumb navigation",
+        "language": "Show multilingual selection",
+        "direction": "Layout direction",
+        "progressBar": "Show top progress bar",
+        "mobileTableCard": "Mobile table card mode",
+        "weakMode": "Color Weakness Mode",
+        "watermark": "Global watermark",
+        "watermarkDisabledTip": "Admin disabled watermark, global watermark cannot be shown",
+        "complianceFooter": "Show copyright and compliance",
+        "menuWidth": "Menu width",
+        "tabStyle": "Tab style",
+        "pageTransition": "Page animation",
+        "borderRadius": "Custom radius"
+      }
+    },
+    "menuColorMode": {
+      "title": "Menu Background",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "dualMenu": {
+      "pin": "Pin submenu",
+      "autoHide": "Auto-hide submenu"
+    },
+    "tabStyle": {
+      "default": "Default",
+      "card": "Card",
+      "google": "Chrome"
+    },
+    "transition": {
+      "list": {
+        "none": "None",
+        "fade": "Fade",
+        "slideLeft": "Slide Left",
+        "slideBottom": "Slide Bottom",
+        "slideTop": "Slide Top"
+      }
+    },
+    "actions": {
+      "resetConfig": "Reset Config",
+      "copyConfig": "Copy Config",
+      "copySuccess": "Configuration copied to clipboard, paste it into src/config/setting.ts file",
+      "copyFailed": "Copy failed, please try again",
+      "resetFailed": "Reset failed, please refresh the page and try again"
+    }
+  },
+  "notice": {
+    "title": "Notice",
+    "btnRead": "Mark as read",
+    "bar": ["Notice"],
+    "text": ["No"],
+    "viewAll": "View all",
+    "empty": "No notifications"
+  },
+  "worktab": {
+    "btn": {
+      "refresh": "Refresh",
+      "fixed": "Fixed",
+      "unfixed": "Unfixed",
+      "contentFull": "Fullscreen",
+      "closeLeft": "Close left",
+      "closeRight": "Close right",
+      "closeOther": "Close other",
+      "closeAll": "Close all"
+    }
+  },
+  "login": {
+    "leftView": {
+      "title": "A backend system of beauty and efficiency",
+      "subTitle": "A sleek and practical interface for a great user experience"
+    },
+    "title": "Welcome back",
+    "subTitle": "Please enter your account and password to login",
+    "roles": {
+      "super": "Super Admin",
+      "admin": "Admin",
+      "user": "User"
+    },
+    "placeholder": {
+      "username": "Please enter your account",
+      "password": "Please enter your password",
+      "slider": "Please slide to verify"
+    },
+    "sliderText": "Please slide to verify",
+    "sliderSuccessText": "Verification successful",
+    "rememberPwd": "Remember password",
+    "forgetPwd": "Forgot password",
+    "btnText": "Login",
+    "noAccount": "No account yet?",
+    "register": "Register",
+    "failedMessage": "Login failed. Please try again later.",
+    "success": {
+      "title": "Login successful",
+      "message": "Welcome back"
+    }
+  },
+  "forgetPassword": {
+    "title": "Forgot password?",
+    "subTitle": "Enter your email to reset your password",
+    "placeholder": "Please enter your email",
+    "rule": {
+      "required": "Please enter your email"
+    },
+    "submitBtnText": "Submit",
+    "backBtnText": "Back",
+    "contactSupport": "Online password recovery is not available yet. Please contact the administrator for assistance.",
+    "contactByEmail": "Online password recovery is not available yet. Please contact support via email: {contact}.",
+    "contactByPhone": "Online password recovery is not available yet. Please contact support by phone: {contact}."
+  },
+  "register": {
+    "title": "Create account",
+    "subTitle": "Welcome to join us, please fill in the following information to complete the registration",
+    "placeholder": {
+      "username": "Please enter your account",
+      "password": "Please enter your password",
+      "confirmPassword": "Please enter your password again"
+    },
+    "rule": {
+      "confirmPasswordRequired": "Please enter your password again",
+      "passwordMismatch": "The two passwords are inconsistent!",
+      "usernameLength": "The length is 3 to 20 characters",
+      "passwordLength": "The password length cannot be less than 6 digits"
+    },
+    "submitBtnText": "Register",
+    "hasAccount": "Already have an account?",
+    "toLogin": "To login",
+    "successMessage": "Registration successful. Please sign in with your new account.",
+    "disabledMessage": "Registration is currently unavailable on this site.",
+    "failedMessage": "Registration failed. Please try again later."
+  },
+  "lockScreen": {
+    "pwdError": "Password error",
+    "lock": {
+      "inputPlaceholder": "Please input lock screen password",
+      "btnText": "Lock"
+    },
+    "unlock": {
+      "inputPlaceholder": "Please input unlock password",
+      "btnText": "Unlock",
+      "backBtnText": "Back to login"
+    }
+  },
+  "greeting": {
+    "dawn": "Good morning!",
+    "morning": "Good morning!",
+    "afternoon": "Good afternoon!",
+    "evening": "Good evening!"
+  },
+  "exceptionPage": {
+    "403": "Sorry, you do not have permission to access this page",
+    "404": "Sorry, the page you are trying to access does not exist",
+    "500": "Sorry, there was an error on the server",
+    "gohome": "Go Home",
+    "headline": "Oops! Something Went Wrong"
+  },
+  "menus": {
+    "login": {
+      "title": "Login"
+    },
+    "register": {
+      "title": "Register"
+    },
+    "forgetPassword": {
+      "title": "Forget Password"
+    },
+    "outside": {
+      "title": "Outside"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "console": "Console",
+      "analysis": "Analysis",
+      "analytics": "Analytics",
+      "ecommerce": "Ecommerce",
+      "crm": "CRM",
+      "hrm": "HRM",
+      "jobs": "Jobs Dashboard",
+      "sales": "Sales Dashboard",
+      "socialMedia": "Social Media",
+      "crypto": "Crypto"
+    },
+    "dataScreen": {
+      "title": "Data Screens",
+      "tobaccoSales": "Tobacco Sales Screen",
+      "saasDataCenter": "SaaS Data Center Screen",
+      "ecommerceBi": "E-Commerce BI Screen",
+      "operationOverview": "Operation Overview Screen",
+      "factoryProduction": "Factory Production Screen"
+    },
+    "template": {
+      "title": "Template Center",
+      "chat": "Chat",
+      "cards": "Cards",
+      "banners": "Banners",
+      "charts": "Charts",
+      "calendar": "Calendar",
+      "pricing": "Pricing"
+    },
+    "widgets": {
+      "title": "Components",
+      "icon": "Icon",
+      "imageCrop": "Image Crop",
+      "excel": "Excel Import Export",
+      "video": "Video Player",
+      "countTo": "Count To",
+      "wangEditor": "Wang Editor",
+      "watermark": "Watermark",
+      "contextMenu": "Context Menu",
+      "dataSelect": "Data Select",
+      "resourceSelect": "Resource Select",
+      "qrcode": "QR Code",
+      "drag": "Drag",
+      "textScroll": "Text Scroll",
+      "fireworks": "Fireworks",
+      "elementUI": "Component Overview"
+    },
+    "content": {
+      "title": "Content",
+      "contentList": "Content Hub",
+      "contentDetail": "Content Detail",
+      "category": "Categories",
+      "tag": "Tags",
+      "recycle": "Recycle Bin"
+    },
+    "mall": {
+      "title": "Commerce",
+      "productMgmt": "Product Management",
+      "inventoryMgmt": "Inventory Management",
+      "orderMgmt": "Order Management",
+      "shopOps": "Shop Operations",
+      "product": "Products",
+      "productDetail": "Product Detail",
+      "brand": "Brands",
+      "productService": "Product Services",
+      "attributeTemplate": "Attribute Templates",
+      "expressCompany": "Express Companies",
+      "shippingTemplate": "Shipping Templates",
+      "warehouse": "Warehouses",
+      "inbound": "Inbound Orders",
+      "outbound": "Outbound Orders",
+      "transfer": "Transfer Orders",
+      "stocktake": "Stocktake Orders",
+      "inventoryQuery": "Inventory Query",
+      "inventoryLog": "Inventory Logs",
+      "review": "Reviews",
+      "aftersaleNotice": "Aftersale Notice",
+      "aftersaleOrder": "Aftersale Orders",
+      "order": "Order List",
+      "orderDetail": "Order Detail",
+      "orderPlaceOnBehalf": "Place Order on Behalf",
+      "category": "Product Categories",
+      "paymentChannel": "Payment Channels",
+      "paymentTransaction": "Payment Transactions",
+      "paymentWebhook": "Webhook Events"
+    },
+    "help": {
+      "document": "Document",
+      "oldVersion": "Legacy Version"
+    },
+    "plan": {
+      "log": "Change Log"
+    },
+    "result": {
+      "title": "Result Page",
+      "success": "Success",
+      "fail": "Fail"
+    },
+    "exception": {
+      "title": "Exception",
+      "forbidden": "403",
+      "notFound": "404",
+      "serverError": "500"
+    },
+    "devTools": {
+      "title": "Developer Tools",
+      "aiGenerator": "Smart Module Factory"
+    },
+    "system": {
+      "title": "System Settings",
+      "user": "User Manage",
+      "role": "Role Manage",
+      "department": "Department Manage",
+      "post": "Post Manage",
+      "dict": "Dictionary Manage",
+      "siteSetting": "Site Settings",
+      "systemParam": "System Parameters",
+      "fileCenter": "File Center",
+      "userCenter": "User Center",
+      "menu": "Menu Manage",
+      "operationLog": "Operation Log",
+      "loginLog": "Login Log",
+      "feedback": "Feedback Center",
+      "visitorAnalytics": "Visitor Analytics",
+      "nested": "Nested Menu",
+      "menu1": "Menu 1",
+      "menu2": "Menu 2",
+      "menu21": "Menu 2-1",
+      "menu3": "Menu 3",
+      "menu31": "Menu 3-1",
+      "menu32": "Menu 3-2",
+      "menu321": "Menu 3-2-1"
+    },
+    "toolbox": {
+      "title": "Toolbox",
+      "category": "Tool Categories",
+      "list": "Tool List",
+      "log": "Usage Logs"
+    },
+    "monitor": {
+      "title": "System Monitor",
+      "overview": "Overview",
+      "onlineUser": "Online Users",
+      "server": "Server Monitor",
+      "cache": "Cache Monitor",
+      "securityAudit": "Security Audit"
+    },
+    "notification": {
+      "title": "Notification Center",
+      "manage": "Notification Manage",
+      "inbox": "Notification Inbox",
+      "detail": "Notification Detail"
+    },
+    "scheduler": {
+      "title": "Job Scheduler",
+      "task": "Scheduled Tasks",
+      "log": "Task Logs"
+    },
+    "workflow": {
+      "title": "Approval Center",
+      "category": "Workflow Categories",
+      "design": "Workflow Designer",
+      "designer": "Workflow Designer",
+      "application": "My Requests",
+      "definition": "Workflow Definitions",
+      "instance": "Request Management",
+      "task": "Approval Tasks"
+    },
+    "safeguard": {
+      "title": "Safeguard",
+      "server": "Server Monitor"
+    }
+  },
+  "table": {
+    "form": {
+      "reset": "Reset",
+      "submit": "Submit"
+    },
+    "searchBar": {
+      "reset": "Reset",
+      "search": "Search",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "searchInputPlaceholder": "Please enter",
+      "searchSelectPlaceholder": "Please select"
+    },
+    "selection": "Select",
+    "sizeOptions": {
+      "small": "Compact",
+      "default": "Default",
+      "large": "Loose"
+    },
+    "column": {
+      "selection": "Select",
+      "expand": "Expand",
+      "index": "Index"
+    },
+    "zebra": "Zebra",
+    "border": "Border",
+    "headerBackground": "Header BG"
+  }
+}

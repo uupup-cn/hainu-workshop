@@ -1,0 +1,51 @@
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
+
+  const component: DefineComponent<Record<string, never>, Record<string, never>, any>
+  export default component
+}
+
+declare module 'nprogress'
+
+declare module 'crypto-js'
+
+declare module 'vue-img-cutter'
+
+declare module 'file-saver'
+
+declare module '@wangeditor/editor-for-vue' {
+  export const Editor: any
+  export const Toolbar: any
+}
+
+declare module 'echarts/lib/*' {
+  export const install: (registers: unknown) => void
+}
+
+declare module 'qrcode.vue' {
+  export type Level = 'L' | 'M' | 'Q' | 'H'
+  export type RenderAs = 'canvas' | 'svg'
+  export type GradientType = 'linear' | 'radial'
+  export interface ImageSettings {
+    src: string
+    height: number
+    width: number
+    excavate: boolean
+  }
+  export interface QRCodeProps {
+    value: string
+    size?: number
+    level?: Level
+    background?: string
+    foreground?: string
+    renderAs?: RenderAs
+  }
+  const QrcodeVue: any
+  export default QrcodeVue
+}
+
+// 全局变量声明
+declare const __APP_VERSION__: string // 版本号
+declare const __APP_BUILD_ID__: string // 构建标识
