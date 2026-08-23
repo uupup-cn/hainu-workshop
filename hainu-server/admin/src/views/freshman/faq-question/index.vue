@@ -16,7 +16,7 @@
         @refresh="loadData"
       >
         <template #left>
-          <ElButton type="primary" plain @click="openDialog()">新增入学指南</ElButton>
+          <ElButton type="primary" plain @click="openDialog()">新增问题</ElButton>
         </template>
       </ArtTableHeader>
 
@@ -28,11 +28,9 @@
         @pagination:current-change="handlePage"
         @pagination:size-change="handleSize"
       >
-        <ElTableColumn prop="entryTitle" label="标题" min-width="200" />
-        <ElTableColumn label="摘要" width="150">
-          <template #default="{ row }">
-            <span class="text-gray-500">{{ truncate(row.summary, 20) }}</span>
-          </template>
+        <ElTableColumn prop="question" label="问题" min-width="300" />
+        <ElTableColumn label="分类" width="120">
+          <template #default="{ row }">{{ categoryLabel(row.categoryId) }}</template>
         </ElTableColumn>
         <ElTableColumn prop="sortOrder" label="排序" width="80" />
         <ElTableColumn label="状态" width="80">
@@ -41,9 +39,6 @@
               {{ row.isActive ? '启用' : '停用' }}
             </ElTag>
           </template>
-        </ElTableColumn>
-        <ElTableColumn label="更新时间" width="150">
-          <template #default="{ row }">{{ formatDate(row.updatedAt) }}</template>
         </ElTableColumn>
         <ElTableColumn label="操作" width="180" fixed="right">
           <template #default="{ row }">
@@ -56,46 +51,44 @@
 
     <ElDialog
       v-model="dialogVisible"
-      :title="dialogMode === 'add' ? '新增入学指南' : '编辑入学指南'"
+      :title="dialogMode === 'add' ? '新增问题' : '编辑问题'"
       width="800px"
       destroy-on-close
     >
       <ElForm ref="formRef" :model="form" :rules="rules" label-width="80px">
         <ElRow :gutter="16">
           <ElCol :xs="24" :sm="12">
-            <ElFormItem label="标识" prop="entryKey">
-              <ElInput v-model.trim="form.entryKey" maxlength="50" placeholder="请输入标识" />
+            <ElFormItem label="分类" prop="categoryId">
+              <ElSelect
+                v-model="form.categoryId"
+                placeholder="请选择分类"
+                style="width: 100%"
+                filterable
+              >
+                <ElOption
+                  v-for="item in categories"
+                  :key="item.id"
+                  :label="item.categoryName"
+                  :value="item.id"
+                />
+              </ElSelect>
             </ElFormItem>
           </ElCol>
-          <ElCol :xs="24" :sm="12">
-            <ElFormItem label="标题" prop="entryTitle">
-              <ElInput v-model.trim="form.entryTitle" maxlength="100" placeholder="请输入标题" />
-            </ElFormItem>
-          </ElCol>
-        </ElRow>
-        <ElFormItem label="摘要" prop="summary">
-          <ElInput
-            v-model.trim="form.summary"
-            maxlength="200"
-            show-word-limit
-            placeholder="可选，用于列表展示的简短描述"
-          />
-        </ElFormItem>
-        <ElRow :gutter="16">
           <ElCol :xs="24" :sm="12">
             <ElFormItem label="排序" prop="sortOrder">
               <ElInputNumber v-model="form.sortOrder" :min="0" />
             </ElFormItem>
           </ElCol>
-          <ElCol :xs="24" :sm="12">
-            <ElFormItem label="启用" prop="isActive">
-              <ElSwitch v-model="form.isActive" />
-            </ElFormItem>
-          </ElCol>
         </ElRow>
-        <ElFormItem label="正文内容" prop="content">
+        <ElFormItem label="问题" prop="question">
+          <ElInput v-model.trim="form.question" maxlength="200" placeholder="请输入问题" />
+        </ElFormItem>
+        <ElFormItem label="启用" prop="isActive">
+          <ElSwitch v-model="form.isActive" />
+        </ElFormItem>
+        <ElFormItem label="答案" prop="answer">
           <ArtWangEditor
-            v-model="form.content"
+            v-model="form.answer"
             height="400px"
             :excludeKeys="['uploadImage', 'insertVideo', 'uploadVideo']"
           />
@@ -114,51 +107,66 @@
   import type { ColumnOption } from '@/types/component'
   import * as api from '@/api/freshman'
 
-  defineOptions({ name: 'FreshmanGuide' })
+  defineOptions({ name: 'FreshmanFaqQuestion' })
 
   const ArtWangEditor = defineAsyncComponent(
     () => import('@/components/core/forms/art-wang-editor/index.vue')
   )
 
-  interface GuideEntry {
+  interface FaqCategory {
+    id: number
+    categoryName: string
+    sortOrder: number
+  }
+
+  interface FaqQuestion {
     id?: number
-    entryKey: string
-    entryTitle: string
-    summary?: string
-    content: string
+    categoryId: number | undefined
+    question: string
+    answer: string
     sortOrder: number
     isActive: boolean
-    updatedAt?: string
   }
 
   const loading = ref(false)
   const submitting = ref(false)
   const showSearchBar = ref(true)
-  const tableData = ref<GuideEntry[]>([])
+  const categories = ref<FaqCategory[]>([])
+  const tableData = ref<FaqQuestion[]>([])
 
   const page = ref(1)
   const size = ref(20)
   const total = ref(0)
 
-  const keyword = ref('')
-
-  const searchForm = ref({ keyword: '' })
+  const searchForm = ref({ categoryId: '' as number | '', keyword: '' })
 
   const searchItems = computed(() => [
+    {
+      label: '分类',
+      key: 'categoryId',
+      type: 'select',
+      props: {
+        clearable: true,
+        placeholder: '请选择分类',
+        options: categories.value.map((item) => ({
+          label: item.categoryName,
+          value: item.id
+        }))
+      }
+    },
     {
       label: '关键词',
       key: 'keyword',
       type: 'input',
-      props: { clearable: true, placeholder: '请输入标题关键词' }
+      props: { clearable: true, placeholder: '请输入问题关键词' }
     }
   ])
 
   const columns = ref<ColumnOption[]>([
-    { prop: 'entryTitle', label: '标题', minWidth: 200 },
-    { prop: 'summary', label: '摘要', width: 150 },
+    { prop: 'question', label: '问题', minWidth: 300 },
+    { prop: 'categoryId', label: '分类', width: 120 },
     { prop: 'sortOrder', label: '排序', width: 80 },
     { prop: 'isActive', label: '状态', width: 80 },
-    { prop: 'updatedAt', label: '更新时间', width: 150 },
     { prop: 'operation', label: '操作', width: 180, fixed: 'right' }
   ])
   const columnChecks = ref<ColumnOption[]>([...columns.value])
@@ -168,21 +176,19 @@
   const editId = ref<number | null>(null)
   const formRef = ref<FormInstance>()
 
-  const createForm = (): GuideEntry => ({
-    entryKey: '',
-    entryTitle: '',
-    summary: '',
-    content: '',
+  const createForm = (): FaqQuestion => ({
+    categoryId: searchForm.value.categoryId || undefined,
+    question: '',
+    answer: '',
     sortOrder: 0,
     isActive: true
   })
-
-  const form = reactive<GuideEntry>(createForm())
+  const form = reactive<FaqQuestion>(createForm())
 
   const rules = reactive<FormRules>({
-    entryKey: [{ required: true, message: '请输入标识', trigger: 'blur' }],
-    entryTitle: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-    content: [{ required: true, message: '请输入正文内容', trigger: 'blur' }]
+    categoryId: [{ required: true, message: '请选择分类', trigger: 'change' }],
+    question: [{ required: true, message: '请输入问题', trigger: 'blur' }],
+    answer: [{ required: true, message: '请输入答案', trigger: 'blur' }]
   })
 
   const pagedData = computed(() => {
@@ -190,21 +196,26 @@
     return tableData.value.slice(start, start + size.value)
   })
 
-  function truncate(text: string | undefined, len: number) {
-    if (!text) return ''
-    return text.length > len ? text.slice(0, len) + '...' : text
+  function categoryLabel(id?: number) {
+    if (!id) return '-'
+    return categories.value.find((item) => item.id === id)?.categoryName || '-'
   }
 
-  function formatDate(value?: string) {
-    return value ? value.slice(0, 16).replace('T', ' ') : '-'
+  function buildParams() {
+    const params: Record<string, any> = {}
+    if (searchForm.value.categoryId) params.categoryId = searchForm.value.categoryId
+    if (searchForm.value.keyword) params.keyword = searchForm.value.keyword
+    return params
+  }
+
+  async function loadCategories() {
+    categories.value = ((await api.fetchAdminFaqCategories()) as FaqCategory[]) || []
   }
 
   async function loadData() {
     loading.value = true
     try {
-      const list = (await api.fetchAdminGuideEntries(
-        keyword.value ? { keyword: keyword.value } : undefined
-      )) as GuideEntry[]
+      const list = (await api.fetchAdminFaqQuestions(buildParams())) as FaqQuestion[]
       tableData.value = list || []
       total.value = tableData.value.length
     } finally {
@@ -221,20 +232,18 @@
     page.value = 1
   }
 
-  function handleSearch(params: Record<string, any>) {
-    keyword.value = params.keyword || ''
+  function handleSearch() {
     page.value = 1
     loadData()
   }
 
   function handleReset() {
-    searchForm.value = { keyword: '' }
-    keyword.value = ''
+    searchForm.value = { categoryId: '', keyword: '' }
     page.value = 1
     loadData()
   }
 
-  function openDialog(row?: GuideEntry) {
+  function openDialog(row?: FaqQuestion) {
     dialogMode.value = row ? 'edit' : 'add'
     editId.value = row?.id || null
     Object.assign(form, row ? { ...row } : createForm())
@@ -247,9 +256,9 @@
     submitting.value = true
     try {
       if (editId.value) {
-        await api.fetchUpdateGuide(editId.value, { ...form })
+        await api.fetchUpdateFaqQuestion(editId.value, { ...form })
       } else {
-        await api.fetchCreateGuide({ ...form })
+        await api.fetchCreateFaqQuestion({ ...form })
       }
       dialogVisible.value = false
       loadData()
@@ -258,15 +267,16 @@
     }
   }
 
-  async function handleDelete(row: GuideEntry) {
+  async function handleDelete(row: FaqQuestion) {
     if (!row.id) return
-    await ElMessageBox.confirm(`确认删除入学指南“${row.entryTitle}”？`, '提示', {
-      type: 'warning'
-    })
-    await api.fetchDeleteGuide(row.id)
+    await ElMessageBox.confirm(`确认删除问题“${row.question}”？`, '提示', { type: 'warning' })
+    await api.fetchDeleteFaqQuestion(row.id)
     ElMessage.success('删除成功')
     loadData()
   }
 
-  onMounted(loadData)
+  onMounted(async () => {
+    await loadCategories()
+    await loadData()
+  })
 </script>

@@ -5,6 +5,7 @@ export function fetchCreateMarketCategory(data: any) { return request.post({ url
 export function fetchUpdateMarketCategory(id: number, data: any) { return request.put({ url: '/api/v1/admin/marketplace/categories/' + id, data, showSuccessMessage: true }) }
 export function fetchDeleteMarketCategory(id: number) { return request.del({ url: '/api/v1/admin/marketplace/categories/' + id, showSuccessMessage: true }) }
 export function fetchMarketItems(params?: any) { return request.get<any>({ url: '/api/v1/admin/marketplace/items', params }) }
+export function fetchAdminMarketItems(params?: any) { return request.get<any>({ url: '/api/v1/admin/marketplace/items', params }) }
 export function fetchMarketItem(id: number) { return request.get<any>({ url: '/api/v1/admin/marketplace/items/' + id }) }
 export function fetchDeleteMarketItem(id: number) { return request.del({ url: '/api/v1/admin/marketplace/items/' + id, showSuccessMessage: true }) }
 export function fetchReports(params?: any) { return request.get<any>({ url: '/api/v1/admin/reports', params }) }

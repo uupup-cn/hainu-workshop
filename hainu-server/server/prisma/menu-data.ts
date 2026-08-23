@@ -49,23 +49,27 @@ export function buildMenuSeed(): MenuSeedItem[] {
     // ===== 新生模块 =====
     { menuKey: 'freshman:guide', menuName: '入学指南', menuType: 'menu', parentId: 'freshman', icon: 'ri-file-list-2-line', path: 'guide', component: '/freshman/guide/index', sortOrder: 1, isVisible: true },
     { menuKey: 'freshman:life', menuName: '生活攻略', menuType: 'menu', parentId: 'freshman', icon: 'ri-restaurant-line', path: 'life', component: '/freshman/life/index', sortOrder: 2, isVisible: true },
-    { menuKey: 'freshman:faq', menuName: '新生FAQ', menuType: 'menu', parentId: 'freshman', icon: 'ri-question-line', path: 'faq', component: '/freshman/faq/index', sortOrder: 3, isVisible: true },
-    { menuKey: 'freshman:roommate', menuName: '找室友', menuType: 'menu', parentId: 'freshman', icon: 'ri-user-add-line', path: 'roommate', component: '/freshman/roommate/index', sortOrder: 4, isVisible: true },
+    { menuKey: 'freshman:faq-category', menuName: 'FAQ分类管理', menuType: 'menu', parentId: 'freshman', icon: 'ri-folder-line', path: 'faq/category', component: '/freshman/faq-category/index', sortOrder: 3, isVisible: true },
+    { menuKey: 'freshman:faq-question', menuName: 'FAQ问题管理', menuType: 'menu', parentId: 'freshman', icon: 'ri-question-line', path: 'faq/question', component: '/freshman/faq-question/index', sortOrder: 4, isVisible: true },
+    { menuKey: 'freshman:roommate', menuName: '找室友', menuType: 'menu', parentId: 'freshman', icon: 'ri-user-add-line', path: 'roommate', component: '/freshman/roommate/index', sortOrder: 5, isVisible: true },
 
     // ===== 智慧海大 =====
     { menuKey: 'wise:intro', menuName: '海大介绍', menuType: 'menu', parentId: 'wise', icon: 'ri-information-line', path: 'intro', component: '/wise/intro/index', sortOrder: 1, isVisible: true },
     { menuKey: 'wise:phonebook', menuName: '电话簿', menuType: 'menu', parentId: 'wise', icon: 'ri-phone-line', path: 'phonebook', component: '/wise/phonebook/index', sortOrder: 2, isVisible: true },
     { menuKey: 'wise:calendar', menuName: '校历', menuType: 'menu', parentId: 'wise', icon: 'ri-calendar-line', path: 'calendar', component: '/wise/calendar/index', sortOrder: 3, isVisible: true },
     { menuKey: 'wise:map', menuName: '校园地图', menuType: 'menu', parentId: 'wise', icon: 'ri-map-2-line', path: 'map', component: '/wise/map/index', sortOrder: 4, isVisible: true },
-    { menuKey: 'wise:bus', menuName: '校园出行', menuType: 'menu', parentId: 'wise', icon: 'ri-bus-line', path: 'bus', component: '/wise/bus/index', sortOrder: 5, isVisible: true },
-    { menuKey: 'wise:campus', menuName: '校区管理', menuType: 'menu', parentId: 'wise', icon: 'ri-community-line', path: 'campus-database/campus', component: '/wise/campus-database/campus/index', sortOrder: 6, isVisible: true },
-    { menuKey: 'wise:department', menuName: '学院管理', menuType: 'menu', parentId: 'wise', icon: 'ri-school-line', path: 'campus-database/department', component: '/wise/campus-database/department/index', sortOrder: 7, isVisible: true },
-    { menuKey: 'wise:major', menuName: '专业管理', menuType: 'menu', parentId: 'wise', icon: 'ri-book-line', path: 'campus-database/major', component: '/wise/campus-database/major/index', sortOrder: 8, isVisible: true },
-    { menuKey: 'wise:college', menuName: '书院管理', menuType: 'menu', parentId: 'wise', icon: 'ri-home-line', path: 'campus-database/college', component: '/wise/campus-database/college/index', sortOrder: 9, isVisible: true },
-    { menuKey: 'wise:building', menuName: '楼栋管理', menuType: 'menu', parentId: 'wise', icon: 'ri-building-2-line', path: 'campus-database/building', component: '/wise/campus-database/building/index', sortOrder: 10, isVisible: true },
+    { menuKey: 'wise:bus-schedule', menuName: '班车时刻表', menuType: 'menu', parentId: 'wise', icon: 'ri-bus-line', path: 'bus-schedule', component: '/wise/bus-schedule/index', sortOrder: 5, isVisible: true },
+    { menuKey: 'wise:bus-station', menuName: '车站信息', menuType: 'menu', parentId: 'wise', icon: 'ri-map-pin-line', path: 'bus-station', component: '/wise/bus-station/index', sortOrder: 6, isVisible: true },
+    { menuKey: 'wise:bus-guide', menuName: '乘车指南', menuType: 'menu', parentId: 'wise', icon: 'ri-road-map-line', path: 'bus-guide', component: '/wise/bus-guide/index', sortOrder: 7, isVisible: true },
+    { menuKey: 'wise:campus', menuName: '校区管理', menuType: 'menu', parentId: 'wise', icon: 'ri-community-line', path: 'campus-database/campus', component: '/wise/campus-database/campus/index', sortOrder: 8, isVisible: true },
+    { menuKey: 'wise:department', menuName: '学院管理', menuType: 'menu', parentId: 'wise', icon: 'ri-school-line', path: 'campus-database/department', component: '/wise/campus-database/department/index', sortOrder: 9, isVisible: true },
+    { menuKey: 'wise:major', menuName: '专业管理', menuType: 'menu', parentId: 'wise', icon: 'ri-book-line', path: 'campus-database/major', component: '/wise/campus-database/major/index', sortOrder: 10, isVisible: true },
+    { menuKey: 'wise:college', menuName: '书院管理', menuType: 'menu', parentId: 'wise', icon: 'ri-home-line', path: 'campus-database/college', component: '/wise/campus-database/college/index', sortOrder: 11, isVisible: true },
+    { menuKey: 'wise:building', menuName: '楼栋管理', menuType: 'menu', parentId: 'wise', icon: 'ri-building-2-line', path: 'campus-database/building', component: '/wise/campus-database/building/index', sortOrder: 12, isVisible: true },
 
     // ===== 社区模块 =====
-    { menuKey: 'community:marketplace', menuName: '二手集市', menuType: 'menu', parentId: 'community', icon: 'ri-shopping-bag-line', path: 'marketplace', component: '/community/marketplace/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'community:marketplace-category', menuName: '集市分类管理', menuType: 'menu', parentId: 'community', icon: 'ri-price-tag-3-line', path: 'marketplace-category', component: '/community/marketplace-category/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'community:marketplace-item', menuName: '集市商品管理', menuType: 'menu', parentId: 'community', icon: 'ri-shopping-bag-line', path: 'marketplace-item', component: '/community/marketplace-item/index', sortOrder: 2, isVisible: true },
     { menuKey: 'community:news', menuName: '快讯管理', menuType: 'menu', parentId: 'community', icon: 'ri-newspaper-line', path: 'news', component: '/community/news/index', sortOrder: 2, isVisible: true },
     { menuKey: 'community:posts', menuName: '帖子管理', menuType: 'menu', parentId: 'community', icon: 'ri-chat-1-line', path: 'alumni/posts', component: '/community/alumni/posts/index', sortOrder: 3, isVisible: true },
     { menuKey: 'community:confession', menuName: '表白墙管理', menuType: 'menu', parentId: 'community', icon: 'ri-heart-line', path: 'alumni/confession', component: '/community/alumni/confession/index', sortOrder: 4, isVisible: true },
@@ -78,13 +82,15 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'tool:usage-log', menuName: '使用记录', menuType: 'menu', parentId: 'tool', icon: 'ri-bar-chart-line', path: 'usage-log', component: '/tool/usage-log/index', sortOrder: 3, isVisible: true },
     { menuKey: 'tool:video-parse', menuName: '影视解析配置', menuType: 'menu', parentId: 'tool', icon: 'ri-film-line', path: 'video-parse', component: '/tool/video-parse/index', sortOrder: 4, isVisible: true },
 
-    // ===== 课表模块 =====
-    { menuKey: 'schedule:course', menuName: '课程库', menuType: 'menu', parentId: 'schedule', icon: 'ri-book-2-line', path: 'course', component: '/schedule/course/index', sortOrder: 1, isVisible: true },
-    { menuKey: 'schedule:color', menuName: '课程颜色', menuType: 'menu', parentId: 'schedule', icon: 'ri-palette-line', path: 'color', component: '/schedule/color/index', sortOrder: 2, isVisible: true },
-    { menuKey: 'schedule:semester', menuName: '学期管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-line', path: 'semester', component: '/schedule/semester/index', sortOrder: 3, isVisible: true },
-    { menuKey: 'schedule:term-week', menuName: '学期周制', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-check-line', path: 'term-week', component: '/schedule/term-week/index', sortOrder: 4, isVisible: true },
-    { menuKey: 'schedule:section', menuName: '节次管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-time-line', path: 'section', component: '/schedule/section/index', sortOrder: 4, isVisible: true },
-    { menuKey: 'schedule:share-code', menuName: '分享码管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-share-line', path: 'share-code', component: '/schedule/share-code/index', sortOrder: 5, isVisible: true },
+    // ===== 课表模块（三级分组）=====
+    { menuKey: 'schedule:course-mgmt', menuName: '课程管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-book-2-line', path: 'course-mgmt', component: '/index/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'schedule:course', menuName: '课程库', menuType: 'menu', parentId: 'schedule:course-mgmt', icon: 'ri-book-2-line', path: 'course', component: '/schedule/course/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'schedule:color', menuName: '课程颜色', menuType: 'menu', parentId: 'schedule:course-mgmt', icon: 'ri-palette-line', path: 'color', component: '/schedule/color/index', sortOrder: 2, isVisible: true },
+    { menuKey: 'schedule:week-mgmt', menuName: '学习周管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-line', path: 'week-mgmt', component: '/index/index', sortOrder: 2, isVisible: true },
+    { menuKey: 'schedule:semester', menuName: '学期管理', menuType: 'menu', parentId: 'schedule:week-mgmt', icon: 'ri-calendar-line', path: 'semester', component: '/schedule/semester/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'schedule:term-week', menuName: '学期周制', menuType: 'menu', parentId: 'schedule:week-mgmt', icon: 'ri-calendar-check-line', path: 'term-week', component: '/schedule/term-week/index', sortOrder: 2, isVisible: true },
+    { menuKey: 'schedule:section', menuName: '节次管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-time-line', path: 'section', component: '/schedule/section/index', sortOrder: 3, isVisible: true },
+    { menuKey: 'schedule:share-code', menuName: '分享码管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-share-line', path: 'share-code', component: '/schedule/share-code/index', sortOrder: 4, isVisible: true },
 
     // ===== 系统监控 =====
     { menuKey: 'monitor:overview', menuName: '监控概览', menuType: 'menu', parentId: 'monitor', icon: 'ri-dashboard-horizontal-line', path: 'overview', component: '/monitor/index', sortOrder: 1, isVisible: true },

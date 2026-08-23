@@ -2,21 +2,29 @@
 import { prisma } from '../../utils/prisma';
 import { ApiError } from '../../utils/api-error';
 import { paginatedResult } from '../../utils/pagination';
+import { sanitizeHtml } from '../../utils/html-sanitize';
+
+// 富文本字段过滤（content/answer）
+function sanitizeContent(d: any, fields: string[] = ['content']): any {
+  const r = { ...d };
+  for (const f of fields) if (typeof r[f] === 'string') r[f] = sanitizeHtml(r[f]);
+  return r;
+}
 
 // ========== 入学指南 ==========
 export const guideEntries = {
   list: (keyword?: string) => prisma.guideEntry.findMany({ where: keyword ? { entryTitle: { contains: keyword } } : {}, orderBy: { sortOrder: 'asc' } }),
   get: async (id: number) => { const e = await prisma.guideEntry.findUnique({ where: { id } }); if (!e) throw new ApiError(40003, '条目不存在'); return e; },
-  create: (d: any) => prisma.guideEntry.create({ data: d }),
-  update: (id: number, d: any) => prisma.guideEntry.update({ where: { id }, data: d }),
+  create: (d: any) => prisma.guideEntry.create({ data: sanitizeContent(d) }),
+  update: (id: number, d: any) => prisma.guideEntry.update({ where: { id }, data: sanitizeContent(d) }),
   delete: (id: number) => prisma.guideEntry.delete({ where: { id } }),
 };
 // ========== 生活攻略 ==========
 export const lifeTopics = {
   list: (campus?: string, keyword?: string) => { const where: any = {}; if (campus) where.campus = campus; if (keyword) where.topicTitle = { contains: keyword }; return prisma.lifeTopic.findMany({ where, orderBy: { sortOrder: 'asc' } }); },
   get: async (id: number) => { const t = await prisma.lifeTopic.findUnique({ where: { id } }); if (!t) throw new ApiError(40003, '主题不存在'); return t; },
-  create: (d: any) => prisma.lifeTopic.create({ data: d }),
-  update: (id: number, d: any) => prisma.lifeTopic.update({ where: { id }, data: d }),
+  create: (d: any) => prisma.lifeTopic.create({ data: sanitizeContent(d) }),
+  update: (id: number, d: any) => prisma.lifeTopic.update({ where: { id }, data: sanitizeContent(d) }),
   delete: (id: number) => prisma.lifeTopic.delete({ where: { id } }),
 };
 // ========== 新生 FAQ 分类 ==========
@@ -31,16 +39,16 @@ export const faqCategories = {
 export const faqQuestions = {
   list: (categoryId?: number, keyword?: string) => { const where: any = {}; if (categoryId) where.categoryId = Number(categoryId); if (keyword) where.question = { contains: keyword }; return prisma.faqQuestion.findMany({ where, orderBy: { sortOrder: 'asc' } }); },
   get: async (id: number) => { const q = await prisma.faqQuestion.findUnique({ where: { id } }); if (!q) throw new ApiError(40003, '问题不存在'); return q; },
-  create: (d: any) => prisma.faqQuestion.create({ data: d }),
-  update: (id: number, d: any) => prisma.faqQuestion.update({ where: { id }, data: d }),
+  create: (d: any) => prisma.faqQuestion.create({ data: sanitizeContent(d, ["answer"]) }),
+  update: (id: number, d: any) => prisma.faqQuestion.update({ where: { id }, data: sanitizeContent(d, ["answer"]) }),
   delete: (id: number) => prisma.faqQuestion.delete({ where: { id } }),
 };
 // ========== 海大介绍 ==========
 export const introEntries = {
   list: (keyword?: string) => prisma.introEntry.findMany({ where: keyword ? { entryTitle: { contains: keyword } } : {}, orderBy: { sortOrder: 'asc' } }),
   get: async (id: number) => { const e = await prisma.introEntry.findUnique({ where: { id } }); if (!e) throw new ApiError(40003, '条目不存在'); return e; },
-  create: (d: any) => prisma.introEntry.create({ data: d }),
-  update: (id: number, d: any) => prisma.introEntry.update({ where: { id }, data: d }),
+  create: (d: any) => prisma.introEntry.create({ data: sanitizeContent(d) }),
+  update: (id: number, d: any) => prisma.introEntry.update({ where: { id }, data: sanitizeContent(d) }),
   delete: (id: number) => prisma.introEntry.delete({ where: { id } }),
 };
 // ========== 电话簿分类 ==========
@@ -135,5 +143,5 @@ export async function deleteRoommatePost(id: number) {
 // 乘车指南（单例：有则更新，无则创建）
 export const busGuide = {
   get: async () => (await prisma.busGuide.findFirst()) || { content: '' },
-  update: async (content: string) => { const g = await prisma.busGuide.findFirst(); if (g) return prisma.busGuide.update({ where: { id: g.id }, data: { content } }); return prisma.busGuide.create({ data: { content } }); },
+  update: async (content: string) => { const safe = sanitizeHtml(content); const g = await prisma.busGuide.findFirst(); if (g) return prisma.busGuide.update({ where: { id: g.id }, data: { content: safe } }); return prisma.busGuide.create({ data: { content: safe } }); },
 };

@@ -1,6 +1,7 @@
 // 社区管理 管理端服务（二手集市/社区启停/快讯/校友圈/抽奖/举报处理）
 import { prisma } from '../../utils/prisma';
 import { ApiError } from '../../utils/api-error';
+import { sanitizeHtml } from '../../utils/html-sanitize';
 import { paginatedResult } from '../../utils/pagination';
 
 // ========== 二手集市分类 ==========
@@ -52,11 +53,12 @@ export async function getNewsList(page: number, size: number, keyword?: string, 
   ]);
   return paginatedResult(list, total, page, size);
 }
-export async function createNews(d: any) { const data = { ...d }; if (data.status === 'published') data.publishedAt = new Date(); return prisma.news.create({ data }); }
+export async function createNews(d: any) { const data = { ...d }; if (data.content) data.content = sanitizeHtml(data.content); if (data.status === 'published') data.publishedAt = new Date(); return prisma.news.create({ data }); }
 export async function updateNews(id: number, d: any) {
   const n = await prisma.news.findUnique({ where: { id } });
   if (!n) throw new ApiError(40003, '快讯不存在');
   const data = { ...d };
+  if (data.content) data.content = sanitizeHtml(data.content);
   if (data.status === 'published' && !n.publishedAt) data.publishedAt = new Date();
   return prisma.news.update({ where: { id }, data });
 }

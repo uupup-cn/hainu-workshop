@@ -1,5 +1,6 @@
 import request from '@/utils/http'
 export function fetchIntroEntries() { return request.get<any>({ url: '/api/v1/intro/entries' }) }
+export function fetchAdminIntroEntries(params?: any) { return request.get<any>({ url: '/api/v1/admin/intro/entries', params }) }
 export function fetchCreateIntro(data: any) { return request.post({ url: '/api/v1/admin/intro/entries', data, showSuccessMessage: true }) }
 export function fetchUpdateIntro(id: number, data: any) { return request.put({ url: '/api/v1/admin/intro/entries/' + id, data, showSuccessMessage: true }) }
 export function fetchDeleteIntro(id: number) { return request.del({ url: '/api/v1/admin/intro/entries/' + id, showSuccessMessage: true }) }
@@ -31,4 +32,5 @@ export function fetchCreateBusStation(data: any) { return request.post({ url: '/
 export function fetchUpdateBusStation(id: number, data: any) { return request.put({ url: '/api/v1/admin/bus/stations/' + id, data, showSuccessMessage: true }) }
 export function fetchDeleteBusStation(id: number) { return request.del({ url: '/api/v1/admin/bus/stations/' + id, showSuccessMessage: true }) }
 export function fetchBusGuide() { return request.get<any>({ url: '/api/v1/bus/guide' }) }
+export function fetchAdminBusGuide() { return request.get<any>({ url: '/api/v1/admin/bus/guide' }) }
 export function fetchUpdateBusGuide(data: any) { return request.put({ url: '/api/v1/admin/bus/guide', data, showSuccessMessage: true }) }
