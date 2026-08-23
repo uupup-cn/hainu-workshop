@@ -3,8 +3,8 @@ export const communityRoutes: AppRouteRecord = {
   path: '/community', name: 'Community', component: '/index/index',
   meta: { title: '社区模块', icon: 'ri:group-line' },
   children: [
-    { path: 'marketplace-category', name: 'CommunityMarketCategory', component: '/community/marketplace-category/index', meta: { title: '集市分类', icon: 'ri:price-tag-3-line', keepAlive: true } },
-    { path: 'marketplace-item', name: 'CommunityMarketItem', component: '/community/marketplace-item/index', meta: { title: '集市商品', icon: 'ri:shopping-bag-line', keepAlive: true } },
+    { path: 'marketplace-category', name: 'CommunityMarketCategory', component: '/community/marketplace-category/index', meta: { title: '分类管理', icon: 'ri:price-tag-3-line', keepAlive: true } },
+    { path: 'marketplace-item', name: 'CommunityMarketItem', component: '/community/marketplace-item/index', meta: { title: '商品管理', icon: 'ri:shopping-bag-line', keepAlive: true } },
     { path: 'news', name: 'CommunityNews', component: '/community/news/index', meta: { title: '快讯管理', icon: 'ri:newspaper-line', keepAlive: true } },
     { path: 'alumni/posts', name: 'CommunityPosts', component: '/community/alumni/posts/index', meta: { title: '帖子管理', icon: 'ri:chat-1-line', keepAlive: true } },
     { path: 'alumni/confession', name: 'CommunityConfession', component: '/community/alumni/confession/index', meta: { title: '表白墙管理', icon: 'ri:heart-line', keepAlive: true } },

@@ -4,7 +4,8 @@ export const wiseRoutes: AppRouteRecord = {
   meta: { title: '智慧海大', icon: 'ri:building-line' },
   children: [
     { path: 'intro', name: 'WiseIntro', component: '/wise/intro/index', meta: { title: '海大介绍', icon: 'ri:information-line', keepAlive: true } },
-    { path: 'phonebook', name: 'WisePhonebook', component: '/wise/phonebook/index', meta: { title: '电话簿', icon: 'ri:phone-line', keepAlive: true } },
+    { path: 'phonebook/category', name: 'WisePhonebookCategory', component: '/wise/phonebook-category/index', meta: { title: '分类管理', icon: 'ri:folder-line', keepAlive: true } },
+    { path: 'phonebook/entry', name: 'WisePhonebookEntry', component: '/wise/phonebook-entry/index', meta: { title: '条目管理', icon: 'ri:contacts-line', keepAlive: true } },
     { path: 'calendar', name: 'WiseCalendar', component: '/wise/calendar/index', meta: { title: '校历', icon: 'ri:calendar-line', keepAlive: true } },
     { path: 'map', name: 'WiseMap', component: '/wise/map/index', meta: { title: '校园地图', icon: 'ri:map-2-line', keepAlive: true } },
     { path: 'bus-schedule', name: 'WiseBusSchedule', component: '/wise/bus-schedule/index', meta: { title: '班车时刻', icon: 'ri:bus-2-line', keepAlive: true } },
