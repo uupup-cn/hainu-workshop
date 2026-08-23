@@ -73,8 +73,7 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'wise:campus', menuName: '校区管理', menuType: 'menu', parentId: 'wise:campus-database', icon: 'ri-community-line', path: 'campus-database/campus', component: '/wise/campus-database/campus/index', sortOrder: 1, isVisible: true },
     { menuKey: 'wise:department', menuName: '学院管理', menuType: 'menu', parentId: 'wise:campus-database', icon: 'ri-school-line', path: 'campus-database/department', component: '/wise/campus-database/department/index', sortOrder: 2, isVisible: true },
     { menuKey: 'wise:major', menuName: '专业管理', menuType: 'menu', parentId: 'wise:campus-database', icon: 'ri-book-line', path: 'campus-database/major', component: '/wise/campus-database/major/index', sortOrder: 3, isVisible: true },
-    { menuKey: 'wise:college', menuName: '书院管理', menuType: 'menu', parentId: 'wise:campus-database', icon: 'ri-home-line', path: 'campus-database/college', component: '/wise/campus-database/college/index', sortOrder: 4, isVisible: true },
-    { menuKey: 'wise:building', menuName: '楼栋管理', menuType: 'menu', parentId: 'wise:campus-database', icon: 'ri-building-2-line', path: 'campus-database/building', component: '/wise/campus-database/building/index', sortOrder: 5, isVisible: true },
+    { menuKey: 'wise:college-building', menuName: '书院楼栋管理', menuType: 'menu', parentId: 'wise:campus-database', icon: 'ri-home-line', path: 'campus-database/college-building', component: '/wise/campus-database/college-building/index', sortOrder: 4, isVisible: true },
 
     // ===== 社区模块 =====
     { menuKey: 'community:marketplace', menuName: '二手集市', menuType: 'menu', parentId: 'community', icon: 'ri-shopping-bag-line', path: 'marketplace', component: '', sortOrder: 1, isVisible: true },

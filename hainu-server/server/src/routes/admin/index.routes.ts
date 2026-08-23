@@ -36,4 +36,6 @@ router.get('/buildings', adminAuthMiddleware, ctrl.listBuildings);
 router.post('/buildings', adminAuthMiddleware, ctrl.createBuilding);
 router.put('/buildings/:id', adminAuthMiddleware, ctrl.updateBuilding);
 router.delete('/buildings/:id', adminAuthMiddleware, ctrl.deleteBuilding);
+// 书院楼栋树
+router.get('/college-tree', adminAuthMiddleware, ctrl.getCollegeTree);
 export default router;

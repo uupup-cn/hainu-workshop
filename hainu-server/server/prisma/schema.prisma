@@ -255,6 +255,8 @@ model BusGuide {
 model Campus {
   id            Int                 @id @default(autoincrement())
   campusName    String              @db.VarChar(50)
+  location      String?             @db.VarChar(200)
+  description   String?             @db.Text
   sortOrder     Int                 @default(0)
   isActive      Boolean             @default(true)
   createdAt     DateTime            @default(now())
@@ -270,6 +272,7 @@ model College {
   id          Int        @id @default(autoincrement())
   campusId    Int
   collegeName String     @db.VarChar(100)
+  description String?    @db.Text
   sortOrder   Int        @default(0)
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
@@ -282,13 +285,14 @@ model College {
 
 model Department {
   id             Int      @id @default(autoincrement())
-  campusId       Int
+  campusId       Int?
   departmentName String   @db.VarChar(100)
+  description    String?  @db.Text
   sortOrder      Int      @default(0)
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  campus         Campus   @relation(fields: [campusId], references: [id])
+  campus         Campus?  @relation(fields: [campusId], references: [id])
   majors         Major[]
 
   @@map("departments")
@@ -298,6 +302,7 @@ model Major {
   id           Int        @id @default(autoincrement())
   departmentId Int
   majorName    String     @db.VarChar(100)
+  description  String?    @db.Text
   sortOrder    Int        @default(0)
   isActive     Boolean    @default(true)
   createdAt    DateTime   @default(now())
@@ -311,6 +316,7 @@ model Building {
   id           Int      @id @default(autoincrement())
   collegeId    Int
   buildingName String   @db.VarChar(100)
+  description  String?  @db.Text
   sortOrder    Int      @default(0)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())

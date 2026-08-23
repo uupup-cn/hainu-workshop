@@ -15,7 +15,6 @@ export const wiseRoutes: AppRouteRecord = {
     { path: 'campus-database/campus', name: 'CampusDB', component: '/wise/campus-database/campus/index', meta: { title: '校区管理', icon: 'ri:community-line', keepAlive: true } },
     { path: 'campus-database/department', name: 'CampusDept', component: '/wise/campus-database/department/index', meta: { title: '学院管理', icon: 'ri:school-line', keepAlive: true } },
     { path: 'campus-database/major', name: 'CampusMajor', component: '/wise/campus-database/major/index', meta: { title: '专业管理', icon: 'ri:book-line', keepAlive: true } },
-    { path: 'campus-database/college', name: 'CampusCollege', component: '/wise/campus-database/college/index', meta: { title: '书院管理', icon: 'ri:home-line', keepAlive: true } },
-    { path: 'campus-database/building', name: 'CampusBuilding', component: '/wise/campus-database/building/index', meta: { title: '楼栋管理', icon: 'ri:building-2-line', keepAlive: true } }
+    { path: 'campus-database/college-building', name: 'CampusCollegeBuilding', component: '/wise/campus-database/college-building/index', meta: { title: '书院楼栋管理', icon: 'ri:home-line', keepAlive: true } }
   ]
 }

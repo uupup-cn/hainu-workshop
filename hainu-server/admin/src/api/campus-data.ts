@@ -19,3 +19,4 @@ export function fetchBuildings(collegeId?: number) { return request.get<any>({ u
 export function fetchCreateBuilding(data: any) { return request.post({ url: '/api/v1/admin/buildings', data, showSuccessMessage: true }) }
 export function fetchUpdateBuilding(id: number, data: any) { return request.put({ url: '/api/v1/admin/buildings/' + id, data, showSuccessMessage: true }) }
 export function fetchDeleteBuilding(id: number) { return request.del({ url: '/api/v1/admin/buildings/' + id, showSuccessMessage: true }) }
+export function fetchCollegeTree(campusId?: number) { return request.get<any>({ url: '/api/v1/admin/college-tree', params: { campusId } }) }
