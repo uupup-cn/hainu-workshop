@@ -231,6 +231,24 @@
 
 ---
 
+### 19b. 管理后台登录弹窗「请求的资源不存在」（crypto/security-config 404）
+
+**现象**：浏览器打开管理后台登录页，页面能显示但弹出错误提示「请求的资源不存在」。
+
+**排查过程**：
+1. curl 测试登录链路全部 200（captcha / admin login / user/info / menus）
+2. 发现 `GET /api/v1/auth/public-key` 和 `GET /api/v1/security-config` 返回 404
+3. 读前端代码发现 `utils/api-security.ts` 的 `getApiSecurityConfig()` 请求 `GET /api/v1/crypto/security-config` 获取 RSA 公钥
+4. `utils/crypto.ts` 的 `encryptPasswordFields()` 在登录页加载时被调用，请求失败后未 catch，异常冒泡为弹窗错误
+
+**根因**：模板（Art Design Pro）的登录流程要求先获取 RSA 公钥加密密码（`encryptPasswordFields`），但后端未实现 `/api/v1/crypto/security-config` 端点。前端 `getPublicKey()` 无错误处理，404 直接抛异常。
+
+**解决方案**：`encryptPasswordFields` 改为公钥获取失败时降级返回明文（后端 `adminLogin` 本为明文校验）。`getPublicKey()` 加 try-catch 返回 null，`encryptWithRSA` 收到 null 时直接返回明文。未来后端实现 security-config 端点后自动启用 RSA 加密。
+
+**文件**：`admin/src/utils/crypto.ts`
+
+---
+
 ## 四、测试阶段
 
 ### 20. 连通性测试脚本 URL 拼接问题
