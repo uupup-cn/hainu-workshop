@@ -5,14 +5,17 @@
       <div class="topbar-inner">
         <router-link to="/home" class="brand"><span class="brand-dot"></span>海大工坊</router-link>
         <nav class="topnav">
+          <router-link to="/guide">新生专区</router-link>
           <router-link to="/intro">海大介绍</router-link>
           <router-link to="/phonebook">电话簿</router-link>
           <router-link to="/calendar">校历</router-link>
+          <router-link to="/map">校园地图</router-link>
           <router-link to="/bus">校园出行</router-link>
           <router-link to="/marketplace">二手集市</router-link>
           <router-link to="/news">快讯</router-link>
           <router-link to="/alumni">校友圈</router-link>
           <router-link to="/schedule">课表</router-link>
+          <router-link to="/tools">工具箱</router-link>
         </nav>
         <div class="topbar-right">
           <template v-if="userStore.isLoggedIn">
@@ -42,27 +45,48 @@
       </div>
     </div>
 
-    <!-- 手机端底部 TabBar -->
+    <!-- 手机端底部 TabBar（按身份差异化） -->
     <nav class="tabbar">
-      <router-link to="/home" class="tab"><span class="tab-icon">🏠</span><span>首页</span></router-link>
-      <router-link to="/intro" class="tab"><span class="tab-icon">🏫</span><span>校园</span></router-link>
-      <router-link to="/marketplace" class="tab"><span class="tab-icon">🛒</span><span>集市</span></router-link>
-      <router-link to="/schedule" class="tab"><span class="tab-icon">📅</span><span>课表</span></router-link>
-      <router-link to="/profile" class="tab"><span class="tab-icon">👤</span><span>我的</span></router-link>
+      <router-link v-for="t in tabItems" :key="t.path" :to="t.path" class="tab"><span class="tab-icon">{{ t.icon }}</span><span>{{ t.label }}</span></router-link>
     </nav>
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from './store/user'
-import { authApi, userApi } from './api'
+import { authApi, userApi, systemApi } from './api'
 
 const userStore = useUserStore()
 const router = useRouter()
 const loginForm = reactive({ uid: '', password: '' })
 const loginLoading = ref(false)
 const loginError = ref('')
+
+// 身份差异化底部 Tab：新生第二栏进新生专区，在校生进校园服务
+const tabItems = computed(() => {
+  const campusTab = userStore.userInfo?.identity === 'freshman'
+    ? { icon: '🎒', label: '新生', path: '/guide' }
+    : { icon: '🏫', label: '校园', path: '/intro' }
+  return [
+    { icon: '🏠', label: '首页', path: '/home' },
+    campusTab,
+    { icon: '🛒', label: '集市', path: '/marketplace' },
+    { icon: '📅', label: '课表', path: '/schedule' },
+    { icon: '👤', label: '我的', path: '/profile' },
+  ]
+})
+
+// 假期模式：campus_mode=holiday 时首次访问进入倒计时启动页
+onMounted(async () => {
+  try {
+    const res = await systemApi.settings()
+    if (res.data?.campus_mode === 'holiday' && !sessionStorage.getItem('launch_passed') && location.pathname !== '/launch' && location.pathname !== '/login') {
+      router.push('/launch')
+    }
+  } catch { /* 设置读取失败不阻塞 */ }
+  if (userStore.isLoggedIn && !userStore.userInfo?.uid) loadProfile()
+})
 
 async function handleLogin() {
   if (!loginForm.uid || !loginForm.password) { loginError.value = '请输入 UID 和密码'; return }
@@ -83,7 +107,6 @@ async function handleLogin() {
 async function loadProfile() {
   try { const res = await userApi.profile(); userStore.setUserInfo(res.data) } catch { /* 未登录时忽略 */ }
 }
-if (userStore.isLoggedIn && !userStore.userInfo) loadProfile()
 </script>
 <style scoped>
 /* 顶部导航（电脑端） */

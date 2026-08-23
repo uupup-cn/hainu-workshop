@@ -24,14 +24,18 @@ import { useUserStore } from '../store/user'
 const router = useRouter()
 const userStore = useUserStore()
 const menus = [
+  { icon: '🎒', label: '新生专区', desc: '指南 / 攻略 / 找室友', path: '/guide' },
   { icon: '🏫', label: '海大介绍', desc: '概况 / 校区 / 院系', path: '/intro' },
   { icon: '📞', label: '电话簿', desc: '校园服务电话', path: '/phonebook' },
   { icon: '📅', label: '校历', desc: '学期安排', path: '/calendar' },
+  { icon: '🗺', label: '校园地图', desc: '全景导览', path: '/map' },
   { icon: '🚌', label: '校园出行', desc: '班车 / 车站', path: '/bus' },
   { icon: '🛒', label: '二手集市', desc: '好物淘换', path: '/marketplace' },
   { icon: '📰', label: '快讯', desc: '校园通知', path: '/news' },
   { icon: '💬', label: '校友圈', desc: '帖子 / 表白墙', path: '/alumni' },
-  { icon: '🗓', label: '我的课表', desc: '周视图查看', path: '/schedule' },
+  { icon: '🗓', label: '我的课表', desc: '周视图管理', path: '/schedule' },
+  { icon: '🧰', label: '工具箱', desc: '10 个实用工具', path: '/tools' },
+  { icon: '🙋', label: '常见问题', desc: '新生 FAQ', path: '/faq' },
 ]
 </script>
 <style scoped>
