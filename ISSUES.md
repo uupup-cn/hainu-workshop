@@ -1,0 +1,299 @@
+# 海大工坊 · 问题记录文档
+
+> 记录开发、测试、部署期间出现的问题与解决方案，供团队复盘参考。
+> 更新日期：2026-08-23
+
+---
+
+## 一、后端开发阶段
+
+### 1. authMiddleware 吞掉下游业务错误（严重）
+
+**现象**：`GET /marketplace/items` 等需登录接口返回 `40002 Token 无效或已过期`，但同一 token 访问 `/user/profile` 正常。
+
+**原因**：`authMiddleware` 的 `try` 块把 `await next()` 也包进去了——控制器抛出的任何业务错误（如 Prisma 校验失败）都被 catch 误判为 Token 失效。
+
+**解决方案**：将 `await next()` 移出 try 块，仅捕获 `verifyToken()` 的异常。`adminAuthMiddleware` 同样修复。
+
+**文件**：`server/src/middlewares/auth.middleware.ts`
+
+---
+
+### 2. 集市商品列表查询不存在的 isActive 字段
+
+**现象**：`getItems` 调用 Prisma 报错 `Unknown argument isActive`。
+
+**原因**：`MarketplaceItem` 模型没有 `isActive` 字段，但 `getItems` 的 where 条件里写了 `isActive: true`。此前从未被真实请求触发所以没暴露。
+
+**解决方案**：移除 where 条件中的 `isActive`，仅按 `status: 'active'` 过滤。
+
+**文件**：`server/src/services/marketplace.service.ts`
+
+---
+
+### 3. 路由遮蔽：静态段被参数路由 :id 吞掉（严重）
+
+**现象**：`GET /notifications/unread-count` 和 `GET /roommate/posts/my` 返回 50000（Prisma findUnique 的 id 参数缺失）。
+
+**原因**：`GET /notifications/:id` 注册在 `GET /notifications/unread-count` 之前，koa-router 按注册顺序匹配，`unread-count` 被当作 `:id` 的值传入 `getNotificationDetail(id)`，导致 `prisma.notification.findUnique({ where: { id: NaN } })`。`roommate/posts/my` 同理被 `posts/:id` 吞掉。
+
+**解决方案**：静态段路由（`unread-count`、`posts/my`、`posts/match`）必须注册在参数路由（`:id`）之前。
+
+**文件**：`server/src/routes/notification.routes.ts`、`server/src/routes/roommate.routes.ts`
+
+---
+
+### 4. 课表复刻接口前后端字段名不一致
+
+**现象**：网页端按 api.md 文档传 `{ share_code: "xxx" }` 调用 `POST /courses/replicate`，后端返回 `40001 缺少分享码`。
+
+**原因**：api.md 文档写 `share_code`（snake_case），后端 controller 解构 `{ shareCode }`（camelCase），字段名不匹配。冲突覆盖参数 `force_overwrite` 同理。
+
+**解决方案**：后端同时兼容 `share_code` 和 `shareCode`、`force_overwrite` 和 `forceOverwrite`。以设计文档 snake_case 为准。
+
+**文件**：`server/src/controllers/course.controller.ts`、`server/src/services/course.service.ts`
+
+---
+
+### 5. 密码无盐 SHA-256 哈希（安全隐患）
+
+**现象**：审查发现密码用 `crypto.createHash('sha256').update(password).digest('hex')` 存储，无盐、可彩虹表破解。
+
+**解决方案**：新建 `utils/password.ts`，改用 PBKDF2-SHA256（10 万次迭代 + 16 字节随机盐）。`verifyPassword` 兼容旧 SHA-256 哈希（64 位 hex 格式），首次登录成功后自动升级为新哈希。auth.service / user.service / integration.service / seed.ts 全部替换。
+
+**文件**：`server/src/utils/password.ts`（新建）、`server/src/services/auth.service.ts`、`server/src/services/user.service.ts`、`server/src/services/admin/integration.service.ts`、`server/prisma/seed.ts`
+
+---
+
+### 6. WSL → Windows MySQL 连接被 Hyper-V 防火墙拦截
+
+**现象**：Windows 端 `prisma db push` 连接 WSL 内 MySQL（172.28.x.x:3306）报 `Connection refused`，但 WSL 内部 `127.0.0.1:3306` 可达。
+
+**原因**：WSL 2 NAT 模式下，Windows → WSL 的回环连接被 Hyper-V 防火墙拦截，且当前用户无管理员权限无法放行。
+
+**尝试**：配置 `.wslconfig` 的 `networkingMode=mirrored` 未生效（仍需管理员权限）。
+
+**最终方案**：整个测试栈放进 WSL 内运行（Node 装入 WSL、server 在 WSL 内连本地 MySQL、测试脚本也在 WSL 内执行），完全绕开防火墙问题。
+
+---
+
+### 7. WSL 虚拟机自动关闭导致服务中断
+
+**现象**：WSL 内 nohup 启动的 MySQL / API 服务器在无活动会话时被自动回收，进程消失。
+
+**原因**：WSL 2 在没有活动会话时会自动关闭虚拟机，nohup 进程随之终止。
+
+**解决方案**：使用 ZCode 的 `run_in_background` 后台任务（`exec node ...`）保持 WSL 会话存活，MySQL 用 `exec sleep infinity` 常驻。
+
+---
+
+## 二、管理后台开发阶段
+
+### 8. 路由模块 index.ts 三处失效引用导致构建必失败（严重）
+
+**现象**：`npm run build`（vue-tsc + vite build）在类型检查阶段直接失败。
+
+**原因**：`src/router/modules/index.ts` 引用了三个不存在的模块：`./data-screen`（data-screen.ts 不存在）、`./tools`（tools.ts 不存在）、`...monitorRoutes`（import 被注释但使用处未注释）。
+
+**解决方案**：删除 data-screen 和 tools 的 import 与使用处，恢复 monitorRoutes 的 import 取消注释，同时恢复 notificationRoutes 注册。
+
+**文件**：`admin/src/router/modules/index.ts`
+
+---
+
+### 9. API URL 双斜杠笔误
+
+**现象**：`fetchUpdateAlumniPostPin` 和 `fetchToggleShareCode` 的请求 404。
+
+**原因**：URL 拼接写成了 `posts//' + id` 和 `share-codes//' + id`（双斜杠）。
+
+**解决方案**：修正为 `posts/' + id + '/pin` 和 `share-codes/' + id + '/status`。
+
+**文件**：`admin/src/api/community.ts`、`admin/src/api/schedule.ts`
+
+---
+
+### 10. data-screen 悬空路由指向已删除组件
+
+**现象**：点击仪表盘「运营概览」菜单白屏。
+
+**原因**：`dashboard.ts` 注册了 `operation-overview` → component `/data-screen/operation-overview`，但 `views/data-screen/` 目录已删除。
+
+**解决方案**：从 dashboard.ts 中移除该路由项。
+
+**文件**：`admin/src/router/modules/dashboard.ts`
+
+---
+
+### 11. content 模块死菜单（后端无接口）
+
+**现象**：「内容管理」菜单点击后页面无法加载（所有 API 404）。
+
+**原因**：`contentRoutes` 注册了文章/分类/标签等页面，但后端无 `/api/v1/contents` 等任何接口。项目内容管理由各业务模块（guide/life/faq/intro 等）承担，不需要模板的通用内容管理。
+
+**解决方案**：在 `index.ts` 中注释 `contentRoutes` 的注册与 import。
+
+**文件**：`admin/src/router/modules/index.ts`
+
+---
+
+### 12. 模板遗留死代码引用断裂
+
+**现象**：删除模板 demo 文件后 vue-tsc 报错 `Cannot find module '@/api/scheduler'` 等。
+
+**原因**：模板核心组件 `art-cron-expression` 引用已删除的 `@/api/scheduler`，`art-chat-window` 引用 `@/api/ai-assistant`，spec 文件引用已删除的 `@/router/modules/mall`。
+
+**解决方案**：删除两个死组件目录、删除 mall spec 文件、清理 `types/import/components.d.ts` 中的类型引用、从 `config/modules/component.ts` 移除注册。
+
+---
+
+## 三、部署阶段
+
+### 13. 服务器 GitHub clone 失败（网络问题）
+
+**现象**：服务器 `git clone https://github.com/...` 报 `GnuTLS recv error` 或 `Failed to connect to github.com port 443`。
+
+**原因**：服务器网络到 GitHub 不稳定（国内服务器），SSH 协议也因服务器无 GitHub SSH key 失败。
+
+**解决方案**：从本地打包源码（排除 node_modules/dist/.git），`scp` 上传到服务器后解压。
+
+---
+
+### 14. 服务器内存不足导致 admin 构建崩溃
+
+**现象**：服务器上 `npm run build`（admin）报 `Aborted (core dumped)`。
+
+**原因**：服务器仅 1.9G 内存，admin 的 vue-tsc + vite build 构建过程内存峰值超限导致 OOM。
+
+**解决方案**：admin 改为本地构建（Windows 端内存充足），`tar` 打包 dist 后 `scp` 上传到服务器部署。web 在服务器上构建正常（内存占用小）。
+
+---
+
+### 15. PM2 ecosystem.config.cjs 路径不匹配
+
+**现象**：`pm2 start ecosystem.config.cjs` 报 `Script not found: /var/www/hainu-workshop/server/dist/app.js`。
+
+**原因**：ecosystem 的 `cwd` 写的是 `/var/www/hainu-workshop/server`，但实际路径是 `/var/www/hainu-workshop/hainu-server/server`（多一层 hainu-server）。
+
+**解决方案**：修正 cwd 为 `/var/www/hainu-workshop/hainu-server/server`。
+
+---
+
+### 16. PM2 日志目录权限不足
+
+**现象**：`pm2 start` 报 `Could not create folder: /var/log/hainu`。
+
+**原因**：ecosystem 配置的日志路径 `/var/log/hainu/` 需 root 权限，当前用户为 ubuntu。
+
+**解决方案**：改为 `/home/ubuntu/.pm2/logs/`（用户目录，无需 sudo）。
+
+---
+
+### 17. 旧端口占用导致 PM2 启动 EADDRINUSE
+
+**现象**：PM2 启动新进程后立即崩溃，日志报 `EADDRINUSE port 3000`。
+
+**原因**：旧版部署的 ts-node 进程仍在 3000 端口运行（PM2 stop 只停了 PM2 管理的进程，但旧的 ts-node 是直接启动的）。
+
+**解决方案**：`pm2 delete all` + `sudo fuser -k 3000/tcp` 强制杀掉占用进程，再用 `dist/app.js`（编译后 JS，非 ts-node）启动。
+
+---
+
+### 18. 旧数据库密码哈希不兼容
+
+**现象**：部署后管理员登录返回 `40001 密码错误`。
+
+**原因**：旧库的 admin 密码哈希是 `240be518...`，与 SHA-256('123456')=`8d969eef...` 不匹配——旧库使用过不同密码或不同哈希方式 seed。
+
+**解决方案**：Drop 整个数据库重建（`DROP DATABASE` + `prisma db push` + `npm run seed`），确保全部用新 seed 的 PBKDF2 哈希。
+
+---
+
+### 19. 管理后台登录 404（严重 · 构建产物 baseURL 空值）
+
+**现象**：浏览器打开 `http://159.75.116.207/admin/` 输入 admin/123456 点击登录，提示 `Request failed with status code 404`。
+
+**排查过程**：
+1. 用 curl 直连 API 全部 200（`/api/v1/auth/admin/login`、`/api/v1/user/info`、`/api/v3/system/menus`），排除后端和 Nginx 反代问题
+2. 检查 admin 构建产物 JS，发现 `/api/v1` 出现 **0 次**——`VITE_API_URL` 没有被注入
+3. 确认 `.env.production` 被 vite `loadEnv` 正确读取（`VITE_API_URL: /api/v1`），vite.config 日志也打印了 `API_URL = /api/v1`
+4. 但 `import.meta.env.VITE_API_URL` 在构建产物中被替换成了空字符串，axios `baseURL` 为空
+5. 所有 API 请求走相对路径（如 `/auth/admin/login`），Nginx 当静态文件处理返回 404
+
+**根因**：Vite 8 的 `import.meta.env.VITE_*` 自动替换机制在生产构建时未将 `VITE_API_URL` 注入到非入口 chunk 的 HTTP 模块中。另外 Git Bash 的 MSYS 路径转换会把 `/api/v1` 变成 `C:/Program Files/Git/api/v1`，进一步污染构建。
+
+**解决方案**：
+1. 在 `vite.config.ts` 的 `define` 块中显式注入：`'import.meta.env.VITE_API_URL': JSON.stringify(VITE_API_URL || '/api/v1')`
+2. 构建时设置 `MSYS_NO_PATHCONV=1` 环境变量防止路径转换
+3. 修复后构建产物中 `/api/v1` 出现在 20 个 chunk（之前 0 个）
+
+**文件**：`admin/vite.config.ts`
+
+---
+
+## 四、测试阶段
+
+### 20. 连通性测试脚本 URL 拼接问题
+
+**现象**：测试脚本对 `/api/v3/system/menus` 等绝对路径端点报 `Failed to parse URL`。
+
+**原因**：测试脚本 `BASE = 'http://localhost:3000/api/v1'`，对 `/api/v3/` 开头的绝对路径直接拼接导致 URL 格式错误。
+
+**解决方案**：`call()` 函数判断路径以 `/api/` 开头时，从 BASE 中提取 origin 再拼接：`BASE.replace(/\/api\/v1$/, '') + path`。
+
+**文件**：`server/scripts/connectivity-test.mjs`
+
+---
+
+### 21. CSV 导出端点测试断言失败
+
+**现象**：`GET /logs/login/export` 测试报 `非 JSON 响应`。
+
+**原因**：CSV 导出端点返回 `text/csv` 格式的二进制内容（带 BOM），不是 JSON。测试脚本的 `check()` 函数默认尝试 `res.json()` 解析。
+
+**解决方案**：CSV 导出端点单独验证 HTTP 状态码和 Content-Type，不走通用 `check()` 函数。
+
+**文件**：`server/scripts/connectivity-test.mjs`
+
+---
+
+### 22. seed 脚本菜单植入幂等性问题
+
+**现象**：重复运行 `npm run seed` 报 `Unique constraint failed on guide_entries_entryKey_key`。
+
+**原因**：seed 脚本对菜单用 `count() === 0` 判断是否首次植入，但其他数据（指南条目等）用 `upsert`。测试脚本创建的 `test-entry` 与 seed 的固定 key 冲突。
+
+**解决方案**：
+1. 测试脚本改用随机 key（`'test-entry-' + Date.now().toString(36)`）
+2. 菜单种子改为按 `menuKey` upsert 增量同步（不再 `count() === 0` 跳过），新增菜单项自动补入
+
+**文件**：`server/prisma/seed.ts`、`server/scripts/connectivity-test.mjs`
+
+---
+
+### 23. 分享功能测试缺少前置使用记录
+
+**现象**：`shareTool` 测试用例 `expect(log!.isShared).toBe(true)` 失败。
+
+**原因**：测试用户从未使用过 schulte 工具，`shareTool` 内的 `updateMany` 没有可标记的 ToolUsageLog 记录，`lastLog()` 取到的是其他工具的记录。
+
+**解决方案**：在分享前先调用 `useTool('schulte', ...)` 产生使用记录。
+
+**文件**：`server/src/__tests__/tool.service.test.ts`
+
+---
+
+## 五、经验总结
+
+| # | 经验 |
+|:--|:-----|
+| 1 | **路由注册顺序**：静态段路径必须先于参数路径（`:id`）注册，否则被吞掉。koa-router 按注册顺序匹配 |
+| 2 | **try-catch 边界**：中间件的 try 块只捕获自身逻辑的异常，`await next()` 必须在 try 外面，否则下游错误被误判 |
+| 3 | **前后端字段命名**：文档定义 snake_case、代码实现 camelCase 时，后端应双兼容，以文档为准 |
+| 4 | **Vite 环境变量**：`import.meta.env.VITE_*` 在 Vite 8 生产构建中可能不被正确注入非入口 chunk，用 `define` 显式注入更可靠 |
+| 5 | **Git Bash 路径转换**：以 `/` 开头的值（如 `/api/v1`）会被 MSYS 转换为 Windows 路径，构建时需 `MSYS_NO_PATHCONV=1` |
+| 6 | **WSL 网络**：NAT 模式下 Windows→WSL 连接受 Hyper-V 防火墙限制，测试栈全放 WSL 内可绕开 |
+| 7 | **服务器内存**：1.9G 内存不足以运行 vue-tsc+vite build，admin 需本地构建上传 |
+| 8 | **密码哈希迁移**：新算法的 verify 函数需兼容旧哈希格式，首次登录成功后自动升级 |
+| 9 | **seed 幂等**：所有 seed 数据用 upsert 而非 create，菜单等结构化数据按唯一键增量同步 |
+| 10 | **测试覆盖**：静态路由审计脚本（check-admin-api.mjs）能发现运行时测试测不到的写接口断链 |
