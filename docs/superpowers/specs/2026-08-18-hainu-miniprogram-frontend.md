@@ -1,8 +1,8 @@
 # 海大工坊 · 微信小程序 — 前端设计文档
 
-> 版本：v2.0
-> 日期：2026-08-19
-> 状态：初稿
+> 版本：v2.1
+> 日期：2026-08-23
+> 状态：初稿（v2.1 更新 §2.3 网页端页面结构为实际实现）
 
 ---
 
@@ -176,22 +176,29 @@ pages/
 
 > 网页端为独立 Vue3 项目，不复用小程序代码。使用 Vue Router 管理路由，Pinia 管理状态，响应式布局适配手机/电脑。
 
-
-
 网页端复用小程序模块结构，按客户端类型自适应布局：
 
 ```
-web/
+web/src/
+  api/               # 接口封装（http 实例 + freshman/roommate/marketplace/alumni/course/tools/profile 模块）
   views/
-    home/            # 主页（模块入口）
-    freshman/        # 新生模块
-    wise/            # 智慧海大
-    community/       # 社区模块
-    schedule/        # 课表模块
-    login/           # 登录页/弹窗（UID+密码；电脑端含小程序扫码登录入口）
-    tools/           # 工具箱
-    profile/         # 个人设置（个人信息/密码/隐私/认证/积分）
+    Home.vue           # 主页（模块入口宫格）
+    Login.vue          # 登录页（UID+密码；电脑端登录弹窗含小程序扫码登录入口占位）
+    Launch.vue         # 假期模式启动页（campus_mode=holiday 时开学倒计时 + 进入按钮）
+    Intro/Phonebook/Calendar/Bus/News.vue       # 智慧海大（介绍/电话簿/校历/出行）与快讯
+    freshman/          # 新生模块：Guide(+Detail)/Life(+Topics+Detail)/Faq/Roommate（发布/多级联动/三态匹配）
+    wise/Map.vue       # 校园地图（海甸校区内置 720yun 全景 https://www.720yun.com/t/9cvkbhfegpl?scene_id=130130450；其余校区展示后台地图图 + 标注点列表）
+    Marketplace.vue    # 二手集市（浏览/发布/我的发布/下架/重新上架/举报）
+    Alumni.vue         # 校友圈（帖子/表白墙、发帖/点赞/楼中楼评论/举报）
+    Schedule.vue       # 课表（周视图、添加/编辑/删除、冲突覆盖、分享码生成/复刻）
+    tools/             # 工具箱主页 + ToolPage 分发 + 10 个工具组件（摇骰子/计算器/证件照裁剪/影视解析/转盘/舒尔特可玩/四类测评问卷引擎）
+    Profile.vue        # 个人中心（资料/密码/隐私/认证含图片上传/通知/反馈）
 ```
+
+**网页端实现补充（v2.1）：**
+- 身份差异化底部 Tab：新生第二栏进「新生专区」，在校生进「校园」
+- 假期模式：启动时读取 /system/settings 的 campus_mode，holiday 时先进入启动页（sessionStorage 记忆已通过）
+- 测评类工具为题库无关的维度得分协议（见 PRD §3.6.7），网页端内置示例题库，正式题库接入后替换
 
 ### 2.4 小程序端项目目录结构（微信原生框架）
 

@@ -1,8 +1,10 @@
 # 海大工坊 · 微信小程序 — API 文档
 
-> 版本：v2.1
+> 版本：v2.2
 > 日期：2026-08-23
-> 状态：初稿（v2.1 补充管理后台模板集成接口）
+> 状态：初稿（v2.1 补充管理后台模板集成接口；v2.2 勘误响应字段命名并补充遗漏端点）
+
+> **命名约定勘误（v2.2）**：本文档早期示例中的响应字段（如 `points_consumed`、`share_code`、`share_url`、`poster_url`、`share_type`、`result_data`）实际实现统一为 **camelCase**（`pointsConsumed`、`shareCode`、`shareUrl`、`posterUrl`、`shareType`、`resultData`），与 Prisma/JS 生态惯例一致。请求字段同时兼容 snake_case（文档写法）与 camelCase；各端消费请按 camelCase 读取。
 
 ---
 
@@ -83,6 +85,11 @@ UID + 密码登录（网页端/小程序端通用）
   "password": "xxx"
 }
 ```
+
+响应 data：`{ uid, accessToken, refreshToken, identity }`
+
+#### POST /api/v1/auth/refresh
+刷新 Access Token（请求体 `{ "refreshToken": "..." }`，返回新 accessToken）
 
 ### 2.2 个人信息
 
@@ -570,7 +577,12 @@ UID + 密码登录（网页端/小程序端通用）
 ### 7.2 课表导入
 
 #### POST /api/v1/courses/import
-文件导入课表
+文件导入课表（**预留待实现**：Excel 解析依赖待确认，小程序端优先实现）
+
+### 7.2.1 上传文件静态访问
+
+#### GET /uploads/:年/:月/:文件名
+上传文件的静态访问（无需鉴权）
 
 ### 7.3 课表分享
 
@@ -631,8 +643,8 @@ UID + 密码登录（网页端/小程序端通用）
 
 ### 10.1 认证
 
-#### POST /api/v1/admin/login
-管理员登录
+#### POST /api/v1/auth/admin/login
+管理员登录（返回 `{ accessToken, refreshToken, userInfo }`；实际路径为 /auth/admin/login 而非 /admin/login，与前端模板登录页一致）
 
 ### 10.2 内容管理 CRUD
 
