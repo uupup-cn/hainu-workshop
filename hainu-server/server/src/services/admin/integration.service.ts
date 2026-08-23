@@ -213,11 +213,12 @@ export async function listAdminUsers(query: any) {
   return templatePage(rows.map(r => mapAdminUser(r, byUser.get(r.id) || [])), total, current, size);
 }
 
-// 创建管理员（password sha256 哈希存储，与 auth.service 的 hashPassword 一致；username 唯一冲突 40001）
+// 创建管理员（password PBKDF2 哈希存储；username 唯一冲突 40001；密码至少 6 位）
 export async function createAdminUser(d: any) {
   const username = String(d.username || '');
   const password = String(d.password || '');
   if (!username || !password) throw new ApiError(40001, '用户名与密码必填');
+  if (password.length < 6) throw new ApiError(40001, '密码至少 6 位');
   if (await prisma.adminUser.findUnique({ where: { username } })) throw new ApiError(40001, '用户名已存在');
   const nickName = String(d.nickName || d.profile?.nickName || username);
   const user = await prisma.adminUser.create({ data: { username, passwordHash: hashPassword(password), nickname: nickName, status: 'active' } });
