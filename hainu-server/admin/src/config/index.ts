@@ -36,11 +36,11 @@ import { headerBarConfig } from './modules/headerBar'
 const appConfig: SystemConfig = {
   // 商业化品牌入口（购买授权、官方文档外链、项目介绍弹窗等）可一键关闭所有供应商相关引流入口
   commercial: {
-    enabled: true
+    enabled: false
   },
   // 系统信息
   systemInfo: {
-    name: 'Ci-Yuu-Plus' // 系统名称
+    name: '海大工坊' // 系统名称
   },
   // 系统主题
   systemThemeStyles: {

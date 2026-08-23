@@ -174,11 +174,11 @@
   const captchaSvg = ref('')
   const displayCaptchaSvg = computed(() => createCaptchaSvg(captchaSvg.value, isDark.value))
   const formData = reactive<LoginForm>({
-    username: 'Super',
-    password: '123456',
+    username: '',
+    password: '',
     captchaId: '',
     captchaCode: '',
-    rememberPassword: true
+    rememberPassword: false
   })
 
   /**

@@ -114,13 +114,10 @@ axiosInstance.interceptors.response.use(
     if (isUnauthorized && requestConfig.silentUnauthorized) {
       throw createHttpError(errorMsg || $t('httpMsg.unauthorized'), ApiStatus.unauthorized)
     }
+    // 未授权直接登出（不自动 refresh——前端未存储 refreshToken，token 7 天有效，过期重新登录）
     if (isUnauthorized) {
-      try {
-        return await retryWithFreshAccessToken(requestConfig)
-      } catch (refreshError) {
-        handleUnauthorizedError(resolveErrorMessage(refreshError) || errorMsg)
-        return Promise.reject(refreshError)
-      }
+      handleUnauthorizedError(errorMsg || $t('httpMsg.unauthorized'))
+      throw createHttpError(errorMsg || $t('httpMsg.unauthorized'), ApiStatus.unauthorized)
     }
     throw createHttpError(errorMsg || $t('httpMsg.requestFailed'), code)
   },
