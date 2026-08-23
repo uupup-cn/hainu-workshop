@@ -95,9 +95,9 @@
             <option v-for="b in buildings" :key="b.id" :value="b.id">{{ b.buildingName }}</option>
           </select>
         </label>
-        <label class="form-row">系 *
-          <select v-model.number="form.departmentId" class="select" :disabled="!form.campusId" @change="onDepartmentChange">
-            <option :value="0">请选择系</option>
+        <label class="form-row">学院 *
+          <select v-model.number="form.departmentId" class="select" @change="onDepartmentChange">
+            <option :value="0">请选择学院</option>
             <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.departmentName }}</option>
           </select>
         </label>
@@ -215,7 +215,7 @@ async function decorate(list: any[]) {
   const deptIds = [...new Set(list.map((p: any) => p.departmentId))]
   const [collegeLists, deptLists, buildingLists, majorLists] = await Promise.all([
     Promise.all(campusIds.map((c) => memo(dict.colleges, c, () => roommateApi.colleges(c)))),
-    Promise.all(campusIds.map((c) => memo(dict.departments, c, () => roommateApi.departments(c)))),
+    departments.value.length ? Promise.resolve([departments.value]) : roommateApi.departments().then((r: any) => { departments.value = r.data || []; return [r.data] }),
     Promise.all(collegeIds.map((c) => memo(dict.buildings, c, () => roommateApi.buildings(c)))),
     Promise.all(deptIds.map((d) => memo(dict.majors, d, () => roommateApi.majors(d)))),
   ])
@@ -285,15 +285,14 @@ async function openDialog(edit: boolean) {
       name: p.name, contact: p.contact, roomNumber: p.roomNumber,
       campusId: p.campusId, collegeId: p.collegeId, departmentId: p.departmentId, majorId: p.majorId, buildingId: p.buildingId,
     })
-    // 预填级联选项
-    const [cs, ds, bs, ms] = await Promise.all([
+    // 预填级联选项（学院全量加载，不按校区）
+    const [cs, bs, ms] = await Promise.all([
       memo(dict.colleges, p.campusId, () => roommateApi.colleges(p.campusId)),
-      memo(dict.departments, p.campusId, () => roommateApi.departments(p.campusId)),
       memo(dict.buildings, p.collegeId, () => roommateApi.buildings(p.collegeId)),
       memo(dict.majors, p.departmentId, () => roommateApi.majors(p.departmentId)),
     ])
+    if (!departments.value.length) { const dr = await roommateApi.departments(); departments.value = dr.data || [] }
     colleges.value = cs
-    departments.value = ds
     buildings.value = bs
     majors.value = ms
   } else {
@@ -306,16 +305,10 @@ async function openDialog(edit: boolean) {
 async function onCampusChange() {
   form.collegeId = 0
   form.buildingId = 0
-  form.departmentId = 0
-  form.majorId = 0
-  resetOptions()
+  colleges.value = []
+  buildings.value = []
   if (!form.campusId) return
-  const [cs, ds] = await Promise.all([
-    memo(dict.colleges, form.campusId, () => roommateApi.colleges(form.campusId)),
-    memo(dict.departments, form.campusId, () => roommateApi.departments(form.campusId)),
-  ])
-  colleges.value = cs
-  departments.value = ds
+  colleges.value = await memo(dict.colleges, form.campusId, () => roommateApi.colleges(form.campusId))
 }
 
 async function onCollegeChange() {
@@ -402,6 +395,8 @@ onMounted(async () => {
   hallLoaded.value = true
   loadPosts(1)
   loadMine()
+  // 学院列表全量加载（不按校区过滤，学院可跨校区）
+  roommateApi.departments().then((r: any) => { departments.value = r.data || [] }).catch(() => {})
 })
 </script>
 <style scoped>
