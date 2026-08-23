@@ -243,11 +243,11 @@ async function main() {
       const row = await prisma.menu.upsert({ where: { menuKey: it.menuKey }, create: { menuKey: it.menuKey, ...data }, update: data });
       idByKey.set(it.menuKey, row.id); if (!existing.some((e) => e.menuKey === it.menuKey)) created++;
     }
-    for (let depth = 0; depth < 3; depth++) {
-      for (const it of items.filter((i: any) => i.parentId && idByKey.has(i.parentId) && !idByKey.has(i.menuKey))) {
+    for (let depth = 0; depth < 4; depth++) {
+      for (const it of items.filter((i: any) => i.parentId && idByKey.has(i.parentId))) {
         const data = { menuName: it.menuName, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible, parentId: idByKey.get(it.parentId as string)! };
         const row = await prisma.menu.upsert({ where: { menuKey: it.menuKey }, create: { menuKey: it.menuKey, ...data }, update: data });
-        idByKey.set(it.menuKey, row.id); created++;
+        idByKey.set(it.menuKey, row.id); if (!existing.some((e) => e.menuKey === it.menuKey)) created++;
       }
     }
     console.log('[seed] 菜单同步完成：共 ' + idByKey.size + ' 项，新增 ' + created + ' 项');
