@@ -6,6 +6,7 @@ import * as svc from '../../services/admin/course.service';
 
 // 课程库
 export async function listCourses(ctx: Context) { const { page, size } = parsePagination(ctx.query); const keyword = ctx.query.keyword as string | undefined; ctx.body = success(await svc.listCourses(page, size, keyword)); }
+export async function deleteCourse(ctx: Context) { ctx.body = success(await svc.deleteCourse(Number(ctx.params.id)), '删除成功'); }
 // 课程颜色
 export async function listCourseColors(ctx: Context) { ctx.body = success(await svc.courseColors.list()); }
 export async function createCourseColor(ctx: Context) { ctx.body = success(await svc.courseColors.create(ctx.request.body)); }

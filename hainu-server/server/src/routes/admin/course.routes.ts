@@ -5,6 +5,7 @@ import * as ctrl from '../../controllers/admin/course.controller';
 const router = new Router({ prefix: '/api/v1/admin' });
 // 课程库
 router.get('/courses', adminAuthMiddleware, ctrl.listCourses);
+router.delete('/courses/:id', adminAuthMiddleware, ctrl.deleteCourse);
 // 课程颜色
 router.get('/course-colors', adminAuthMiddleware, ctrl.listCourseColors);
 router.post('/course-colors', adminAuthMiddleware, ctrl.createCourseColor);

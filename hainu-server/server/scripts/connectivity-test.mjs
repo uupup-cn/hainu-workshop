@@ -187,6 +187,13 @@ async function main() {
     await check('管理员退出', 'POST', '/auth/logout');
     const info = await check('当前管理员信息', 'GET', '/user/info', undefined, adminToken);
     if (!(info && info.data && Array.isArray(info.data.roles))) { failCount++; failures.push('当前管理员信息 → 缺少 roles 数组'); }
+    const stats = await check('分析仪表聚合', 'GET', '/admin/dashboard/stats', undefined, adminToken);
+    if (stats && stats.data) {
+      for (const k of ['users', 'activity', 'community', 'marketplace', 'tools', 'service']) {
+        if (!(k in stats.data)) { failCount++; failures.push('分析仪表聚合 → 缺少 ' + k + ' 分组'); }
+      }
+      if (stats.data.users && !Array.isArray(stats.data.users.weekTrend)) { failCount++; failures.push('分析仪表聚合 → users.weekTrend 缺失'); }
+    }
     const menus = await check('动态菜单树', 'GET', '/api/v3/system/menus', undefined, adminToken);
     if (menus && menus.data) {
       if (!Array.isArray(menus.data) || menus.data.length < 8) { failCount++; failures.push('动态菜单树 → 根节点数 ' + (Array.isArray(menus.data) ? menus.data.length : '非数组') + '（期望 ≥8）'); }
@@ -208,6 +215,28 @@ async function main() {
     await check('反馈概览(模板)', 'GET', '/feedback/overview', undefined, adminToken);
     await check('通知管理(模板)', 'GET', '/notifications/admin', undefined, adminToken);
     await check('访客趋势(模板)', 'GET', '/monitor/visitor-analytics', undefined, adminToken);
+    console.log('[管理端·模板补缺]');
+    await check('服务器资源', 'GET', '/monitor/system-resource', undefined, adminToken);
+    await check('缓存清理', 'POST', '/monitor/cache/clear', { namespace: 'all' }, adminToken);
+    await check('缓存刷新', 'POST', '/monitor/cache/refresh', {}, adminToken);
+    await check('操作日志详情', 'GET', '/logs/operation/1', undefined, adminToken, 40003);
+    // CSV 导出端点返回 text/csv（非 JSON），单独验证 HTTP 成功
+    try {
+      const csvRes = await fetch(BASE.replace(/\/api\/v1$/, '') + '/api/v1/logs/login/export', { headers: { Authorization: 'Bearer ' + adminToken } });
+      if (csvRes.ok && csvRes.headers.get('content-type')?.includes('text/csv')) passCount++;
+      else { failCount++; failures.push('登录日志导出 → 非 CSV 响应（status=' + csvRes.status + '）'); }
+    } catch (e) { failCount++; failures.push('登录日志导出 → 请求异常: ' + e.message); }
+    await check('登录日志清空', 'DELETE', '/logs/login/clear', undefined, adminToken);
+    await check('修改管理员密码-旧密错', 'POST', '/user/password/change', { currentPassword: 'wrong', newPassword: 'abc12345', confirmPassword: 'abc12345' }, adminToken, 40001);
+    await check('在线会话列表', 'GET', '/auth/sessions', undefined, adminToken);
+    await check('通知收件箱', 'GET', '/notifications/inbox', undefined, adminToken);
+    await check('通知统计', 'GET', '/notifications/stats', undefined, adminToken);
+    await check('流式令牌', 'POST', '/notifications/stream-token', {}, adminToken);
+    await check('角色数据权限', 'GET', '/roles/1/data-permissions', undefined, adminToken);
+    await check('反馈详情(404校验)', 'GET', '/feedback/999999', undefined, adminToken, 40003);
+    await check('部门占位', 'GET', '/departments', undefined, adminToken);
+    await check('岗位占位', 'GET', '/posts', undefined, adminToken);
+    await check('文件下载地址', 'POST', '/files/1/download-url', {}, adminToken, 40003);
   }
 
   // ===== 结果 =====

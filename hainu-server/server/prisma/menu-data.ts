@@ -92,7 +92,6 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'monitor:online-user', menuName: '在线用户', menuType: 'menu', parentId: 'monitor', icon: 'ri-user-shared-line', path: 'online-user', component: '/monitor/online-user/index', sortOrder: 2, isVisible: true },
     { menuKey: 'monitor:server', menuName: '服务器监控', menuType: 'menu', parentId: 'monitor', icon: 'ri-server-line', path: 'server', component: '/monitor/server/index', sortOrder: 3, isVisible: true },
     { menuKey: 'monitor:cache', menuName: '缓存监控', menuType: 'menu', parentId: 'monitor', icon: 'ri-database-2-line', path: 'cache', component: '/monitor/cache/index', sortOrder: 4, isVisible: true },
-    { menuKey: 'monitor:security-audit', menuName: '安全审计', menuType: 'menu', parentId: 'monitor', icon: 'ri-alarm-warning-line', path: 'security-audit', component: '/monitor/security-audit/index', sortOrder: 5, isVisible: true },
 
     // ===== 系统管理 =====
     { menuKey: 'system:user', menuName: '用户管理', menuType: 'menu', parentId: 'system', icon: 'ri-user-line', path: 'user', component: '/system/user/index', sortOrder: 1, isVisible: true },
@@ -130,8 +129,6 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'monitor:online-user:forceLogout', menuName: '强制下线', menuType: 'button', parentId: 'monitor:online-user', sortOrder: 2, isVisible: true },
     { menuKey: 'monitor:cache:view', menuName: '查看', menuType: 'button', parentId: 'monitor:cache', sortOrder: 1, isVisible: true },
     { menuKey: 'monitor:cache:refresh', menuName: '刷新', menuType: 'button', parentId: 'monitor:cache', sortOrder: 2, isVisible: true },
-    { menuKey: 'monitor:security-audit:view', menuName: '查看', menuType: 'button', parentId: 'monitor:security-audit', sortOrder: 1, isVisible: true },
-    { menuKey: 'monitor:security-audit:edit', menuName: '编辑', menuType: 'button', parentId: 'monitor:security-audit', sortOrder: 2, isVisible: true },
     { menuKey: 'system:site-setting:edit', menuName: '编辑', menuType: 'button', parentId: 'system:site-setting', sortOrder: 1, isVisible: true },
     { menuKey: 'system:file-center:upload', menuName: '上传', menuType: 'button', parentId: 'system:file-center', sortOrder: 1, isVisible: true },
     { menuKey: 'system:file-center:delete', menuName: '删除', menuType: 'button', parentId: 'system:file-center', sortOrder: 2, isVisible: true },

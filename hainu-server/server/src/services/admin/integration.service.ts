@@ -267,6 +267,31 @@ export async function updateMyProfile(userId: number, d: any) {
   return profile.profile;
 }
 
+// 修改当前管理员密码（body：currentPassword/newPassword/confirmPassword，sha256 校验旧密码后更新 passwordHash）
+export async function changeMyPassword(userId: number, d: any) {
+  const admin = await prisma.adminUser.findUnique({ where: { id: userId } });
+  if (!admin) throw new ApiError(40003, '管理员不存在');
+  const oldPassword = String(d.currentPassword ?? d.oldPassword ?? '');
+  const newPassword = String(d.newPassword ?? '');
+  if (!oldPassword || !newPassword) throw new ApiError(40001, '请填写当前密码与新密码');
+  if (admin.passwordHash !== sha256(oldPassword)) throw new ApiError(40001, '当前密码错误');
+  if (d.confirmPassword !== undefined && String(d.confirmPassword) !== newPassword) throw new ApiError(40001, '两次输入的新密码不一致');
+  await prisma.adminUser.update({ where: { id: userId }, data: { passwordHash: sha256(newPassword) } });
+  await prisma.systemLog.create({ data: { level: 'info', module: 'admin', message: '管理员修改密码：' + admin.username } });
+  return null;
+}
+
+// ===== 当前管理员在线会话（JWT 无服务端会话存储：返回空分页 / 直接回执成功，形状照 mock）=====
+export async function getMySessions(query: any) { const { current, size } = parseCurrent(query); return templatePage([], 0, current, size); }
+export async function revokeMySession(sessionId: string) {
+  await prisma.systemLog.create({ data: { level: 'warn', module: 'admin', message: '管理员注销会话：' + sessionId } });
+  return null;
+}
+export async function revokeOtherSessions() {
+  await prisma.systemLog.create({ data: { level: 'warn', module: 'admin', message: '管理员注销其他会话' } });
+  return { message: '已注销其他会话', shouldLogout: false, count: 0 };
+}
+
 // ===== 角色管理 =====
 
 // 角色分页列表（含权限数 / 用户数）
@@ -349,6 +374,25 @@ export async function setRolePermissions(id: number, body: any) {
   const uniqueIds = [...new Set(permIds)];
   await prisma.$transaction([prisma.rolePermission.deleteMany({ where: { roleId: id } }), ...(uniqueIds.length ? [prisma.rolePermission.createMany({ data: uniqueIds.map(permissionId => ({ roleId: id, permissionId })) })] : [])]);
   return getRolePermissions(id);
+}
+
+// 角色数据权限（照 mock 形状 {roleId, policies}；无独立表——存 SystemSetting key=role_data_permissions，值为 JSON {[roleId]: policies[]}）
+async function roleDataPermissionMap(): Promise<Record<string, any[]>> {
+  const s = await prisma.systemSetting.findUnique({ where: { settingKey: 'role_data_permissions' } });
+  if (!s?.settingValue) return {};
+  try { return JSON.parse(s.settingValue) || {}; } catch { return {}; }
+}
+export async function getRoleDataPermissions(id: number) {
+  const map = await roleDataPermissionMap();
+  return { roleId: id, policies: Array.isArray(map[String(id)]) ? map[String(id)] : [] };
+}
+export async function setRoleDataPermissions(id: number, d: any) {
+  const role = await prisma.role.findUnique({ where: { id } });
+  if (!role) throw new ApiError(40003, '角色不存在');
+  const map = await roleDataPermissionMap();
+  map[String(id)] = Array.isArray(d.policies) ? d.policies : [];
+  await upsertSetting('role_data_permissions', JSON.stringify(map));
+  return { roleId: id, policies: map[String(id)] };
 }
 
 // 接口权限目录树（照 mock permissionCatalog 形状：模块=根菜单，分类=二级菜单，权限=按钮节点；按钮不足时并入 permissions 表）
@@ -594,6 +638,37 @@ export async function getPublicLink(id: number) {
 // 删除文件（删记录 + 删磁盘文件，复用 system.service 的 deleteFile）
 export async function removeFile(id: number) { await deleteFileRecord(id); return true; }
 
+// 文件详情（单条，形状同列表记录）
+export async function getFileDetail(id: number) {
+  const f = await prisma.file.findUnique({ where: { id } });
+  if (!f) throw new ApiError(40003, '文件不存在');
+  return (await mapFileRows([f]))[0];
+}
+
+// 文件下载地址（本地存储直接给固定 url，expiresAt 给 1 小时，照 mock {url, expiresAt}）
+export async function getFileDownloadUrl(id: number) {
+  const f = await prisma.file.findUnique({ where: { id } });
+  if (!f) throw new ApiError(40003, '文件不存在');
+  return { url: config.fileBaseUrl + f.filePath, expiresAt: new Date(Date.now() + 3600000).toISOString() };
+}
+
+// 批量移动文件（File 表无 folder 字段——schema 限制，仅回执数量，照 mock {count}）
+export function batchMoveFiles(d: any) { const ids = ((d.ids || []) as any[]).map(Number).filter(Boolean); return { count: ids.length }; }
+
+// 批量删除文件（逐个删记录 + 磁盘文件，单个不存在则跳过）
+export async function batchDeleteFiles(d: any) {
+  const ids = ((d.ids || []) as any[]).map(Number).filter(Boolean);
+  let count = 0;
+  for (const id of ids) { try { await deleteFileRecord(id); count++; } catch { /* 单条失败跳过 */ } }
+  return { count };
+}
+
+// ===== 文件夹（模板占位：项目无文件夹存储，树返回空、写操作仅回执，形状照 mock）=====
+export function getFileFolderTree() { return []; }
+export function createFileFolder(d: any) { return { id: 0, parentId: d.parentId ?? null, name: d.name ?? '', slug: 'folder-0', visibility: d.visibility || 'PRIVATE', sort: d.sort || 1, fileCount: 0, children: [] }; }
+export function updateFileFolder(id: number, d: any) { return { id, ...(d as object), children: [] }; }
+export function deleteFileFolder() { return { success: true }; }
+
 // ===== 监控 =====
 
 function parseBrowser(ua: string) { if (/edg\//i.test(ua)) return 'Edge'; if (/chrome/i.test(ua)) return 'Chrome'; if (/safari/i.test(ua)) return 'Safari'; if (/firefox/i.test(ua)) return 'Firefox'; return 'Unknown'; }
@@ -632,6 +707,28 @@ export async function forceLogoutSessions(ids: string[]) {
 export function getCacheMonitor() {
   const m = process.memoryUsage();
   return { enabled: false, engine: 'memory', status: 'NOT_CONFIGURED', message: '未接入 Redis，展示进程内存信息', redis: 'not_configured', connection: null, metrics: { hitRate: 0, keyCount: 0, memoryUsed: Math.round(m.heapUsed / 1024) + ' KB', connectedClients: 0, opsPerSec: 0 }, manageableNamespaces: [], plannedPanels: [], actions: { canRefresh: false, canClear: false }, uptime: Math.floor(process.uptime()), memory: { rss: m.rss, heapTotal: m.heapTotal, heapUsed: m.heapUsed, external: m.external, usagePercent: m.heapTotal ? Math.round((m.heapUsed / m.heapTotal) * 100) : 0 }, updatedAt: new Date().toISOString() };
+}
+
+// 服务器资源监控（独立端点，照 mock：GET /monitor/system-resource → buildSystemResource）
+export function getSystemResource() { return buildSystemResource(); }
+
+// 在线用户详情（sessionId 形如 sess-{loginLogId}，照 mock：找不到给 404 语义）
+export async function getOnlineUserDetail(sessionId: string) {
+  const item = (await getOnlineUsersList()).find(u => u.sessionId === sessionId);
+  if (!item) throw new ApiError(40003, '会话不存在');
+  return item;
+}
+
+// 刷新缓存（未接入 Redis：写 SystemLog 后回执，形状照 mock {updatedAt}）
+export async function refreshCacheMonitor() {
+  await prisma.systemLog.create({ data: { level: 'info', module: 'monitor', message: '刷新缓存监控' } });
+  return { updatedAt: new Date().toISOString() };
+}
+
+// 按命名空间清理缓存（未接入 Redis：写 SystemLog 后回执，形状照 mock {namespace, cleared}）
+export async function clearCacheNamespace(namespace?: string) {
+  await prisma.systemLog.create({ data: { level: 'warn', module: 'monitor', message: '清理业务缓存：' + (namespace || '-') } });
+  return { namespace: namespace || null, cleared: true };
 }
 
 // 近 N 天每日登录量趋势（LoginLog 聚合）
@@ -699,7 +796,10 @@ export async function getVisitorAnalytics(query: any) {
 
 // ===== 日志 =====
 
-// 操作日志分页（detail JSON 内 operator/method/path 摊平，照 mock operationLogs 项形状）
+// OperationLog → 模板记录形状（detail JSON 内 operator/method/path 摊平，照 mock operationLogs 项形状）
+function mapOperationLog(l: any) { return { id: l.id, logNo: 'OP-' + String(l.id).padStart(6, '0'), module: l.module || 'admin', operationType: l.action || '操作', description: l.action || '操作', method: (l.detail as any)?.method || '', path: (l.detail as any)?.path || '', userId: l.userId, username: (l.detail as any)?.operator || 'admin', ip: l.ip || '', status: 'SUCCESS', durationMs: 0, requestParams: null, responsePayload: null, responseCode: 200, errorMessage: null, createdAt: l.createdAt }; }
+
+// 操作日志分页
 export async function getOperationLogs(query: any) {
   const { current, size } = parseCurrent(query);
   const where: any = {};
@@ -707,9 +807,18 @@ export async function getOperationLogs(query: any) {
   const all = await prisma.operationLog.findMany({ where, orderBy: { createdAt: 'desc' } });
   let filtered = all;
   if (query.username) { const kw = String(query.username); filtered = all.filter(l => String((l.detail as any)?.operator || '').includes(kw)); }
-  const records = filtered.slice((current - 1) * size, current * size).map(l => ({ id: l.id, logNo: 'OP-' + String(l.id).padStart(6, '0'), module: l.module || 'admin', operationType: l.action || '操作', description: l.action || '操作', method: (l.detail as any)?.method || '', path: (l.detail as any)?.path || '', userId: l.userId, username: (l.detail as any)?.operator || 'admin', ip: l.ip || '', status: 'SUCCESS', durationMs: 0, requestParams: null, responsePayload: null, responseCode: 200, errorMessage: null, createdAt: l.createdAt }));
-  return templatePage(records, filtered.length, current, size);
+  return templatePage(filtered.slice((current - 1) * size, current * size).map(mapOperationLog), filtered.length, current, size);
 }
+
+// 操作日志详情（单条，形状同列表记录）
+export async function getOperationLogDetail(id: number) {
+  const l = await prisma.operationLog.findUnique({ where: { id } });
+  if (!l) throw new ApiError(40003, '日志不存在');
+  return mapOperationLog(l);
+}
+
+// 批量删除操作日志（?ids=1,2,3）
+export async function deleteOperationLogsByIds(ids: number[]) { const r = await prisma.operationLog.deleteMany({ where: { id: { in: ids } } }); return r.count; }
 
 // 清空操作日志（保留最近 7 天）
 export async function clearOperationLogs() {
@@ -718,7 +827,10 @@ export async function clearOperationLogs() {
   return r.count;
 }
 
-// 登录日志分页（uid 通过 User 关联取，无关联给 null，照 mock loginLogs 项形状）
+// LoginLog → 模板记录形状（uid 由调用方关联传入，照 mock loginLogs 项形状）
+function mapLoginLog(l: any, uid: string | null) { return { id: l.id, logNo: 'LG-' + String(l.id).padStart(6, '0'), event: l.status === 'success' ? '登录成功' : '登录失败', userId: l.userId, username: uid, uid, ip: l.ip || '', location: '', deviceType: /mobile/i.test(l.userAgent || '') ? 'MOBILE' : 'PC', os: parseOs(l.userAgent || ''), browser: parseBrowser(l.userAgent || ''), userAgent: l.userAgent || '', status: l.status === 'success' ? 'SUCCESS' : 'FAIL', description: '', createdAt: l.createdAt }; }
+
+// 登录日志分页（uid 通过 User 关联取，无关联给 null）
 export async function getLoginLogs(query: any) {
   const { current, size } = parseCurrent(query);
   const where: any = {};
@@ -731,8 +843,25 @@ export async function getLoginLogs(query: any) {
   const userIds = [...new Set(rows.map(r => r.userId).filter((x): x is number => x !== null))];
   const users = userIds.length ? await prisma.user.findMany({ where: { id: { in: userIds } }, select: { id: true, uid: true } }) : [];
   const uidById = new Map(users.map(u => [u.id, u.uid]));
-  const records = rows.map(l => ({ id: l.id, logNo: 'LG-' + String(l.id).padStart(6, '0'), event: l.status === 'success' ? '登录成功' : '登录失败', userId: l.userId, username: l.userId !== null ? uidById.get(l.userId) || null : null, uid: l.userId !== null ? uidById.get(l.userId) || null : null, ip: l.ip || '', location: '', deviceType: /mobile/i.test(l.userAgent || '') ? 'MOBILE' : 'PC', os: parseOs(l.userAgent || ''), browser: parseBrowser(l.userAgent || ''), userAgent: l.userAgent || '', status: l.status === 'success' ? 'SUCCESS' : 'FAIL', description: '', createdAt: l.createdAt }));
-  return templatePage(records, total, current, size);
+  return templatePage(rows.map(l => mapLoginLog(l, l.userId !== null ? uidById.get(l.userId) || null : null)), total, current, size);
+}
+
+// 登录日志详情（单条，形状同列表记录）
+export async function getLoginLogDetail(id: number) {
+  const l = await prisma.loginLog.findUnique({ where: { id } });
+  if (!l) throw new ApiError(40003, '日志不存在');
+  const u = l.userId !== null ? await prisma.user.findUnique({ where: { id: l.userId }, select: { uid: true } }) : null;
+  return mapLoginLog(l, u?.uid || null);
+}
+
+// 批量删除登录日志（?ids=1,2,3）
+export async function deleteLoginLogsByIds(ids: number[]) { const r = await prisma.loginLog.deleteMany({ where: { id: { in: ids } } }); return r.count; }
+
+// 清空登录日志（保留最近 7 天，同操作日志语义）
+export async function clearLoginLogs() {
+  const cutoff = new Date(Date.now() - 7 * 86400000);
+  const r = await prisma.loginLog.deleteMany({ where: { createdAt: { lt: cutoff } } });
+  return r.count;
 }
 
 // ===== 用户反馈 =====
@@ -753,6 +882,13 @@ export async function getFeedbackList(query: any) {
   let records = rows.map(f => mapFeedback(f, f.user?.uid || null));
   if (query.keyword) { const kw = String(query.keyword); records = records.filter(f => f.title.includes(kw) || f.content.includes(kw)); }
   return templatePage(records, total, current, size);
+}
+
+// 反馈详情（单条，形状同列表记录，照 mock：不存在给 404 语义）
+export async function getFeedbackDetail(id: number) {
+  const f = await prisma.userFeedback.findUnique({ where: { id }, include: { user: { select: { uid: true } } } });
+  if (!f) throw new ApiError(40003, '反馈不存在');
+  return mapFeedback(f, f.user?.uid || null);
 }
 
 // 反馈概览（照 mock overview 形状：summary + statusBuckets + typeBuckets + latestRecords）
@@ -863,4 +999,97 @@ export async function revokeNotification(id: number) {
 export async function deleteNotificationAdmin(id: number) {
   await prisma.$transaction([prisma.notificationRead.deleteMany({ where: { notificationId: id } }), prisma.notification.delete({ where: { id } })]);
   return true;
+}
+
+// ===== 通知收件箱（管理员侧：数据为 notifications 表 isActive 记录；无管理员已读状态存储——isRead 恒为已读、unreadCount=0，已读操作仅回执）=====
+
+// Notification → 收件箱条目形状（照 mock notificationInbox 项）
+function mapInboxItem(n: any) {
+  return { id: n.id, recipientId: 0, title: n.title, summary: (n.content || '').replace(/<[^>]+>/g, '').slice(0, 50), content: n.content, type: NOTIF_TYPE_CODE[n.type?.typeName] || 'SYSTEM', isRead: true, readAt: n.publishTime, publishedAt: n.publishTime, createdBy: null };
+}
+
+// 收件箱分页（isActive 记录按 publishTime 倒序，附加 unreadCount，照 mock inbox 返回）
+export async function getNotificationInbox(query: any) {
+  const { current, size } = parseCurrent(query);
+  const where: any = { isActive: true };
+  const [rows, total] = await Promise.all([prisma.notification.findMany({ where, include: { type: true }, orderBy: { publishTime: 'desc' }, skip: (current - 1) * size, take: size }), prisma.notification.count({ where })]);
+  return { ...templatePage(rows.map(mapInboxItem), total, current, size), unreadCount: 0 };
+}
+
+// 收件箱详情（单条，照 mock：不存在给 404 语义）
+export async function getNotificationInboxDetail(id: number) {
+  const n = await prisma.notification.findUnique({ where: { id }, include: { type: true } });
+  if (!n) throw new ApiError(40003, '通知不存在');
+  return mapInboxItem(n);
+}
+
+export function markInboxRead() { return null; }
+export function markInboxAllRead() { return null; }
+export function getNotificationStats() { return { unreadCount: 0 }; }
+// SSE 通知流未实现：发放一次性令牌，页面降级轮询（照 mock {token}）
+export function getNotificationStreamToken() { return { token: 'stream-' + crypto.randomUUID().slice(0, 8) }; }
+
+// ===== 部门/岗位（模板占位：项目无部门/岗位概念，列表返回空集合，页面留空）=====
+export function listDepartments() { return []; }
+export function listPosts(query: any) { const { current, size } = parseCurrent(query); return templatePage([], 0, current, size); }
+
+// ===== 分析仪表聚合（管理后台「分析仪表」页；日期按本地时区当日 00:00 分桶）=====
+
+// 近 7 日分桶初始化（date 形如 MM-DD）
+function weekBuckets(): { date: string; count: number }[] {
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6);
+  return Array.from({ length: 7 }, (_, i) => { const d = new Date(start.getTime() + i * 86400000); return { date: `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, count: 0 }; });
+}
+
+// 按本地时区当日归桶索引（返回 -1 表示不在近 7 日内）
+function weekBucketIndex(createdAt: Date) {
+  const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6);
+  const idx = Math.floor((new Date(createdAt).setHours(0, 0, 0, 0) - start.getTime()) / 86400000);
+  return idx >= 0 && idx < 7 ? idx : -1;
+}
+
+export async function getDashboardStats() {
+  const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+  const since30m = new Date(Date.now() - 30 * 60 * 1000);
+  const [totalUsers, todayNew, weekUserRows, identityGroups, verifiedCount, todayLogins, weekLoginRows, onlineRows, posts, confessions, todayPosts, pendingReports, activeItems, todayPublished, viewAgg, offItems, totalUsage, todayUsage, topGroups, pendingFeedback] = await Promise.all([
+    prisma.user.count(),
+    prisma.user.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.user.findMany({ where: { createdAt: { gte: new Date(startOfDay.getTime() - 6 * 86400000) } }, select: { createdAt: true } }),
+    prisma.user.groupBy({ by: ['identity'], _count: { _all: true } }),
+    prisma.user.count({ where: { authStatus: 'verified' } }),
+    prisma.loginLog.count({ where: { createdAt: { gte: startOfDay }, status: 'success' } }),
+    prisma.loginLog.findMany({ where: { createdAt: { gte: new Date(startOfDay.getTime() - 6 * 86400000) }, status: 'success' }, select: { createdAt: true } }),
+    prisma.loginLog.findMany({ where: { createdAt: { gte: since30m }, userId: { not: null } }, select: { userId: true }, distinct: ['userId'] }),
+    prisma.alumniPost.count({ where: { type: 'post' } }),
+    prisma.alumniPost.count({ where: { type: 'confession' } }),
+    prisma.alumniPost.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.report.count({ where: { status: 'pending' } }),
+    prisma.marketplaceItem.count({ where: { status: 'active' } }),
+    prisma.marketplaceItem.count({ where: { publishedAt: { gte: startOfDay } } }),
+    prisma.marketplaceItem.aggregate({ _sum: { viewCount: true } }),
+    prisma.marketplaceItem.count({ where: { status: { not: 'active' } } }),
+    prisma.toolUsageLog.count(),
+    prisma.toolUsageLog.count({ where: { createdAt: { gte: startOfDay } } }),
+    prisma.toolUsageLog.groupBy({ by: ['toolId'], _count: { _all: true }, orderBy: { _count: { toolId: 'desc' } }, take: 5 }),
+    prisma.userFeedback.count({ where: { status: 'pending' } }),
+  ]);
+  // 近 7 日注册 / 登录趋势按本地时区逐日归桶
+  const weekTrend = weekBuckets(); const loginWeekTrend = weekBuckets();
+  for (const r of weekUserRows) { const i = weekBucketIndex(r.createdAt); if (i >= 0) weekTrend[i].count++; }
+  for (const r of weekLoginRows) { const i = weekBucketIndex(r.createdAt); if (i >= 0) loginWeekTrend[i].count++; }
+  // 身份分布（freshman/undergrad/grad，缺省 0）
+  const identityDist: Record<string, number> = { freshman: 0, undergrad: 0, grad: 0 };
+  for (const g of identityGroups) if (g.identity in identityDist) identityDist[g.identity] = g._count._all;
+  // 工具使用 Top5（groupBy 无关联，二次查 Tool 取 toolName）
+  const toolIds = topGroups.map(g => g.toolId);
+  const tools = toolIds.length ? await prisma.tool.findMany({ where: { id: { in: toolIds } }, select: { id: true, toolName: true } }) : [];
+  const nameById = new Map(tools.map(t => [t.id, t.toolName]));
+  return {
+    users: { total: totalUsers, todayNew, weekTrend, identityDist, verifiedRate: totalUsers ? Math.round((verifiedCount / totalUsers) * 10000) / 10000 : 0 },
+    activity: { todayLogins, loginWeekTrend, onlineNow: onlineRows.length },
+    community: { posts, confessions, todayPosts, pendingReports },
+    marketplace: { activeItems, todayPublished, totalViews: viewAgg._sum.viewCount || 0, offItems },
+    tools: { totalUsage, todayUsage, topTools: topGroups.map(g => ({ name: nameById.get(g.toolId) || `#${g.toolId}`, count: g._count._all })) },
+    service: { pendingFeedback, uptimeDays: Number((process.uptime() / 86400).toFixed(1)) },
+  };
 }

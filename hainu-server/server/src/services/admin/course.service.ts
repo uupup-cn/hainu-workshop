@@ -6,6 +6,9 @@ import { paginatedResult } from '../../utils/pagination';
 // 课程库列表（分页 + 课程名关键字筛选，含拥有者 uid 关联）
 export async function listCourses(page = 1, size = 20, keyword?: string) { const where = keyword ? { courseName: { contains: keyword } } : {}; const [list, total] = await Promise.all([prisma.course.findMany({ where, include: { user: { select: { uid: true, nickname: true } } }, skip: (page-1)*size, take: size, orderBy: { createdAt: 'desc' } }), prisma.course.count({ where })]); return paginatedResult(list, total, page, size); }
 
+// 删除课程库课程（Course 无子关联可直接删；ShareCode 为 JSON 快照不受影响）
+export async function deleteCourse(id: number) { const c = await prisma.course.findUnique({ where: { id } }); if (!c) throw new ApiError(40003, '课程不存在'); await prisma.course.delete({ where: { id } }); return true; }
+
 // 课程颜色 CRUD
 export const courseColors = { list: () => prisma.courseColor.findMany({ orderBy: { sortOrder: 'asc' } }), create: (d: any) => prisma.courseColor.create({ data: d }), update: (id: number, d: any) => prisma.courseColor.update({ where: { id }, data: d }), delete: (id: number) => prisma.courseColor.delete({ where: { id } }) };
 
