@@ -17,10 +17,6 @@
           <ArtSvgIcon icon="ri:refresh-line" class="mr-1.5" />
           刷新
         </ElButton>
-        <ElButton plain @click="router.push('/monitor/security-audit')">
-          <ArtSvgIcon icon="ri:shield-keyhole-line" class="mr-1.5" />
-          安全审计
-        </ElButton>
         <ElButton type="primary" @click="router.push('/monitor/online-user')">
           <ArtSvgIcon icon="ri:user-shared-line" class="mr-1.5" />
           在线用户

@@ -15,9 +15,11 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 // 读取 .auto-import.json 文件的内容，并将其解析为 JSON 对象
-const autoImportConfig = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, '.auto-import.json'), 'utf-8')
-)
+// 该文件由 unplugin-auto-import 在 vite 启动/构建时生成，不存在时使用空配置
+const autoImportFilePath = path.resolve(__dirname, '.auto-import.json')
+const autoImportConfig = fs.existsSync(autoImportFilePath)
+  ? JSON.parse(fs.readFileSync(autoImportFilePath, 'utf-8'))
+  : { globals: {} }
 
 export default [
   // 指定文件匹配规则

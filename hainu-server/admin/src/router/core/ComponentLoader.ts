@@ -80,7 +80,7 @@ export class ComponentLoader {
    * 加载 iframe 组件
    */
   loadIframe(): () => Promise<any> {
-    return () => import('@/views/outside/Iframe.vue')
+    return () => import('@/components/core/views/Iframe.vue')
   }
 
   /**

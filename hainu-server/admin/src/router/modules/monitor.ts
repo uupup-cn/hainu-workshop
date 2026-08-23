@@ -57,20 +57,6 @@ export const monitorRoutes: AppRouteRecord[] = [
             { title: '刷新', authMark: 'refresh' }
           ]
         }
-      },
-      {
-        path: 'security-audit',
-        name: 'SecurityAudit',
-        component: '/monitor/security-audit',
-        meta: {
-          title: 'menus.monitor.securityAudit',
-          icon: 'ri:alarm-warning-line',
-          keepAlive: true,
-          authList: [
-            { title: '查看', authMark: 'view' },
-            { title: '编辑', authMark: 'edit' }
-          ]
-        }
       }
     ]
   }

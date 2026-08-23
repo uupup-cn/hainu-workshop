@@ -29,28 +29,6 @@ export const systemRoutes: AppRouteRecord = {
         keepAlive: true
       }
     },
-    // 超出 AGENTS.md 目标菜单结构（系统管理仅保留 功能/角色/用户/字典/通知管理/站点设置），暂不启用
-    // {
-    //   path: 'department',
-    //   name: 'Department',
-    //   component: '/system/department',
-    //   meta: {
-    //     title: 'menus.system.department',
-    //     icon: 'ri:building-line',
-    //     keepAlive: true
-    //   }
-    // },
-    // 超出目标菜单结构，暂不启用
-    // {
-    //   path: 'post',
-    //   name: 'Post',
-    //   component: '/system/post',
-    //   meta: {
-    //     title: 'menus.system.post',
-    //     icon: 'ri:briefcase-4-line',
-    //     keepAlive: true
-    //   }
-    // },
     {
       path: 'dict',
       name: 'Dict',
@@ -72,23 +50,6 @@ export const systemRoutes: AppRouteRecord = {
         authList: [{ title: '编辑', authMark: 'edit' }]
       }
     },
-    // 超出 AGENTS.md 目标菜单结构（系统参数未列入系统管理），暂不启用
-    // {
-    //   path: 'system-param',
-    //   name: 'SystemParam',
-    //   component: '/system/system-param',
-    //   meta: {
-    //     title: 'menus.system.systemParam',
-    //     icon: 'ri:settings-3-line',
-    //     keepAlive: true,
-    //     authList: [
-    //       { title: '新增', authMark: 'add' },
-    //       { title: '编辑', authMark: 'edit' },
-    //       { title: '删除', authMark: 'delete' },
-    //       { title: '刷新缓存', authMark: 'refresh' }
-    //     ]
-    //   }
-    // },
     {
       path: 'file-center',
       name: 'FileCenter',
@@ -167,17 +128,6 @@ export const systemRoutes: AppRouteRecord = {
           { title: '处理', authMark: 'handle' }
         ]
       }
-    },
-    // 超出 AGENTS.md 目标菜单结构（访客分析未列入系统管理，且菜单种子中未注册），暂不启用
-    // {
-    //   path: 'visitor-analytics',
-    //   name: 'SystemVisitorAnalytics',
-    //   component: '/system/visitor-analytics',
-    //   meta: {
-    //     title: 'menus.system.visitorAnalytics',
-    //     icon: 'ri:user-search-line',
-    //     keepAlive: true
-    //   }
-    // }
+    }
   ]
 }

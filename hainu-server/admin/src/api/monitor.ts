@@ -12,17 +12,6 @@ export function fetchMonitorOverview() {
 }
 
 /**
- * 获取访客分析数据
- */
-export function fetchVisitorAnalytics(params: Api.Monitor.VisitorAnalyticsSearchParams) {
-  return request.get<Api.Monitor.VisitorAnalyticsResponse>({
-    url: '/api/v1/monitor/visitor-analytics',
-    params,
-    permissionCode: ApiPermissionCode.MONITOR.VISITOR_ANALYTICS_VIEW
-  })
-}
-
-/**
  * 获取在线用户列表
  */
 export function fetchOnlineUsers(params: Api.Monitor.OnlineUserSearchParams) {

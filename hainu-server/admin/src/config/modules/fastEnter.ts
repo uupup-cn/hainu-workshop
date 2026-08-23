@@ -25,25 +25,7 @@ const fastEnterConfig: FastEnterConfig = {
       iconColor: '#ff3b30',
       enabled: true,
       order: 2,
-      routeName: 'Analysis'
-    },
-    {
-      name: '礼花效果',
-      description: '动画特效展示',
-      icon: 'ri:loader-line',
-      iconColor: '#7A7FFF',
-      enabled: true,
-      order: 3,
-      routeName: 'Fireworks'
-    },
-    {
-      name: '聊天',
-      description: '即时通讯功能',
-      icon: 'ri:user-line',
-      iconColor: '#13DEB9',
-      enabled: true,
-      order: 4,
-      routeName: 'Chat'
+      routeName: 'DashboardAnalysis'
     },
     {
       name: '官方文档',
@@ -60,15 +42,6 @@ const fastEnterConfig: FastEnterConfig = {
       iconColor: '#ff6b6b',
       enabled: true,
       order: 6
-    },
-    {
-      name: '更新日志',
-      description: '版本更新与变更记录',
-      icon: 'ri:gamepad-line',
-      iconColor: '#38C0FC',
-      enabled: true,
-      order: 7,
-      routeName: 'ChangeLog'
     },
     {
       name: '哔哩哔哩',

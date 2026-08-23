@@ -302,19 +302,12 @@ export const ApiPermissionCode = {
   },
   MONITOR: {
     OVERVIEW: 'system:monitor:overview',
-    VISITOR_ANALYTICS_VIEW: 'system:monitor:visitor-analytics:view',
     ONLINE_USER_LIST: 'system:monitor:online-user:list',
     ONLINE_USER_DETAIL: 'system:monitor:online-user:detail',
     ONLINE_USER_FORCE_LOGOUT: 'system:monitor:online-user:force-logout',
     SYSTEM_RESOURCE_VIEW: 'system:monitor:system-resource:view',
     CACHE_VIEW: 'system:monitor:cache:view',
     CACHE_REFRESH: 'system:monitor:cache:refresh'
-  },
-  AUDIT: {
-    OVERVIEW: 'system:security-audit:overview',
-    EVENT_LIST: 'system:security-audit:event:list',
-    EVENT_DETAIL: 'system:security-audit:event:detail',
-    EVENT_STATUS_UPDATE: 'system:security-audit:event:status:update'
   },
   FEEDBACK: {
     CREATE: 'account:feedback:create',

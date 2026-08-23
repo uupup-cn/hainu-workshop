@@ -164,6 +164,7 @@ declare module 'vue' {
     HorizontalSubmenu: typeof import('./../../components/core/layouts/art-menus/art-horizontal-menu/widget/HorizontalSubmenu.vue')['default']
     HoverMenuPanel: typeof import('./../../components/core/layouts/art-menus/art-sidebar-menu/widget/HoverMenuPanel.vue')['default']
     HoverMenuPanelBadges: typeof import('./../../components/core/layouts/art-menus/art-sidebar-menu/widget/HoverMenuPanelBadges.vue')['default']
+    Iframe: typeof import('./../../components/core/views/Iframe.vue')['default']
     LoginLeftView: typeof import('./../../components/core/views/login/LoginLeftView.vue')['default']
     MenuColorModeSettings: typeof import('./../../components/core/layouts/art-settings-panel/widget/MenuColorModeSettings.vue')['default']
     MenuLayoutSettings: typeof import('./../../components/core/layouts/art-settings-panel/widget/MenuLayoutSettings.vue')['default']

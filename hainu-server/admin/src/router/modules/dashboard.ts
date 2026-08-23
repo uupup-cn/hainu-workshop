@@ -28,8 +28,17 @@ export const dashboardRoutes: AppRouteRecord = {
         icon: 'ri:shopping-cart-2-line',
         keepAlive: false
       }
+    },
+    {
+      path: 'analysis',
+      name: 'DashboardAnalysis',
+      component: '/dashboard/analysis/index',
+      meta: {
+        title: '分析仪表',
+        icon: 'ri:bar-chart-2-line',
+        keepAlive: false
+      }
     }
-    // 精简版：控制台 + 二手集市分析
-    // operation-overview（views/data-screen 已删除）、analysis 及演示仪表盘未注册
+    // 精简版：控制台 + 二手集市分析 + 分析仪表（演示仪表盘已删除）
   ]
 }
