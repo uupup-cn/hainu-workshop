@@ -83,10 +83,10 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'tool:video-parse', menuName: '影视解析配置', menuType: 'menu', parentId: 'tool', icon: 'ri-film-line', path: 'video-parse', component: '/tool/video-parse/index', sortOrder: 4, isVisible: true },
 
     // ===== 课表模块（三级分组）=====
-    { menuKey: 'schedule:course-mgmt', menuName: '课程管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-book-2-line', path: 'course-mgmt', component: '/index/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'schedule:course-mgmt', menuName: '课程管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-book-2-line', path: 'course-mgmt', component: '', sortOrder: 1, isVisible: true },
     { menuKey: 'schedule:course', menuName: '课程库', menuType: 'menu', parentId: 'schedule:course-mgmt', icon: 'ri-book-2-line', path: 'course', component: '/schedule/course/index', sortOrder: 1, isVisible: true },
     { menuKey: 'schedule:color', menuName: '课程颜色', menuType: 'menu', parentId: 'schedule:course-mgmt', icon: 'ri-palette-line', path: 'color', component: '/schedule/color/index', sortOrder: 2, isVisible: true },
-    { menuKey: 'schedule:week-mgmt', menuName: '学习周管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-line', path: 'week-mgmt', component: '/index/index', sortOrder: 2, isVisible: true },
+    { menuKey: 'schedule:week-mgmt', menuName: '学习周管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-line', path: 'week-mgmt', component: '', sortOrder: 2, isVisible: true },
     { menuKey: 'schedule:semester', menuName: '学期管理', menuType: 'menu', parentId: 'schedule:week-mgmt', icon: 'ri-calendar-line', path: 'semester', component: '/schedule/semester/index', sortOrder: 1, isVisible: true },
     { menuKey: 'schedule:term-week', menuName: '学期周制', menuType: 'menu', parentId: 'schedule:week-mgmt', icon: 'ri-calendar-check-line', path: 'term-week', component: '/schedule/term-week/index', sortOrder: 2, isVisible: true },
     { menuKey: 'schedule:section', menuName: '节次管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-time-line', path: 'section', component: '/schedule/section/index', sortOrder: 3, isVisible: true },
