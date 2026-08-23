@@ -16,4 +16,7 @@ export const config = {
   fileBaseUrl: process.env.FILE_BASE_URL || 'http://localhost:3000',
   corsOrigin: process.env.CORS_ORIGIN || '*',
   port: parseInt(process.env.PORT || '3000', 10),
+  rateLimitGeneral: parseInt(process.env.RATE_LIMIT_GENERAL || '60', 10),
+  rateLimitLogin: parseInt(process.env.RATE_LIMIT_LOGIN || '10', 10),
+  rateLimitLottery: parseInt(process.env.RATE_LIMIT_LOTTERY || '5', 10),
 };

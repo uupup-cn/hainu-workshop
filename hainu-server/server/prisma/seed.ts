@@ -4,10 +4,10 @@
  * 幂等：重复执行不会产生重复数据（唯一键 upsert / 先查后建）
  */
 import { PrismaClient } from '@prisma/client';
-import * as crypto from 'crypto';
+import { hashPassword } from '../src/utils/password';
 
 const prisma = new PrismaClient();
-const sha256 = (p: string) => crypto.createHash('sha256').update(p).digest('hex');
+const sha256 = (p: string) => hashPassword(p);
 
 async function main() {
   // ===== 系统管理：角色 + 管理员 =====

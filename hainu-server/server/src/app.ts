@@ -2,12 +2,23 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import { errorHandler } from './middlewares/error.middleware';
+import { rateLimitGeneral } from './middlewares/rate-limit.middleware';
 import { config } from './config';
 
 const app = new Koa();
 app.use(errorHandler);
-app.use(cors({ origin: config.corsOrigin, credentials: true }));
-app.use(bodyParser());
+// CORS：支持逗号分隔多源（生产域名+IP:端口），回退 * 用于开发
+const origins = config.corsOrigin.split(',').map((s) => s.trim()).filter(Boolean);
+app.use(cors({
+  origin: (ctx) => {
+    const reqOrigin = ctx.headers.origin || '';
+    if (origins.includes('*') || origins.includes(reqOrigin)) return reqOrigin;
+    return origins[0] || '';
+  },
+  credentials: true,
+}));
+app.use(bodyParser({ jsonLimit: '8mb' })); // 8MB 支持 base64 图片上传
+app.use(rateLimitGeneral);
 
 // 路由
 // 模板集成路由必须先挂载：其字面量路径（如 /notifications/admin）需优先于用户端参数路由（/notifications/:id）

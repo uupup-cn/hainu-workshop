@@ -4,8 +4,8 @@ import { signAccessToken, signRefreshToken } from '../utils/jwt';
 import { codeToOpenid } from '../utils/wechat';
 import { generateUid } from '../utils/uid';
 import { ApiError } from '../utils/api-error';
+import { hashPassword, verifyPassword, maybeUpgrade } from '../utils/password';
 
-function hashPassword(p: string): string { return crypto.createHash('sha256').update(p).digest('hex'); }
 function genPassword(): string { return crypto.randomBytes(4).toString('hex'); }
 
 export async function registerByWechat(code: string, identity: string, nickname?: string, avatar?: string) {
@@ -24,7 +24,9 @@ export async function registerByWechat(code: string, identity: string, nickname?
 export async function loginByUid(uid: string, password: string) {
   const user = await prisma.user.findUnique({ where: { uid } });
   if (!user) throw new ApiError(40003, '用户不存在');
-  if (user.passwordHash !== hashPassword(password)) throw new ApiError(40001, '密码错误');
+  const { valid, needsUpgrade } = verifyPassword(password, user.passwordHash);
+  if (!valid) throw new ApiError(40001, '密码错误');
+  if (needsUpgrade) await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hashPassword(password) } });
   return { uid: user.uid, accessToken: signAccessToken({ userId: user.id, identity: user.identity }), refreshToken: signRefreshToken({ userId: user.id }), identity: user.identity };
 }
 
@@ -43,6 +45,8 @@ export async function adminLogin(username: string, password: string) {
   const user = await prisma.adminUser.findUnique({ where: { username } });
   if (!user) throw new ApiError(40003, '用户不存在');
   if (user.status !== 'active') throw new ApiError(40004, '账号已禁用');
-  if (user.passwordHash !== hashPassword(password)) throw new ApiError(40001, '密码错误');
+  const { valid, needsUpgrade } = verifyPassword(password, user.passwordHash);
+  if (!valid) throw new ApiError(40001, '密码错误');
+  if (needsUpgrade) await prisma.adminUser.update({ where: { id: user.id }, data: { passwordHash: hashPassword(password) } });
   return { accessToken: signAccessToken({ userId: user.id, isAdmin: true }, true), refreshToken: signRefreshToken({ userId: user.id }, true), userInfo: { id: user.id, username: user.username, nickname: user.nickname } };
 }

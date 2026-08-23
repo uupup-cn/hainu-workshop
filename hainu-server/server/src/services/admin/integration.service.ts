@@ -16,7 +16,7 @@ export function parseCurrent(query: any) { return { current: Math.max(1, Number(
 // 模板分页包裹（照抄 mock paginate 返回：{records, total, current, size}）
 export function templatePage(records: any[], total: number, current: number, size: number) { return { records, total, current, size }; }
 
-const sha256 = (p: string) => crypto.createHash('sha256').update(p).digest('hex');
+import { hashPassword, verifyPassword } from '../../utils/password';
 
 // ===== 模板接口权限码全集 =====
 // 前端 http 层 assertApiPermission 对带 permissionCode 的请求做 includes 严格匹配，
@@ -220,7 +220,7 @@ export async function createAdminUser(d: any) {
   if (!username || !password) throw new ApiError(40001, '用户名与密码必填');
   if (await prisma.adminUser.findUnique({ where: { username } })) throw new ApiError(40001, '用户名已存在');
   const nickName = String(d.nickName || d.profile?.nickName || username);
-  const user = await prisma.adminUser.create({ data: { username, passwordHash: sha256(password), nickname: nickName, status: 'active' } });
+  const user = await prisma.adminUser.create({ data: { username, passwordHash: hashPassword(password), nickname: nickName, status: 'active' } });
   const roleIds: number[] = ((d.roleIds || d.roles || []) as any[]).map(Number).filter(Boolean);
   if (roleIds.length) await prisma.roleUser.createMany({ data: roleIds.map(roleId => ({ adminUserId: user.id, roleId })) });
   return mapAdminUser(user, await rolesOfUser(user.id));
@@ -233,7 +233,7 @@ export async function updateAdminUser(id: number, d: any) {
   const data: any = {};
   if (d.nickName !== undefined || d.profile?.nickName !== undefined) data.nickname = String(d.nickName ?? d.profile.nickName);
   if (d.status !== undefined) data.status = String(d.status);
-  if (d.password) data.passwordHash = sha256(String(d.password));
+  if (d.password) data.passwordHash = hashPassword(String(d.password));
   const updated = Object.keys(data).length ? await prisma.adminUser.update({ where: { id }, data }) : user;
   if (d.roleIds || d.roles) {
     const roleIds: number[] = ((d.roleIds || d.roles) as any[]).map(Number).filter(Boolean);
@@ -274,9 +274,9 @@ export async function changeMyPassword(userId: number, d: any) {
   const oldPassword = String(d.currentPassword ?? d.oldPassword ?? '');
   const newPassword = String(d.newPassword ?? '');
   if (!oldPassword || !newPassword) throw new ApiError(40001, '请填写当前密码与新密码');
-  if (admin.passwordHash !== sha256(oldPassword)) throw new ApiError(40001, '当前密码错误');
+  if (!verifyPassword(oldPassword, admin.passwordHash).valid) throw new ApiError(40001, '当前密码错误');
   if (d.confirmPassword !== undefined && String(d.confirmPassword) !== newPassword) throw new ApiError(40001, '两次输入的新密码不一致');
-  await prisma.adminUser.update({ where: { id: userId }, data: { passwordHash: sha256(newPassword) } });
+  await prisma.adminUser.update({ where: { id: userId }, data: { passwordHash: hashPassword(newPassword) } });
   await prisma.systemLog.create({ data: { level: 'info', module: 'admin', message: '管理员修改密码：' + admin.username } });
   return null;
 }
