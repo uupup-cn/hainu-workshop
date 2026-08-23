@@ -132,3 +132,8 @@ export async function deleteRoommatePost(id: number) {
   await prisma.roommatePost.delete({ where: { id } });
   return true;
 }
+// 乘车指南（单例：有则更新，无则创建）
+export const busGuide = {
+  get: async () => (await prisma.busGuide.findFirst()) || { content: '' },
+  update: async (content: string) => { const g = await prisma.busGuide.findFirst(); if (g) return prisma.busGuide.update({ where: { id: g.id }, data: { content } }); return prisma.busGuide.create({ data: { content } }); },
+};

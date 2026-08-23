@@ -97,7 +97,13 @@ async function main() {
   await check('工具分类', 'GET', '/tools/categories');
   await check('工具列表', 'GET', '/tools', undefined, userToken);
   await check('课表', 'GET', '/courses', undefined, userToken);
+  const guestCourses = await check('游客课表框架', 'GET', '/courses');
+  if (!(guestCourses && guestCourses.data && guestCourses.data.frameworkOnly === true && Array.isArray(guestCourses.data.sections))) {
+    failCount++; failures.push('游客课表框架 → 缺少 frameworkOnly/sections 框架数据');
+  }
   await check('通知列表', 'GET', '/notifications', undefined, userToken);
+  await check('未读通知数量', 'GET', '/notifications/unread-count', undefined, userToken);
+  await check('我的找室友信息', 'GET', '/roommate/posts/my', undefined, userToken);
   await check('系统设置', 'GET', '/system/settings');
 
   // ===== 7. 管理端 =====
@@ -118,6 +124,9 @@ async function main() {
     await check('地图管理', 'GET', '/admin/maps', undefined, adminToken);
     await check('班车管理', 'GET', '/admin/bus/schedules', undefined, adminToken);
     await check('车站管理', 'GET', '/admin/bus/stations', undefined, adminToken);
+    await check('乘车指南读取', 'GET', '/admin/bus/guide', undefined, adminToken);
+    await check('乘车指南更新', 'PUT', '/admin/bus/guide', { content: '乘车指南：校内班车凭校园卡免费乘坐，请提前10分钟到站候车。' }, adminToken);
+    await check('认证申请详情(404校验)', 'GET', '/admin/auth-applications/999999', undefined, adminToken, 40003);
 
     console.log('[管理端·找室友/校园数据]');
     await check('找室友配置', 'GET', '/admin/roommate/settings', undefined, adminToken);

@@ -2,6 +2,7 @@
 import { Context } from 'koa';
 import { success } from '../../utils/response';
 import { parsePagination } from '../../utils/pagination';
+import { ApiError } from '../../utils/api-error';
 import * as cs from '../../services/admin/content.service';
 
 // 入学指南
@@ -75,3 +76,5 @@ export async function updateRoommateSettings(ctx: Context) { ctx.body = success(
 export async function listRoommatePosts(ctx: Context) { const { page, size } = parsePagination(ctx.query); const { campusId } = ctx.query as any; ctx.body = success(await cs.getRoommatePosts(page, size, campusId)); }
 export async function getRoommatePost(ctx: Context) { ctx.body = success(await cs.getRoommatePost(Number(ctx.params.id))); }
 export async function deleteRoommatePost(ctx: Context) { ctx.body = success(await cs.deleteRoommatePost(Number(ctx.params.id))); }
+export async function getBusGuide(ctx: Context) { ctx.body = success(await cs.busGuide.get()); }
+export async function updateBusGuide(ctx: Context) { const { content } = ctx.request.body as any; if (typeof content !== 'string' || !content.trim()) throw new ApiError(40001, '指南内容不能为空'); ctx.body = success(await cs.busGuide.update(content)); }

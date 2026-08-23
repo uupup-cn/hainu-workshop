@@ -229,23 +229,28 @@ async function main() {
     await prisma.notification.create({ data: { typeId: nt.id, title: '欢迎使用海大工坊', content: '欢迎来到海大工坊，祝你校园生活愉快！', target: 'all' } });
   }
 
-  // ===== 管理后台菜单（动态路由 + 按钮权限）=====
-  if ((await prisma.menu.count()) === 0) {
+  // ===== 管理后台菜单（动态路由 + 按钮权限）— 按 menuKey upsert，增量同步 =====
+  {
     const { buildMenuSeed } = await require('./menu-data');
     const items = buildMenuSeed();
     const idByKey = new Map<string, number>();
-    // 先插入根节点，再按父子两层遍历解析 parentId
+    // 已存在的行直接入映射（更新其字段），不存在的新建；先根节点再按父子逐层
+    const existing = await prisma.menu.findMany();
+    for (const row of existing) idByKey.set(row.menuKey, row.id);
+    let created = 0;
     for (const it of items.filter((i: any) => !i.parentId)) {
-      const row = await prisma.menu.create({ data: { menuName: it.menuName, menuKey: it.menuKey, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible } });
-      idByKey.set(it.menuKey, row.id);
+      const data = { menuName: it.menuName, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible };
+      const row = await prisma.menu.upsert({ where: { menuKey: it.menuKey }, create: { menuKey: it.menuKey, ...data }, update: data });
+      idByKey.set(it.menuKey, row.id); if (!existing.some((e) => e.menuKey === it.menuKey)) created++;
     }
     for (let depth = 0; depth < 3; depth++) {
-      for (const it of items.filter((i: any) => i.parentId && !idByKey.has(i.menuKey) && idByKey.has(i.parentId))) {
-        const row = await prisma.menu.create({ data: { menuName: it.menuName, menuKey: it.menuKey, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible, parentId: idByKey.get(it.parentId as string)! } });
-        idByKey.set(it.menuKey, row.id);
+      for (const it of items.filter((i: any) => i.parentId && idByKey.has(i.parentId) && !idByKey.has(i.menuKey))) {
+        const data = { menuName: it.menuName, menuType: it.menuType, icon: it.icon || null, path: it.path || null, component: it.component || null, sortOrder: it.sortOrder, isVisible: it.isVisible, parentId: idByKey.get(it.parentId as string)! };
+        const row = await prisma.menu.upsert({ where: { menuKey: it.menuKey }, create: { menuKey: it.menuKey, ...data }, update: data });
+        idByKey.set(it.menuKey, row.id); created++;
       }
     }
-    console.log('[seed] 菜单已植入：' + idByKey.size + ' 项');
+    console.log('[seed] 菜单同步完成：共 ' + idByKey.size + ' 项，新增 ' + created + ' 项');
   }
 
   console.log('[seed] 种子数据完成：管理员 admin/123456，测试用户 00001/00002（密码 123456）');

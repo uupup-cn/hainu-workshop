@@ -8,7 +8,7 @@ import { monitorRoutes } from './monitor'
 import { notificationRoutes } from './notification'
 // import { schedulerRoutes } from './scheduler'
 // import { workflowRoutes } from './workflow'
-import { contentRoutes } from './content'
+// import { contentRoutes } from './content'
 // import { mallRoutes } from './mall'
 // import { resultRoutes } from './result'
 import { exceptionRoutes } from './exception'
@@ -40,7 +40,7 @@ export const routeModules: AppRouteRecord[] = [
   ...notificationRoutes,
   // ...schedulerRoutes,
   // ...workflowRoutes,
-  contentRoutes,
+  // contentRoutes, // 模板内容管理（文章/分类/标签）后端无对应接口，菜单为死链，停用待移除
   // mallRoutes,
   // resultRoutes,
   exceptionRoutes,

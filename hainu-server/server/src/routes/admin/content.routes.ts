@@ -62,6 +62,9 @@ router.post('/bus/schedules', adminAuthMiddleware, ctrl.createBusSchedule);
 router.put('/bus/schedules/:id', adminAuthMiddleware, ctrl.updateBusSchedule);
 router.delete('/bus/schedules/:id', adminAuthMiddleware, ctrl.deleteBusSchedule);
 // 校园出行（车站）
+// 乘车指南（单例）
+router.get('/bus/guide', adminAuthMiddleware, ctrl.getBusGuide);
+router.put('/bus/guide', adminAuthMiddleware, ctrl.updateBusGuide);
 router.get('/bus/stations', adminAuthMiddleware, ctrl.listBusStations);
 router.get('/bus/stations/:id', adminAuthMiddleware, ctrl.getBusStation);
 router.post('/bus/stations', adminAuthMiddleware, ctrl.createBusStation);

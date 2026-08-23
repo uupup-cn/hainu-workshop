@@ -9,6 +9,7 @@ router.put('/users/:id', adminAuthMiddleware, ctrl.updateUser);
 router.delete('/users/:id', adminAuthMiddleware, ctrl.deleteUser);
 // 认证审核
 router.get('/auth-applications', adminAuthMiddleware, ctrl.getAuthApplications);
+router.get('/auth-applications/:id', adminAuthMiddleware, ctrl.getAuthApplicationDetail);
 router.put('/auth-applications/:id/review', adminAuthMiddleware, ctrl.reviewAuthApplication);
 // 校区
 router.get('/campuses', adminAuthMiddleware, ctrl.listCampuses);

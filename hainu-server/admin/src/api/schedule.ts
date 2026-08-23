@@ -15,3 +15,7 @@ export function fetchUpdateSection(id: number, data: any) { return request.put({
 export function fetchDeleteSection(id: number) { return request.del({ url: '/api/v1/admin/sections/' + id, showSuccessMessage: true }) }
 export function fetchShareCodes(params?: any) { return request.get<any>({ url: '/api/v1/admin/share-codes', params }) }
 export function fetchToggleShareCode(id: number, data: any) { return request.put({ url: '/api/v1/admin/share-codes/' + id + '/status', data, showSuccessMessage: true }) }
+export function fetchTermWeeks(semesterId?: number) { return request.get<any>({ url: '/api/v1/admin/term-weeks', params: semesterId ? { semesterId } : {} }) }
+export function fetchCreateTermWeek(data: any) { return request.post({ url: '/api/v1/admin/term-weeks', data, showSuccessMessage: true }) }
+export function fetchUpdateTermWeek(id: number, data: any) { return request.put({ url: '/api/v1/admin/term-weeks/' + id, data, showSuccessMessage: true }) }
+export function fetchDeleteTermWeek(id: number) { return request.del({ url: '/api/v1/admin/term-weeks/' + id, showSuccessMessage: true }) }

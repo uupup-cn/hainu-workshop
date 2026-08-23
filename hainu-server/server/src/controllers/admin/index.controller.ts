@@ -38,3 +38,4 @@ export async function listBuildings(ctx: Context) { const cid = ctx.query.colleg
 export async function createBuilding(ctx: Context) { ctx.body = success(await cd.buildings.create(ctx.request.body)); }
 export async function updateBuilding(ctx: Context) { ctx.body = success(await cd.buildings.update(Number(ctx.params.id), ctx.request.body)); }
 export async function deleteBuilding(ctx: Context) { ctx.body = success(await cd.buildings.delete(Number(ctx.params.id))); }
+export async function getAuthApplicationDetail(ctx: Context) { ctx.body = success(await us.getAuthApplicationDetail(Number(ctx.params.id))); }

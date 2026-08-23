@@ -83,6 +83,7 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'schedule:course', menuName: '课程库', menuType: 'menu', parentId: 'schedule', icon: 'ri-book-2-line', path: 'course', component: '/schedule/course/index', sortOrder: 1, isVisible: true },
     { menuKey: 'schedule:color', menuName: '课程颜色', menuType: 'menu', parentId: 'schedule', icon: 'ri-palette-line', path: 'color', component: '/schedule/color/index', sortOrder: 2, isVisible: true },
     { menuKey: 'schedule:semester', menuName: '学期管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-line', path: 'semester', component: '/schedule/semester/index', sortOrder: 3, isVisible: true },
+    { menuKey: 'schedule:term-week', menuName: '学期周制', menuType: 'menu', parentId: 'schedule', icon: 'ri-calendar-check-line', path: 'term-week', component: '/schedule/term-week/index', sortOrder: 4, isVisible: true },
     { menuKey: 'schedule:section', menuName: '节次管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-time-line', path: 'section', component: '/schedule/section/index', sortOrder: 4, isVisible: true },
     { menuKey: 'schedule:share-code', menuName: '分享码管理', menuType: 'menu', parentId: 'schedule', icon: 'ri-share-line', path: 'share-code', component: '/schedule/share-code/index', sortOrder: 5, isVisible: true },
 

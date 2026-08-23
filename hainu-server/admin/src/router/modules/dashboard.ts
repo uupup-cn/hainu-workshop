@@ -10,18 +10,6 @@ export const dashboardRoutes: AppRouteRecord = {
   },
   children: [
     {
-      path: 'operation-overview',
-      name: 'DataScreenOperationOverview',
-      component: '/data-screen/operation-overview',
-      meta: {
-        title: 'menus.dataScreen.operationOverview',
-        icon: 'ri:pie-chart-2-line',
-        keepAlive: false,
-        fixedTab: true,
-        isFullPage: true
-      }
-    },
-    {
       path: 'console',
       name: 'Console',
       component: '/dashboard/console',
@@ -41,7 +29,7 @@ export const dashboardRoutes: AppRouteRecord = {
         keepAlive: false
       }
     }
-    // 精简版：仅保留数据大屏(运营概览)和控制台
-    // analysis, ecommerce, analytics, hrm, jobs, sales, crm, social-media, crypto
+    // 精简版：控制台 + 二手集市分析
+    // operation-overview（views/data-screen 已删除）、analysis 及演示仪表盘未注册
   ]
 }
