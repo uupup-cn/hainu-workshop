@@ -358,22 +358,26 @@ src/api/
 
 ---
 
-## 附录：实施状态（2026-08-23）
+## 附录：实施状态（2026-08-23 更新）
 
 ### 已完成
 
 | 范围 | 状态 |
 |:--|:--|
-| 7 个开发批次全部页面 | ✅ 已建成并注册（含第 5 步新增的 app-user 小程序用户、auth-review 认证审核页；补齐学期周制页面） |
-| 动态路由 | ✅ 采用**后端动态菜单**模式（偏离计划注 5 的"初期前端静态"建议）：GET /api/v3/system/menus 驱动，菜单数据由 seed 按 menuKey upsert 增量同步（prisma/menu-data.ts，169 项含按钮权限） |
-| 模板集成接口 | ✅ 计划未预见的必要补充：登录引导/后台用户/角色/字典/站点设置/文件中心/监控/日志/反馈/通知的模板路径端点（详见 api.md §10.17，共 74 个） |
-| API 层结构 | ⚠️ 与计划步骤 3 的 25 文件清单不同：实际合并为 7 个业务文件（freshman/wise/community/schedule/tool-module/app-user/campus-data）+ 模板原有文件 |
-| 二手集市分析仪表 | ✅ 已建（views/dashboard/marketplace-analytics）；「分析仪表」模板演示页未注册（数据为假数据，待定义真实指标后启用） |
+| 7 个开发批次全部页面 | ✅ 已建成并注册 |
+| 三级折叠分组 | ✅ 全部模块统一折叠分组结构（FAQ管理/找室友/电话簿/校历管理/校内班车/校园数据库/二手集市/校友圈管理/课程管理/学习周管理），详见 AGENTS.md |
+| 富文本编辑器 | ✅ ArtWangEditor 接入 11 个内容编辑页（仅网络图片 URL 插入），后端 XSS 白名单过滤 |
+| 校园数据库优化 | ✅ 校区加位置+介绍、学院去校区绑定+介绍、专业学院下拉+介绍、书院楼栋合并为树形页（ElTree） |
+| 动态路由 | ✅ 后端动态菜单模式，GET /api/v3/system/menus 驱动，菜单 seed 按 menuKey upsert 增量同步（183 项含按钮权限） |
+| 模板集成接口 | ✅ 74+ 个端点含登录引导/后台用户/角色/字典/站点设置/文件中心/监控/日志/反馈/通知 + 分析仪表聚合 |
+| 模板清理 | ✅ 约 150 个 demo 文件已删除（dashboard 演示/template/widgets/content 等），mock-server.mjs 已删除，pnpm 锁文件已删除 |
+| 安全加固 | ✅ 密码 PBKDF2 哈希（兼容旧 SHA-256 自动升级）、XSS 白名单过滤、限流中间件、CORS 白名单 |
 
-### 已知遗留（待项目负责人决策）
+### 已知遗留
 
-1. **模板遗留 demo 文件约 152 个仍在磁盘并已入库**：views/dashboard/{analytics,crm,crypto,ecommerce,hrm,jobs,sales,social-media}（114）、views/template、views/widgets、views/{result,outside,change}、views/system/{department,post,system-param,visitor-analytics}、views/content（7 个，路由已停用）。计划 §3.3 建议删除，当前仅停用未删。
-2. **mock-server.mjs（2959 行）与 .auto-import.json 已入库**：后端接口已全部真实可用，mock 服务无使用场景。
-3. **admin 双锁文件并存**：package-lock.json 与 pnpm-lock.yaml/pnpm-workspace.yaml 同时入库，存在包管理器混用风险，建议保留一套。
-4. **模板 api 死代码**：api/{tools,posts,departments,security-audit,system-params,content*,content-category,content-tag}.ts 调用的后端接口不存在（对应页面未注册或部分功能不可用）；部分模板页面调用的次级接口（files 批量操作、notifications inbox、monitor cache 清理等）后端未实现。
-5. **monitor/security-audit 页面**已注册但后端无 /security-audit 接口（页面可用性受限）。
+1. **模板 api 死代码**：api/{posts,departments}.ts 调用的后端接口不存在（页面已删但 api 文件保留供 user/notification 页引用，返回空列表兼容）
+2. **测试覆盖率**：核心新逻辑（工具内核 100%、tool.service 93%）达标，但全项目整体覆盖率约 12%（老服务未写测试）
+3. **小程序端**：0 代码，仅有设计文档（独立应用，暂未启动）
+4. **测评题库**：网页端内置示例题库（6-8 题/工具），正式题库待接入（PRD §3.6.7 已归档开源调研结论）
+5. **Excel 课表导入**：预留未实现（小程序端优先）
+6. **小程序扫码登录**：依赖小程序端开发

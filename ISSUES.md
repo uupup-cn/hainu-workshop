@@ -315,3 +315,99 @@
 | 8 | **密码哈希迁移**：新算法的 verify 函数需兼容旧哈希格式，首次登录成功后自动升级 |
 | 9 | **seed 幂等**：所有 seed 数据用 upsert 而非 create，菜单等结构化数据按唯一键增量同步 |
 | 10 | **测试覆盖**：静态路由审计脚本（check-admin-api.mjs）能发现运行时测试测不到的写接口断链 |
+
+---
+
+## 六、部署后修复阶段
+
+### 24. 管理后台登录「请求的资源不存在」（crypto/security-config 404）
+
+**现象**：浏览器打开管理后台登录页，弹出「请求的资源不存在」。
+
+**原因**：模板登录页加载时调用 `GET /api/v1/crypto/security-config` 获取 RSA 公钥加密密码，后端未实现该端点返回 404，前端 `getPublicKey()` 无错误处理，异常冒泡为弹窗。
+
+**解决方案**：后端新增 `GET /api/v1/crypto/security-config` 返回 `{ enabled: false }`；前端 `encryptPasswordFields` 降级返回明文（后端 adminLogin 本为明文校验）。
+
+**文件**：`server/src/routes/admin/integration.routes.ts`、`admin/src/utils/crypto.ts`
+
+---
+
+### 25. 管理后台登录成功但不跳转（ApiStatus.success=200 vs 后端 code:0）
+
+**现象**：登录请求返回 200，但页面停在登录页不跳转，弹窗「请求失败」。
+
+**原因**：模板的 `ApiStatus.success = 200`，但后端统一响应 `code: 0`。响应拦截器 `if (code === 200)` 不匹配，把成功响应当错误处理。
+
+**解决方案**：`ApiStatus.success` 改为 `0`；响应拦截器兼容 `40010/40002` 为未授权；`BaseResponse` 增加 `message` 字段兼容（后端返回 message 非 msg）。
+
+**文件**：`admin/src/utils/http/status.ts`、`admin/src/utils/http/index.ts`、`admin/src/types/common/response.ts`
+
+---
+
+### 26. API 请求双重前缀 /api/v1/api/v1/（VITE_API_URL 叠加）
+
+**现象**：所有 API 请求返回 404，Nginx 日志显示路径 `/api/v1/api/v1/auth/refresh`。
+
+**原因**：`.env.production` 的 `VITE_API_URL = /api/v1`，但 API 文件中 URL 已含完整 `/api/v1/` 前缀，axios baseURL 叠加后路径重复。
+
+**解决方案**：`VITE_API_URL` 改为空字符串（API 文件 URL 已自带前缀）；vite.config.ts 用 `define` 显式注入 `import.meta.env.VITE_API_URL`。
+
+**文件**：`admin/.env.production`、`admin/vite.config.ts`
+
+---
+
+### 27. 管理后台频繁报「服务器内部错误」（限流 429 + refresh 死循环）
+
+**现象**：登录后页面频繁弹窗「服务器内部错误」。
+
+**原因**：①限流中间件（60次/分钟）把管理后台并发请求限流返回 429；②前端 `auth/refresh` 自动重试机制因未存储 refreshToken 而死循环，每秒发十几个请求进一步触发限流。
+
+**解决方案**：限流中间件排除管理后台所有路径；前端禁用自动 refresh（token 7 天有效，过期直接登出重新登录）。
+
+**文件**：`server/src/middlewares/rate-limit.middleware.ts`、`admin/src/utils/http/index.ts`
+
+---
+
+### 28. 菜单 seed 不更新已存在菜单的 parentId（三级折叠分组不显示）
+
+**现象**：课表模块改为三级分组后，左侧导航不显示折叠子项。
+
+**原因**：seed 脚本的 upsert 对已存在菜单只更新名称/路径等字段，不更新 parentId——菜单结构变更后旧菜单的 parentId 仍指向旧父级。条件 `!idByKey.has(i.menuKey)` 跳过了已存在菜单。
+
+**解决方案**：去掉该条件，让已存在菜单也更新 parentId；遍历深度从 3 增至 4 层。
+
+**文件**：`server/prisma/seed.ts`
+
+---
+
+### 29. 课表三级路由嵌套导致页面内重复管理后台布局
+
+**现象**：点击课表折叠分组下的「课程库」，页面内嵌套了一层完整的管理后台（侧边栏+菜单+内容区）。
+
+**原因**：分组节点 `course-mgmt` 的 `component: '/index/index'` 被模板当成页面组件渲染——而 `/index/index` 本身是布局组件。
+
+**解决方案**：①分组节点 `component` 设为空字符串（模板对空 component 的有 children 节点只作折叠标题）；②路由从嵌套 children 改为扁平结构（path 含分组前缀）；③菜单三级项 path 改为叶子段（模板自动拼接）。
+
+**文件**：`server/prisma/menu-data.ts`、`admin/src/router/modules/schedule.ts`
+
+---
+
+### 30. Git Bash MSYS 路径转换污染构建参数
+
+**现象**：`VITE_API_URL = /api/v1` 被构建日志显示为 `C:/Program Files/Git/api/v1`。
+
+**原因**：Git Bash 的 MSYS 自动将以 `/` 开头的值转换为 Windows 路径。
+
+**解决方案**：构建时设置 `MSYS_NO_PATHCONV=1` 环境变量。
+
+---
+
+## 七、经验总结补充
+
+| # | 经验 |
+|:--|:-----|
+| 11 | **前后端协议对齐**：响应码（200 vs 0）、字段名（msg vs message）、路径前缀（baseURL 叠加）必须在开发前统一，否则部署后逐一排查耗时巨大 |
+| 12 | **浏览器端到端测试**：curl 只能测 API 连通性，前端的 baseURL 拼接、拦截器逻辑、路由跳转只有真实浏览器才能暴露 |
+| 13 | **模板集成策略**：对 Art Design Pro 等模板，以 mock-server 为响应形状规格抄 data 结构，后端实现模板路径端点，比改造模板 8000 行页面风险低 |
+| 14 | **菜单分组节点**：component 为空的有 children 节点只作折叠标题不渲染页面；非空的 `/index/index` 会被当布局组件渲染导致嵌套 |
+| 15 | **seed 增量同步**：upsert 的 update 必须包含所有可能变更的字段（含 parentId），不能只 update 部分字段 |

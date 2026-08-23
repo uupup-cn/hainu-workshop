@@ -1,8 +1,8 @@
 # 海大工坊 · 微信小程序 — API 文档
 
-> 版本：v2.2
+> 版本：v2.3
 > 日期：2026-08-23
-> 状态：初稿（v2.1 补充管理后台模板集成接口；v2.2 勘误响应字段命名并补充遗漏端点）
+> 状态：初稿（v2.3 补充校园数据库字段变更、college-tree 端点、分析仪表聚合端点）
 
 > **命名约定勘误（v2.2）**：本文档早期示例中的响应字段（如 `points_consumed`、`share_code`、`share_url`、`poster_url`、`share_type`、`result_data`）实际实现统一为 **camelCase**（`pointsConsumed`、`shareCode`、`shareUrl`、`posterUrl`、`shareType`、`resultData`），与 Prisma/JS 生态惯例一致。请求字段同时兼容 snake_case（文档写法）与 camelCase；各端消费请按 camelCase 读取。
 
@@ -674,11 +674,12 @@ UID + 密码登录（网页端/小程序端通用）
 
 | 方法 | 路径 | 说明 |
 |:----|:-----|:-----|
-| GET / POST / PUT / DELETE | /api/v1/admin/campuses[/:id] | 校区 CRUD（联动电话簿分类） |
-| GET / POST / PUT / DELETE | /api/v1/admin/colleges[/:id] | 书院 CRUD |
-| GET / POST / PUT / DELETE | /api/v1/admin/departments[/:id] | 学院 CRUD |
-| GET / POST / PUT / DELETE | /api/v1/admin/majors[/:id] | 专业 CRUD |
-| GET / POST / PUT / DELETE | /api/v1/admin/buildings[/:id] | 楼栋号 CRUD |
+| GET / POST / PUT / DELETE | /api/v1/admin/campuses[/:id] | 校区 CRUD（含 location 地理位置和 description 富文本介绍） |
+| GET / POST / PUT / DELETE | /api/v1/admin/colleges[/:id] | 书院 CRUD（含 description，list 返回 buildings 关联） |
+| GET / POST / PUT / DELETE | /api/v1/admin/departments[/:id] | 学院 CRUD（campusId 可选，含 description，list 返回 campus 关联） |
+| GET / POST / PUT / DELETE | /api/v1/admin/majors[/:id] | 专业 CRUD（含 description，list 返回 department 关联） |
+| GET / POST / PUT / DELETE | /api/v1/admin/buildings[/:id] | 楼栋 CRUD（含 description，list 返回 college 关联） |
+| GET | /api/v1/admin/college-tree?campusId=xxx | 书院楼栋树形数据（书院含 buildings 数组，v2.3 新增） |
 
 ### 10.5 社区管理
 

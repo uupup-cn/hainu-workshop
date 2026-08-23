@@ -1,8 +1,8 @@
 # 海大工坊 · 微信小程序 — 后端设计文档
 
-> 版本：v2.0
-> 日期：2026-08-19
-> 状态：初稿
+> 版本：v2.2
+> 日期：2026-08-23
+> 状态：初稿（v2.2 补充校园数据库字段变更、XSS 过滤、限流中间件、密码哈希升级、模板集成接口）
 
 ---
 
@@ -1034,3 +1034,32 @@ server/
 
 > 文件保留天数为 0 时永久保留。定时任务每天清理过期文件。
 
+
+---
+
+## 附录：v2.2 变更记录（2026-08-23）
+
+### 校园数据库 Schema 变更
+
+| 模型 | 变更 |
+|:--|:--|
+| Campus | 新增 `location` VARCHAR(200) 地理位置、`description` TEXT 校区介绍（富文本 HTML） |
+| Department | `campusId` 从 NOT NULL 改为可选（INT?），新增 `description` TEXT 学院介绍 |
+| Major | 新增 `description` TEXT 专业介绍 |
+| College | 新增 `description` TEXT 书院介绍 |
+| Building | 新增 `description` TEXT 楼栋介绍 |
+
+### 新增端点
+
+- `GET /api/v1/admin/college-tree?campusId=xxx` — 书院含 buildings 的树形数据（供管理后台树形页面）
+
+### 安全增强
+
+- **密码哈希**：从无盐 SHA-256 升级为 PBKDF2-SHA256（10 万次迭代 + 16 字盐），`verifyPassword` 兼容旧哈希并自动升级（`utils/password.ts`）
+- **XSS 过滤**：`utils/html-sanitize.ts` 白名单过滤 HTML（移除 script/on*/javascript:），接入 content.service / community.service / campus-data.service 的 create/update
+- **限流中间件**：`middlewares/rate-limit.middleware.ts`，通用 60/分钟 + 登录 10/分钟 + 抽奖 5/分钟；管理后台路径不限流
+- **CORS 收紧**：从 `*` 改为白名单（逗号分隔多源）
+
+### 模板集成接口（api.md §10.17）
+
+共 74+ 个端点，包括登录引导链路（captcha/logout/user-info/menus）、后台用户/角色/字典/站点设置/文件中心/监控/日志/反馈/通知管理，以及分析仪表聚合端点 `GET /admin/dashboard/stats`。
