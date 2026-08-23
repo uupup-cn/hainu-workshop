@@ -48,7 +48,9 @@ export default ({ mode }: { mode: string }) => {
   return defineConfig({
     define: {
       __APP_VERSION__: JSON.stringify(VITE_VERSION),
-      __APP_BUILD_ID__: JSON.stringify(buildId)
+      __APP_BUILD_ID__: JSON.stringify(buildId),
+      'import.meta.env.VITE_API_URL': JSON.stringify(VITE_API_URL || '/api/v1'),
+      'import.meta.env.VITE_BASE_URL': JSON.stringify(VITE_BASE_URL || '/admin/')
     },
     base: VITE_BASE_URL,
     server: {
