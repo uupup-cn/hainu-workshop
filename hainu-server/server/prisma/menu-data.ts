@@ -43,7 +43,6 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'system', menuName: '系统管理', menuType: 'menu', parentId: null, icon: 'ri-settings-line', path: '/system', component: '/index/index', sortOrder: 8, isVisible: true },
 
     // ===== 仪表盘 =====
-    { menuKey: 'dashboard:operation-overview', menuName: '运营概览', menuType: 'menu', parentId: 'dashboard', icon: 'ri-pie-chart-2-line', path: 'operation-overview', component: '/data-screen/operation-overview/index', sortOrder: 1, isVisible: true },
     { menuKey: 'dashboard:console', menuName: '控制台', menuType: 'menu', parentId: 'dashboard', icon: 'ri-home-smile-2-line', path: 'console', component: '/dashboard/console/index', sortOrder: 2, isVisible: true },
     { menuKey: 'dashboard:marketplace-analytics', menuName: '二手集市分析', menuType: 'menu', parentId: 'dashboard', icon: 'ri-shopping-cart-2-line', path: 'marketplace-analytics', component: '/dashboard/marketplace-analytics/index', sortOrder: 3, isVisible: true },
 

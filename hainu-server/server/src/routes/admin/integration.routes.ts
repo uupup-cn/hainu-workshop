@@ -8,6 +8,8 @@ const router = new Router({ prefix: '' });
 
 // ===== 引导链路（登录后必须；captcha/logout/signup 为公开接口）=====
 router.get('/api/v1/auth/captcha', ctrl.getCaptcha);
+// 密码加密配置（模板登录页加载时请求，返回 enabled:false 让前端跳过 RSA 加密）
+router.get('/api/v1/crypto/security-config', ctrl.getSecurityConfig);
 router.post('/api/v1/auth/signup', ctrl.signup);
 router.post('/api/v1/auth/logout', ctrl.logout);
 router.get('/api/v1/user/info', adminAuthMiddleware, ctrl.getUserInfo);

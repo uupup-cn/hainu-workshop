@@ -175,3 +175,4 @@ export async function deletePost(ctx: Context) { ctx.body = success(null, '删�
 
 // ===== 分析仪表 =====
 export async function getDashboardStats(ctx: Context) { ctx.body = success(await svc.getDashboardStats()); }
+export async function getSecurityConfig(ctx: Context) { ctx.body = success({ keyId: '', publicKey: '', enabled: false, serverTime: Date.now(), signatureRequired: false, clockSkewMs: 30000, nonceTtlMs: 300000, nonceMinLength: 16, unsignedPayloadToken: '', exemptPaths: ['/api/v1/auth/admin/login', '/api/v1/auth/login', '/api/v1/auth/captcha', '/api/v1/crypto/security-config'] }); }

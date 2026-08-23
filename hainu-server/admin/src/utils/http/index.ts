@@ -105,21 +105,24 @@ axiosInstance.interceptors.request.use(
 /** 响应拦截器 */
 axiosInstance.interceptors.response.use(
   async (response: AxiosResponse<BaseResponse>) => {
-    const { code, msg } = response.data
+    const { code, msg, message } = response.data
     const requestConfig = response.config as ExtendedAxiosRequestConfig
+    // 后端统一响应 code:0=成功；40010/40002=未授权（兼容模板的 401 逻辑）
+    const isUnauthorized = code === ApiStatus.unauthorized || code === 40010 || code === 40002
+    const errorMsg = msg || message || ''
     if (code === ApiStatus.success) return response
-    if (code === ApiStatus.unauthorized && requestConfig.silentUnauthorized) {
-      throw createHttpError(msg || $t('httpMsg.unauthorized'), ApiStatus.unauthorized)
+    if (isUnauthorized && requestConfig.silentUnauthorized) {
+      throw createHttpError(errorMsg || $t('httpMsg.unauthorized'), ApiStatus.unauthorized)
     }
-    if (code === ApiStatus.unauthorized) {
+    if (isUnauthorized) {
       try {
         return await retryWithFreshAccessToken(requestConfig)
       } catch (refreshError) {
-        handleUnauthorizedError(resolveErrorMessage(refreshError) || msg)
+        handleUnauthorizedError(resolveErrorMessage(refreshError) || errorMsg)
         return Promise.reject(refreshError)
       }
     }
-    throw createHttpError(msg || $t('httpMsg.requestFailed'), code)
+    throw createHttpError(errorMsg || $t('httpMsg.requestFailed'), code)
   },
   async (error) => {
     const originalRequest = error.config as ExtendedAxiosRequestConfig | undefined
