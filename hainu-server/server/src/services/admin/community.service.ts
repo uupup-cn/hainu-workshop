@@ -102,11 +102,18 @@ export async function updateAlumniPost(id: number, d: any) {
   if (d.content !== undefined) data.content = sanitizeHtml(d.content);
   return prisma.alumniPost.update({ where: { id }, data });
 }
-// 上线/下线
-export async function setAlumniPostStatus(id: number, isActive: boolean) {
+// 上线/下线（下线时需填原因，发送站内信通知作者）
+export async function setAlumniPostStatus(id: number, isActive: boolean, reason?: string) {
   const p = await prisma.alumniPost.findUnique({ where: { id } });
   if (!p) throw new ApiError(40003, '帖子不存在');
-  return prisma.alumniPost.update({ where: { id }, data: { isActive } });
+  if (!isActive && !reason) throw new ApiError(40001, '下架需填写原因备注');
+  const updated = await prisma.alumniPost.update({ where: { id }, data: { isActive } });
+  // 下线时发站内信通知作者
+  if (!isActive) {
+    const postType = p.type === 'confession' ? '表白墙' : '帖子';
+    await prisma.notification.create({ data: { typeId: 1, title: `您的${postType}已被下架`, content: `您的${postType}已被管理员下架。原因：${reason}`, target: 'all' } });
+  }
+  return updated;
 }
 // 分页查询帖子评论
 export async function getAlumniComments(postId: number, page: number, size: number) {

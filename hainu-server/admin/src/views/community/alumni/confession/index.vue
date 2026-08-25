@@ -74,7 +74,15 @@ function handleSize(val: number) { size.value = val; page.value = 1; loadData() 
 function openPreview(row: any) { previewRow.value = row; previewVisible.value = true }
 function openDialog(row: any) { editId.value = row.id; form.value = { isAnonymous: !!row.isAnonymous, content: row.content || '' }; dialogVisible.value = true }
 async function handleSave() { try { await api.fetchUpdateAlumniPost(editId.value!, form.value); dialogVisible.value = false; loadData() } catch {} }
-async function handleStatus(row: any) { try { await api.fetchSetAlumniPostStatus(row.id, !row.isActive); loadData() } catch {} }
+async function handleStatus(row: any) {
+  if (row.isActive) {
+    const { value } = await ElMessageBox.prompt('请填写下架原因（将作为站内信通知作者）', '下架表白墙', { confirmButtonText: '确认下架', cancelButtonText: '取消', inputType: 'textarea', inputPlaceholder: '请输入下架原因…', inputValidator: (v: string) => !!v?.trim() || '请填写下架原因' })
+    await api.fetchSetAlumniPostStatus(row.id, false, value.trim())
+  } else {
+    await api.fetchSetAlumniPostStatus(row.id, true)
+  }
+  loadData()
+}
 async function handleDelete(row: any) { await ElMessageBox.confirm('确认删除该表白墙内容？删除后评论和点赞将一并清除。', '提示'); try { await api.fetchDeleteAlumniPost(row.id); loadData() } catch {} }
 onMounted(loadData)
 </script>

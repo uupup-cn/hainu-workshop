@@ -30,7 +30,7 @@ export async function deleteAlumniSection(ctx: Context) { ctx.body = success(awa
 export async function listAlumniPosts(ctx: Context) { const { page, size } = parsePagination(ctx.query); const { type, keyword } = ctx.query as any; ctx.body = success(await cm.getAlumniPosts(page, size, type, keyword)); }
 export async function getAlumniPost(ctx: Context) { ctx.body = success(await cm.getAlumniPostDetail(Number(ctx.params.id))); }
 export async function updateAlumniPost(ctx: Context) { ctx.body = success(await cm.updateAlumniPost(Number(ctx.params.id), ctx.request.body)); }
-export async function setAlumniPostStatus(ctx: Context) { const { isActive } = ctx.request.body as any; if (typeof isActive !== 'boolean') throw new ApiError(40001, 'isActive 参数无效'); ctx.body = success(await cm.setAlumniPostStatus(Number(ctx.params.id), isActive)); }
+export async function setAlumniPostStatus(ctx: Context) { const { isActive, reason } = ctx.request.body as any; if (typeof isActive !== 'boolean') throw new ApiError(40001, 'isActive 参数无效'); ctx.body = success(await cm.setAlumniPostStatus(Number(ctx.params.id), isActive, reason)); }
 export async function listAlumniComments(ctx: Context) { const { page, size } = parsePagination(ctx.query); ctx.body = success(await cm.getAlumniComments(Number(ctx.params.id), page, size)); }
 export async function pinAlumniPost(ctx: Context) { const { isPinned } = ctx.request.body as any; if (typeof isPinned !== 'boolean') throw new ApiError(40001, 'isPinned 参数无效'); ctx.body = success(await cm.pinAlumniPost(Number(ctx.params.id), isPinned)); }
 export async function deleteAlumniPost(ctx: Context) { ctx.body = success(await cm.deleteAlumniPost(Number(ctx.params.id))); }
