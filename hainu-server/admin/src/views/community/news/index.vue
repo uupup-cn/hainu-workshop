@@ -35,7 +35,7 @@
       <ElForm :model="form" label-width="80px">
         <ElRow :gutter="16">
           <ElCol :span="12"><ElFormItem label="标题"><ElInput v-model="form.title" /></ElFormItem></ElCol>
-          <ElCol :span="12"><ElFormItem label="推送对象"><ElSelect v-model="form.target" style="width: 100%"><ElOption label="全部学生" value="all_student" /><ElOption label="新生" value="freshman" /><ElOption label="本科生" value="undergrad" /><ElOption label="研究生" value="grad" /></ElSelect></ElFormItem></ElCol>
+          <ElCol :span="12"><ElFormItem label="推送对象"><ElSelect v-model="form.target" style="width: 100%"><ElOption label="全部学生" value="all_student" /><ElOption label="新生" value="freshman" /><ElOption label="在校生" value="enrolled" /><ElOption label="本科生" value="undergrad" /><ElOption label="研究生" value="grad" /></ElSelect></ElFormItem></ElCol>
         </ElRow>
         <ElRow :gutter="16">
           <ElCol :span="8"><ElFormItem label="状态"><ElSelect v-model="form.status" style="width: 100%"><ElOption label="草稿" value="draft" /><ElOption label="已发布" value="published" /></ElSelect></ElFormItem></ElCol>
@@ -64,7 +64,7 @@ const searchItems = [
 const page = ref(1); const size = ref(20); const total = ref(0)
 const previewVisible = ref(false); const previewRow = ref<any>(null)
 const dialogVisible = ref(false); const dialogTitle = ref(''); const editId = ref<number | null>(null); const form = ref<any>({})
-const targetMap: Record<string, string> = { all_student: '全部学生', freshman: '新生', undergrad: '本科生', grad: '研究生' }
+const targetMap: Record<string, string> = { all_student: '全部学生', freshman: '新生', enrolled: '在校生', undergrad: '本科生', grad: '研究生' }
 function targetLabel(v: string) { return targetMap[v] || v }
 const stats = computed(() => ({
   total: tableData.value.length,
