@@ -698,7 +698,11 @@ UID + 密码登录（网页端/小程序端通用）
 | PUT | /api/v1/admin/community/modules/:key | 启停社区功能 |
 | GET / POST / PUT / DELETE | /api/v1/admin/news[/:id] | 快讯 CRUD |
 | GET / POST / PUT / DELETE | /api/v1/admin/alumni/sections[/:id] | 版块 CRUD |
-| GET | /api/v1/admin/alumni/posts | 帖子/表白墙列表 |
+| GET | /api/v1/admin/alumni/posts | 帖子/表白墙列表（支持 keyword 搜索） |
+| GET | /api/v1/admin/alumni/posts/:id | 帖子详情（含 user/section/comments） |
+| PUT | /api/v1/admin/alumni/posts/:id | 编辑帖子内容（content 经 XSS 过滤） |
+| PUT | /api/v1/admin/alumni/posts/:id/status | 上线/下线（下线需 body.reason，自动发站内信通知作者） |
+| GET | /api/v1/admin/alumni/posts/:id/comments | 帖子评论分页列表 |
 | PUT | /api/v1/admin/alumni/posts/:id/pin | 帖子置顶/取消置顶 |
 | DELETE | /api/v1/admin/alumni/posts/:id | 删除帖子/表白墙 |
 | DELETE | /api/v1/admin/alumni/comments/:id | 删除评论 |

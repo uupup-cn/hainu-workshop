@@ -426,3 +426,16 @@
 - 网页端联动逻辑调整：住宿线（校区→书院→楼栋）按校区联动；学术线（学院→专业）学院全量加载、选学院后联动专业
 
 **文件**：`server/src/controllers/campus-data.controller.ts`、`web/src/views/freshman/Roommate.vue`、`web/src/api/roommate.ts`
+
+---
+
+### 32. 帖子/表白墙下架需填写原因并发送站内信
+
+**需求**：管理后台点击下架按钮时需填写下架原因，该原因作为站内信内容通知帖子作者。
+
+**实现**：
+- 后端 `setAlumniPostStatus` 新增 `reason` 参数，下线时校验非空，创建 Notification 站内信
+- 前端 `handleStatus`：下线时弹 `ElMessageBox.prompt` 填写原因，上线直接切换
+- 同时补充了帖子管理/表白墙管理的文章管理样式重构（统计卡片+搜索栏+预览/编辑/下线/置顶/删除）
+
+**文件**：`server/src/services/admin/community.service.ts`、`server/src/controllers/admin/community.controller.ts`、`admin/src/views/community/alumni/posts/index.vue`、`admin/src/views/community/alumni/confession/index.vue`、`admin/src/api/community.ts`
