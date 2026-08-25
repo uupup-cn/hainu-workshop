@@ -49,8 +49,8 @@ export async function exportTableData(payload: DataExportPayload) {
   workbook.Props = {
     Title: title,
     Subject: '数据导出',
-    Author: 'Ci-Yuu-Plus',
-    Company: 'Ci-Yuu-Plus',
+    Author: '海大工坊',
+    Company: '海大工坊',
     CreatedDate: new Date()
   }
   XLSX.utils.book_append_sheet(

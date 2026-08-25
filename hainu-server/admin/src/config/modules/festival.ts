@@ -21,7 +21,7 @@
  * - 默认每个活动只触发一次礼花效果，dailyFireworks 为 true 时每天触发一次礼花
  *
  * @module config/modules/festival
- * @author Ci-Yuu-Plus Team
+ * @author 海大工坊 Team
  */
 
 import { FestivalConfig } from '@/types/config'
@@ -48,6 +48,6 @@ export const festivalConfigList: FestivalConfig[] = [
   //   date: '2024-12-25',
   //   image: sd,
   //   count: 3 // 可选，不设置则使用默认值 3 次
-  //   scrollText: 'Merry Christmas！Ci-Yuu-Plus 祝您圣诞快乐，愿节日的欢乐与祝福如雪花般纷至沓来！',
+  //   scrollText: 'Merry Christmas！海大工坊 祝您圣诞快乐，愿节日的欢乐与祝福如雪花般纷至沓来！',
   // }
 ]

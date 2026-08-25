@@ -136,7 +136,7 @@ export const upgradeLogList = ref<UpgradeLog[]>([
   },
   {
     version: 'v1.0.0',
-    title: 'Ci-Yuu-Plus 商业版首个正式版本',
+    title: '海大工坊 商业版首个正式版本',
     date: '2026-04-23',
     detailGroups: [
       {

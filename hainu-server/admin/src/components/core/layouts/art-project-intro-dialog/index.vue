@@ -76,7 +76,7 @@
                   <ArtSvgIcon icon="ri:book-open-line" />
                 </span>
                 <div>
-                  <p :class="capabilityTitleClass">为什么选择 Ci-Yuu-Plus</p>
+                  <p :class="capabilityTitleClass">为什么选择 海大工坊</p>
                   <p :class="capabilitySummaryClass">不止功能完整，更在设计与体验上真正拉开差距</p>
                 </div>
               </div>
@@ -84,7 +84,7 @@
                 市面上不缺后台系统，缺的是一套真正兼顾设计、体验与交付效率的产品。很多系统功能不少，但界面普通、风格不统一，客户第一眼很难感受到专业度与价值感。
               </p>
               <p :class="[paragraphClass, 'mt-2.5']">
-                Ci-Yuu-Plus
+                海大工坊
                 想解决的，不只是后台搭建问题，更是项目呈现、品牌表达与长期使用体验的问题。它让你的系统从“只是能用”，走向“更高级、更完整、更容易被认可”。
               </p>
             </article>

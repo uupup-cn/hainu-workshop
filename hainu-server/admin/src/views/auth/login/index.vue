@@ -153,7 +153,7 @@
 
   const siteSettingsStore = useSiteSettingsStore()
   const { publicConfig } = storeToRefs(siteSettingsStore)
-  const siteBrandName = computed(() => publicConfig.value.siteName || 'Ci-Yuu-Plus')
+  const siteBrandName = computed(() => publicConfig.value.siteName || '海大工坊')
   const isImageCaptchaEnabled = computed(
     () => publicConfig.value.captchaEnabled && publicConfig.value.captchaType === 'IMAGE'
   )
