@@ -411,3 +411,18 @@
 | 13 | **模板集成策略**：对 Art Design Pro 等模板，以 mock-server 为响应形状规格抄 data 结构，后端实现模板路径端点，比改造模板 8000 行页面风险低 |
 | 14 | **菜单分组节点**：component 为空的有 children 节点只作折叠标题不渲染页面；非空的 `/index/index` 会被当布局组件渲染导致嵌套 |
 | 15 | **seed 增量同步**：upsert 的 update 必须包含所有可能变更的字段（含 parentId），不能只 update 部分字段 |
+
+---
+
+### 31. 找室友联动参数名不匹配 + 学院不应按校区过滤
+
+**现象**：找室友的多级联动选择器中，书院和学院都不按校区过滤，返回全部数据。
+
+**原因**：①前端传 `campus_id`（snake_case），后端读 `campusId`（camelCase），参数名不匹配导致过滤失效；②Department 的 campusId 改为可选后，按校区筛选学院会漏掉未绑校区的学院。
+
+**解决方案**：
+- 后端控制器新增 `numParam()` 兼容 snake_case 和 camelCase 参数名
+- `getDepartments` 不再按 campusId 过滤（学院全量返回，可跨校区）
+- 网页端联动逻辑调整：住宿线（校区→书院→楼栋）按校区联动；学术线（学院→专业）学院全量加载、选学院后联动专业
+
+**文件**：`server/src/controllers/campus-data.controller.ts`、`web/src/views/freshman/Roommate.vue`、`web/src/api/roommate.ts`

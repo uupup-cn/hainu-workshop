@@ -239,14 +239,17 @@ UID + 密码登录（网页端/小程序端通用）
 
 ### 4.2 数据源（多级联动）
 
+> 联动结构：住宿线（校区→书院→楼栋）按校区过滤；学术线（学院→专业）学院全量返回不按校区（v2.3 变更：学院可跨校区存在）。
+> 参数名兼容：后端同时接受 snake_case（campus_id）和 camelCase（campusId）。
+
 #### GET /api/v1/roommate/campuses
 获取校区列表
 
 #### GET /api/v1/roommate/colleges?campus_id=:id
 根据校区获取书院列表
 
-#### GET /api/v1/roommate/departments?campus_id=:id
-根据校区获取学院列表
+#### GET /api/v1/roommate/departments
+获取全部活跃学院列表（v2.3 变更：不再按 campus_id 过滤，学院可跨校区）
 
 #### GET /api/v1/roommate/majors?department_id=:id
 根据学院获取专业列表
