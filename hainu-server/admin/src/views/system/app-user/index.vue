@@ -12,6 +12,10 @@
         <ElTableColumn label="身份" width="100"><template #default="{ row }"><ElTag :type="identityTag(row.identity)" size="small">{{ identityLabel(row.identity) }}</ElTag></template></ElTableColumn>
         <ElTableColumn label="认证状态" width="100"><template #default="{ row }"><ElTag :type="authStatusTag(row.authStatus)" size="small">{{ authStatusLabel(row.authStatus) }}</ElTag></template></ElTableColumn>
         <ElTableColumn prop="points" label="积分" width="90" />
+        <ElTableColumn label="头像" width="80"><template #default="{ row }"><ElImage v-if="row.avatar" :src="row.avatar" fit="cover" style="width: 50px; height: 50px; border-radius: 50%" /><span v-else class="text-g-400">-</span></template></ElTableColumn>
+        <ElTableColumn label="邮箱" min-width="160"><template #default="{ row }">{{ row.email || '-' }}</template></ElTableColumn>
+        <ElTableColumn label="QQ" width="120"><template #default="{ row }">{{ row.qq || '-' }}</template></ElTableColumn>
+        <ElTableColumn label="微信" width="120"><template #default="{ row }">{{ row.wechat || '-' }}</template></ElTableColumn>
         <ElTableColumn label="注册时间" width="110"><template #default="{ row }">{{ (row.createdAt || '').slice(0, 10) }}</template></ElTableColumn>
         <ElTableColumn label="操作" width="150" fixed="right"><template #default="{ row }"><ElButton size="small" @click="openDialog(row)">编辑</ElButton><ElButton size="small" type="danger" @click="handleDelete(row)">删除</ElButton></template></ElTableColumn>
       </ArtTable>
@@ -21,6 +25,10 @@
         <ElFormItem label="身份"><ElSelect v-model="form.identity" style="width: 100%"><ElOption label="新生" value="freshman" /><ElOption label="本科生" value="undergrad" /><ElOption label="研究生" value="grad" /></ElSelect></ElFormItem>
         <ElFormItem label="积分"><ElInputNumber v-model="form.points" :min="0" /></ElFormItem>
         <ElFormItem label="积分启用"><ElSwitch v-model="form.pointsEnabled" /></ElFormItem>
+        <ElFormItem label="头像URL"><ElInput v-model="form.avatar" placeholder="非必填，请输入头像图片地址" clearable /></ElFormItem>
+        <ElFormItem label="邮箱"><ElInput v-model="form.email" placeholder="非必填" clearable /></ElFormItem>
+        <ElFormItem label="QQ"><ElInput v-model="form.qq" placeholder="非必填" clearable /></ElFormItem>
+        <ElFormItem label="微信"><ElInput v-model="form.wechat" placeholder="非必填" clearable /></ElFormItem>
       </ElForm>
       <template #footer><ElButton @click="dialogVisible = false">取消</ElButton><ElButton type="primary" @click="handleSave">保存</ElButton></template>
     </ElDialog>
@@ -45,8 +53,8 @@ function handleSearch() { page.value = 1; loadData() }
 function handleReset() { keyword.value = ''; page.value = 1; loadData() }
 function handlePage(val: number) { page.value = val; loadData() }
 function handleSize(val: number) { size.value = val; page.value = 1; loadData() }
-function openDialog(row: any) { editId.value = row.id; form.value = { identity: row.identity, points: row.points, pointsEnabled: row.pointsEnabled }; dialogVisible.value = true }
-async function handleSave() { try { if (editId.value != null) await api.fetchUpdateUser(editId.value, { identity: form.value.identity, points: form.value.points, pointsEnabled: form.value.pointsEnabled }); dialogVisible.value = false; loadData() } catch {} }
+function openDialog(row: any) { editId.value = row.id; form.value = { identity: row.identity, points: row.points, pointsEnabled: row.pointsEnabled, avatar: row.avatar || '', email: row.email || '', qq: row.qq || '', wechat: row.wechat || '' }; dialogVisible.value = true }
+async function handleSave() { try { if (editId.value != null) await api.fetchUpdateUser(editId.value, { identity: form.value.identity, points: form.value.points, pointsEnabled: form.value.pointsEnabled, avatar: form.value.avatar, email: form.value.email, qq: form.value.qq, wechat: form.value.wechat }); dialogVisible.value = false; loadData() } catch {} }
 async function handleDelete(row: any) { await ElMessageBox.confirm(`确认删除用户 ${row.uid}（${row.nickname || '未设置昵称'}）？`, '提示'); await api.fetchDeleteUser(row.id); loadData() }
 onMounted(loadData)
 </script>

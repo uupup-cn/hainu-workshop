@@ -151,12 +151,12 @@
     }
 
     emit('update:value', false)
-    router.push(`/notification/detail/${item.id}?scene=inbox`)
+    router.push(`/system/notification/detail/${item.id}?scene=inbox`)
   }
 
   const handleViewAll = () => {
     emit('update:value', false)
-    router.push('/notification/inbox')
+    router.push('/system/notification/inbox')
   }
 
   watch(

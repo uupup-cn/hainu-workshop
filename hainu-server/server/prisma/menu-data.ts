@@ -84,7 +84,10 @@ export function buildMenuSeed(): MenuSeedItem[] {
     { menuKey: 'community:posts', menuName: '帖子管理', menuType: 'menu', parentId: 'community:alumni', icon: 'ri-chat-1-line', path: 'alumni/posts', component: '/community/alumni/posts/index', sortOrder: 1, isVisible: true },
     { menuKey: 'community:confession', menuName: '表白墙管理', menuType: 'menu', parentId: 'community:alumni', icon: 'ri-heart-line', path: 'alumni/confession', component: '/community/alumni/confession/index', sortOrder: 2, isVisible: true },
     { menuKey: 'community:section', menuName: '版块管理', menuType: 'menu', parentId: 'community:alumni', icon: 'ri-layout-grid-line', path: 'alumni/section', component: '/community/alumni/section/index', sortOrder: 3, isVisible: true },
-    { menuKey: 'community:lottery', menuName: '抽奖管理', menuType: 'menu', parentId: 'community', icon: 'ri-gift-line', path: 'lottery', component: '/community/lottery/index', sortOrder: 4, isVisible: true },
+    { menuKey: 'community:lottery', menuName: '抽奖管理', menuType: 'menu', parentId: 'community', icon: 'ri-gift-line', path: 'lottery', component: '', sortOrder: 4, isVisible: true },
+    { menuKey: 'community:lottery-activities', menuName: '活动管理', menuType: 'menu', parentId: 'community:lottery', icon: 'ri-gift-2-line', path: 'lottery/activities', component: '/community/lottery/activities/index', sortOrder: 1, isVisible: true },
+    { menuKey: 'community:lottery-prizes', menuName: '奖品配置', menuType: 'menu', parentId: 'community:lottery', icon: 'ri-award-line', path: 'lottery/prizes', component: '/community/lottery/prizes/index', sortOrder: 2, isVisible: true },
+    { menuKey: 'community:lottery-winners', menuName: '中奖记录', menuType: 'menu', parentId: 'community:lottery', icon: 'ri-trophy-line', path: 'lottery/winners', component: '/community/lottery/winners/index', sortOrder: 3, isVisible: true },
 
     // ===== 工具模块 =====
     { menuKey: 'tool:manage', menuName: '工具管理', menuType: 'menu', parentId: 'tool', icon: 'ri-hammer-line', path: 'manage', component: '/tool/manage/index', sortOrder: 1, isVisible: true },
@@ -131,7 +134,7 @@ export function buildMenuSeed(): MenuSeedItem[] {
     'freshman:guide', 'freshman:life', 'freshman:faq', 'freshman:roommate',
     'wise:intro', 'wise:phonebook', 'wise:calendar', 'wise:map', 'wise:bus',
     'wise:campus', 'wise:department', 'wise:major', 'wise:college', 'wise:building',
-    'community:marketplace', 'community:news', 'community:posts', 'community:confession', 'community:section', 'community:lottery',
+    'community:marketplace', 'community:news', 'community:posts', 'community:confession', 'community:section', 'community:lottery-activities', 'community:lottery-prizes', 'community:lottery-winners',
     'tool:manage', 'tool:category', 'tool:video-parse',
     'schedule:course', 'schedule:color', 'schedule:semester', 'schedule:section', 'schedule:share-code',
     'system:user', 'system:role', 'system:menu', 'system:dict', 'system:notification',

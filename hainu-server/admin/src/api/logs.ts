@@ -2,14 +2,44 @@ import request from '@/utils/http'
 import { ApiPermissionCode } from '@/constants/api-permissions'
 
 /**
+ * 标准化分页响应。
+ *
+ * 后端返回标准分页 `{ records, total, current, size }`，但部分历史接口/页面可能
+ * 期望 `list` 字段。这里统一兜底：始终返回 `records` 数组与 `total` 数值，
+ * 避免空列表或字段缺失时页面白屏（useTable 默认适配器虽支持多字段，仍在此收口）。
+ */
+function normalizeLogPage<T>(response: unknown): Api.Common.PaginatedResponse<T> {
+  if (!response || typeof response !== 'object') {
+    return { records: [], total: 0, current: 1, size: 20 }
+  }
+  const res = response as Record<string, unknown>
+  const records = (Array.isArray(res.records)
+    ? res.records
+    : Array.isArray(res.list)
+      ? res.list
+      : Array.isArray(res.data)
+        ? res.data
+        : []) as T[]
+  const total =
+    typeof res.total === 'number' ? res.total : typeof res.count === 'number' ? res.count : records.length
+  return {
+    records,
+    total,
+    current: typeof res.current === 'number' ? res.current : 1,
+    size: typeof res.size === 'number' ? res.size : 20
+  }
+}
+
+/**
  * 获取操作日志列表
  */
-export function fetchOperationLogs(params: Api.Audit.OperationLogSearchParams) {
-  return request.get<Api.Audit.OperationLogList>({
+export async function fetchOperationLogs(params: Api.Audit.OperationLogSearchParams) {
+  const response = await request.get<Api.Audit.OperationLogList>({
     url: '/api/v1/logs/operation',
     params,
     permissionCode: ApiPermissionCode.LOG.OPERATION_LIST
   })
+  return normalizeLogPage<Api.Audit.OperationLogItem>(response)
 }
 
 /**
@@ -59,12 +89,13 @@ export function fetchClearOperationLogs() {
 /**
  * 获取登录日志列表
  */
-export function fetchLoginLogs(params: Api.Audit.LoginLogSearchParams) {
-  return request.get<Api.Audit.LoginLogList>({
+export async function fetchLoginLogs(params: Api.Audit.LoginLogSearchParams) {
+  const response = await request.get<Api.Audit.LoginLogList>({
     url: '/api/v1/logs/login',
     params,
     permissionCode: ApiPermissionCode.LOG.LOGIN_LIST
   })
+  return normalizeLogPage<Api.Audit.LoginLogItem>(response)
 }
 
 /**

@@ -3,13 +3,35 @@ import { ApiPermissionCode } from '@/constants/api-permissions'
 
 /**
  * 获取文件列表
+ *
+ * 后端返回标准分页 `{ records, total, current, size }`，但页面依赖 `summary`
+ * 汇总字段（总文件数/私有/公开数量）。后端未返回该字段时这里补齐零值，
+ * 避免页面访问 `response.summary.total` 时因 `summary` 为 undefined 而白屏。
  */
-export function fetchFileList(params: Api.Files.FileSearchParams) {
-  return request.get<Api.Files.FileListResponse>({
+export async function fetchFileList(params: Api.Files.FileSearchParams) {
+  const response = await request.get<Api.Files.FileListResponse>({
     url: '/api/v1/files',
     params,
     permissionCode: ApiPermissionCode.FILE.LIST
   })
+
+  // 数据适配：后端未返回 summary 时补零值，records 统一为数组
+  const records = Array.isArray(response?.records) ? response.records : []
+  const total = typeof response?.total === 'number' ? response.total : records.length
+  const summary: Api.Files.FileListSummary = response?.summary ?? {
+    total,
+    privateCount: records.filter((item) => item.visibility !== 'PUBLIC').length,
+    publicCount: records.filter((item) => item.visibility === 'PUBLIC').length
+  }
+
+  return {
+    ...response,
+    records,
+    total,
+    current: response?.current ?? params.current ?? 1,
+    size: response?.size ?? params.size ?? 12,
+    summary
+  }
 }
 
 /**

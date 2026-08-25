@@ -18,7 +18,7 @@
               v-if="scene === 'admin'"
               type="primary"
               plain
-              @click="router.push('/notification/manage')"
+              @click="router.push('/system/notification/manage')"
             >
               通知管理
             </ElButton>
@@ -102,11 +102,11 @@
   // 返回上一页
   function goBack() {
     if (scene.value === 'admin') {
-      router.push('/notification/manage')
+      router.push('/system/notification/manage')
       return
     }
 
-    router.push('/notification/inbox')
+    router.push('/system/notification/inbox')
   }
 
   // 获取通知类型文案

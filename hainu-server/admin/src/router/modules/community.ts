@@ -9,6 +9,8 @@ export const communityRoutes: AppRouteRecord = {
     { path: 'alumni/posts', name: 'CommunityPosts', component: '/community/alumni/posts/index', meta: { title: '帖子管理', icon: 'ri:chat-1-line', keepAlive: true } },
     { path: 'alumni/confession', name: 'CommunityConfession', component: '/community/alumni/confession/index', meta: { title: '表白墙管理', icon: 'ri:heart-line', keepAlive: true } },
     { path: 'alumni/section', name: 'CommunitySection', component: '/community/alumni/section/index', meta: { title: '版块管理', icon: 'ri:layout-grid-line', keepAlive: true } },
-    { path: 'lottery', name: 'CommunityLottery', component: '/community/lottery/index', meta: { title: '抽奖管理', icon: 'ri:gift-line', keepAlive: true } }
+    { path: 'lottery/activities', name: 'CommunityLotteryActivities', component: '/community/lottery/activities/index', meta: { title: '活动管理', icon: 'ri:gift-2-line', keepAlive: true } },
+    { path: 'lottery/prizes', name: 'CommunityLotteryPrizes', component: '/community/lottery/prizes/index', meta: { title: '奖品配置', icon: 'ri:award-line', keepAlive: true } },
+    { path: 'lottery/winners', name: 'CommunityLotteryWinners', component: '/community/lottery/winners/index', meta: { title: '中奖记录', icon: 'ri:trophy-line', keepAlive: true } }
   ]
 }

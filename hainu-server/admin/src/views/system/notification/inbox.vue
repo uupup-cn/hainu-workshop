@@ -120,11 +120,11 @@
             </div>
 
             <ElSpace wrap class="shrink-0">
-              <ElButton @click="router.push('/notification/manage')">进入通知管理</ElButton>
+              <ElButton @click="router.push('/system/notification/manage')">进入通知管理</ElButton>
               <ElButton
                 type="primary"
                 plain
-                @click="router.push(`/notification/detail/${detail.id}?scene=inbox`)"
+                @click="router.push(`/system/notification/detail/${detail.id}?scene=inbox`)"
               >
                 独立页查看
               </ElButton>
@@ -304,7 +304,7 @@
     detail.value = await fetchNotificationInboxDetail(item.id)
 
     if (syncRoute) {
-      router.replace(`/notification/inbox?id=${item.id}`)
+      router.replace(`/system/notification/inbox?id=${item.id}`)
     }
   }
 

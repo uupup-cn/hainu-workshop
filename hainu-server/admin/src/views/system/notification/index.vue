@@ -22,10 +22,10 @@
       >
         <template #left>
           <ElSpace wrap>
-            <ElButton v-if="hasAuth('add')" @click="openAddDialog" type="primary" plain v-ripple
+            <ElButton @click="openAddDialog" type="primary" plain v-ripple
               >新增通知</ElButton
             >
-            <ElButton @click="router.push('/notification/inbox')" type="primary" plain v-ripple>
+            <ElButton @click="router.push('/system/notification/inbox')" type="primary" plain v-ripple>
               我的收件箱
             </ElButton>
           </ElSpace>
@@ -187,7 +187,7 @@
   /**
    * 跳转到管理端通知详情预览页。
    */
-  const goDetail = (id: number) => router.push(`/notification/detail/${id}?scene=admin`)
+  const goDetail = (id: number) => router.push(`/system/notification/detail/${id}?scene=admin`)
 
   const {
     columns,
