@@ -25,7 +25,11 @@ router.put('/alumni/sections/:id', adminAuthMiddleware, ctrl.updateAlumniSection
 router.delete('/alumni/sections/:id', adminAuthMiddleware, ctrl.deleteAlumniSection);
 // 校友圈帖子/评论
 router.get('/alumni/posts', adminAuthMiddleware, ctrl.listAlumniPosts);
+router.get('/alumni/posts/:id/comments', adminAuthMiddleware, ctrl.listAlumniComments);
+router.get('/alumni/posts/:id', adminAuthMiddleware, ctrl.getAlumniPost);
 router.put('/alumni/posts/:id/pin', adminAuthMiddleware, ctrl.pinAlumniPost);
+router.put('/alumni/posts/:id/status', adminAuthMiddleware, ctrl.setAlumniPostStatus);
+router.put('/alumni/posts/:id', adminAuthMiddleware, ctrl.updateAlumniPost);
 router.delete('/alumni/posts/:id', adminAuthMiddleware, ctrl.deleteAlumniPost);
 router.delete('/alumni/comments/:id', adminAuthMiddleware, ctrl.deleteAlumniComment);
 // 抽奖活动

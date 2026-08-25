@@ -76,11 +76,44 @@ export const alumniSections = {
   delete: async (id: number) => { const n = await prisma.alumniPost.count({ where: { sectionId: id } }); if (n > 0) throw new ApiError(40001, '该版块下存在帖子，无法删除'); return prisma.alumniSection.delete({ where: { id } }); },
 };
 // ========== 校友圈帖子/评论 ==========
-export async function getAlumniPosts(page: number, size: number, type?: string) {
+export async function getAlumniPosts(page: number, size: number, type?: string, keyword?: string) {
   const where: any = {}; if (type) where.type = type;
+  if (keyword) where.OR = [{ title: { contains: keyword } }, { content: { contains: keyword } }];
   const [list, total] = await Promise.all([
     prisma.alumniPost.findMany({ where, skip: (page - 1) * size, take: size, orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }], include: { user: { select: { uid: true, nickname: true } }, section: true } }),
     prisma.alumniPost.count({ where }),
+  ]);
+  return paginatedResult(list, total, page, size);
+}
+// 帖子详情（含用户、版块、评论）
+export async function getAlumniPostDetail(id: number) {
+  const p = await prisma.alumniPost.findUnique({ where: { id }, include: { user: { select: { uid: true, nickname: true } }, section: true, comments: { orderBy: { createdAt: 'desc' }, include: { user: { select: { uid: true, nickname: true } } } } } });
+  if (!p) throw new ApiError(40003, '帖子不存在');
+  return p;
+}
+// 编辑帖子内容（title/content/isAnonymous，content 经 XSS 过滤）
+export async function updateAlumniPost(id: number, d: any) {
+  const p = await prisma.alumniPost.findUnique({ where: { id } });
+  if (!p) throw new ApiError(40003, '帖子不存在');
+  const data: any = {};
+  if (d.title !== undefined) data.title = d.title;
+  if (d.sectionId !== undefined) data.sectionId = d.sectionId;
+  if (d.isAnonymous !== undefined) data.isAnonymous = !!d.isAnonymous;
+  if (d.content !== undefined) data.content = sanitizeHtml(d.content);
+  return prisma.alumniPost.update({ where: { id }, data });
+}
+// 上线/下线
+export async function setAlumniPostStatus(id: number, isActive: boolean) {
+  const p = await prisma.alumniPost.findUnique({ where: { id } });
+  if (!p) throw new ApiError(40003, '帖子不存在');
+  return prisma.alumniPost.update({ where: { id }, data: { isActive } });
+}
+// 分页查询帖子评论
+export async function getAlumniComments(postId: number, page: number, size: number) {
+  const where = { postId };
+  const [list, total] = await Promise.all([
+    prisma.alumniComment.findMany({ where, skip: (page - 1) * size, take: size, orderBy: { createdAt: 'desc' }, include: { user: { select: { uid: true, nickname: true } } } }),
+    prisma.alumniComment.count({ where }),
   ]);
   return paginatedResult(list, total, page, size);
 }

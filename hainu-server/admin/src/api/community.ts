@@ -20,6 +20,10 @@ export function fetchCreateAlumniSection(data: any) { return request.post({ url:
 export function fetchUpdateAlumniSection(id: number, data: any) { return request.put({ url: '/api/v1/admin/alumni/sections/' + id, data, showSuccessMessage: true }) }
 export function fetchDeleteAlumniSection(id: number) { return request.del({ url: '/api/v1/admin/alumni/sections/' + id, showSuccessMessage: true }) }
 export function fetchAlumniPosts(params?: any) { return request.get<any>({ url: '/api/v1/admin/alumni/posts', params }) }
+export function fetchAlumniPostDetail(id: number) { return request.get<any>({ url: '/api/v1/admin/alumni/posts/' + id }) }
+export function fetchUpdateAlumniPost(id: number, data: any) { return request.put({ url: '/api/v1/admin/alumni/posts/' + id, data, showSuccessMessage: true }) }
+export function fetchSetAlumniPostStatus(id: number, isActive: boolean) { return request.put({ url: '/api/v1/admin/alumni/posts/' + id + '/status', data: { isActive }, showSuccessMessage: true }) }
+export function fetchAlumniComments(postId: number, params?: any) { return request.get<any>({ url: '/api/v1/admin/alumni/posts/' + postId + '/comments', params }) }
 export function fetchUpdateAlumniPostPin(id: number, data: any) { return request.put({ url: '/api/v1/admin/alumni/posts/' + id + '/pin', data, showSuccessMessage: true }) }
 export function fetchDeleteAlumniPost(id: number) { return request.del({ url: '/api/v1/admin/alumni/posts/' + id, showSuccessMessage: true }) }
 export function fetchLotteryActivities() { return request.get<any>({ url: '/api/v1/lottery/activities' }) }
