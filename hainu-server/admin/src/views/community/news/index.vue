@@ -1,17 +1,36 @@
 <template>
   <div>
+    <ElRow :gutter="16" class="mb-3">
+      <ElCol :span="6"><ElCard shadow="never"><div class="text-gray-500 text-sm">快讯总数</div><div class="text-2xl font-bold mt-2">{{ stats.total }}</div></ElCard></ElCol>
+      <ElCol :span="6"><ElCard shadow="never"><div class="text-gray-500 text-sm">已发布数</div><div class="text-2xl font-bold mt-2">{{ stats.published }}</div></ElCard></ElCol>
+      <ElCol :span="6"><ElCard shadow="never"><div class="text-gray-500 text-sm">草稿数</div><div class="text-2xl font-bold mt-2">{{ stats.draft }}</div></ElCard></ElCol>
+      <ElCol :span="6"><ElCard shadow="never"><div class="text-gray-500 text-sm">置顶数</div><div class="text-2xl font-bold mt-2">{{ stats.pinned }}</div></ElCard></ElCol>
+    </ElRow>
     <ArtSearchBar v-model="searchForm" :items="searchItems" :showExpand="false" @search="handleSearch" @reset="handleReset" />
     <ElCard shadow="never" style="margin-top: 12px">
       <div class="mb-4"><ElButton type="primary" plain @click="openDialog()">新增快讯</ElButton></div>
       <ArtTable :loading="loading" :data="tableData" :columns="columns" :pagination="{ current: page, size, total }" @pagination:current-change="handlePage" @pagination:size-change="handleSize">
         <ElTableColumn label="置顶" width="60"><template #default="{ row }"><ElTag v-if="row.isPinned" type="warning" size="small">置顶</ElTag></template></ElTableColumn>
-        <ElTableColumn prop="title" label="标题" min-width="200" show-overflow-tooltip />
+        <ElTableColumn label="快讯信息" min-width="300"><template #default="{ row }"><div class="font-bold truncate">{{ row.title }}</div><div class="text-gray-500 text-xs truncate">{{ (row.content || '').replace(/<[^>]+>/g, '').slice(0, 50) }}</div></template></ElTableColumn>
         <ElTableColumn label="推送对象" width="100"><template #default="{ row }">{{ targetLabel(row.target) }}</template></ElTableColumn>
         <ElTableColumn label="状态" width="90"><template #default="{ row }"><ElTag :type="row.status === 'published' ? 'success' : 'info'" size="small">{{ row.status === 'published' ? '已发布' : '草稿' }}</ElTag></template></ElTableColumn>
+        <ElTableColumn prop="sortOrder" label="排序" width="70" />
         <ElTableColumn label="发布时间" width="150"><template #default="{ row }">{{ (row.publishedAt || '').slice(0, 16).replace('T', ' ') || '-' }}</template></ElTableColumn>
-        <ElTableColumn label="操作" width="180" fixed="right"><template #default="{ row }"><ElButton size="small" @click="openDialog(row)">编辑</ElButton><ElButton size="small" type="danger" @click="handleDelete(row)">删除</ElButton></template></ElTableColumn>
+        <ElTableColumn label="操作" width="180" fixed="right"><template #default="{ row }"><ElButton size="small" link @click="openPreview(row)">预览</ElButton><ElButton size="small" link type="primary" @click="openDialog(row)">编辑</ElButton><ElButton size="small" link type="danger" @click="handleDelete(row)">删除</ElButton></template></ElTableColumn>
       </ArtTable>
     </ElCard>
+    <ElDialog v-model="previewVisible" title="快讯预览" width="700px" destroy-on-close>
+      <div v-if="previewRow">
+        <h3 class="text-lg font-bold mb-3">{{ previewRow.title }}</h3>
+        <div class="post-content mb-3" v-html="previewRow.content"></div>
+        <div class="text-gray-500 text-sm space-y-1">
+          <div>推送对象：{{ targetLabel(previewRow.target) }}</div>
+          <div>状态：{{ previewRow.status === 'published' ? '已发布' : '草稿' }}</div>
+          <div>置顶：{{ previewRow.isPinned ? '是' : '否' }}</div>
+          <div>发布时间：{{ (previewRow.publishedAt || '').slice(0, 16).replace('T', ' ') || '-' }}</div>
+        </div>
+      </div>
+    </ElDialog>
     <ElDialog v-model="dialogVisible" :title="dialogTitle" width="800px" destroy-on-close>
       <ElForm :model="form" label-width="80px">
         <ElRow :gutter="16">
@@ -32,7 +51,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import * as api from '@/api/community'
 const ArtWangEditor = defineAsyncComponent(() => import('@/components/core/forms/art-wang-editor/index.vue'))
@@ -43,16 +62,24 @@ const searchItems = [
   { label: '关键词', key: 'keyword', type: 'input', props: { clearable: true, placeholder: '请输入标题关键词' } }
 ]
 const page = ref(1); const size = ref(20); const total = ref(0)
-const dialogVisible = ref(false); const dialogTitle = ref(''); const editId = ref<number|null>(null); const form = ref<any>({})
+const previewVisible = ref(false); const previewRow = ref<any>(null)
+const dialogVisible = ref(false); const dialogTitle = ref(''); const editId = ref<number | null>(null); const form = ref<any>({})
 const targetMap: Record<string, string> = { all_student: '全部学生', freshman: '新生', undergrad: '本科生', grad: '研究生' }
 function targetLabel(v: string) { return targetMap[v] || v }
+const stats = computed(() => ({
+  total: tableData.value.length,
+  published: tableData.value.filter(r => r.status === 'published').length,
+  draft: tableData.value.filter(r => r.status === 'draft').length,
+  pinned: tableData.value.filter(r => !!r.isPinned).length,
+}))
 async function loadData() { loading.value = true; try { const res: any = await api.fetchAdminNews({ page: page.value, size: size.value, status: searchForm.value.status || undefined, keyword: searchForm.value.keyword || undefined }); tableData.value = res.list; total.value = res.total } finally { loading.value = false } }
 function handleSearch() { page.value = 1; loadData() }
 function handleReset() { searchForm.value.status = ''; searchForm.value.keyword = ''; page.value = 1; loadData() }
 function handlePage(val: number) { page.value = val; loadData() }
 function handleSize(val: number) { size.value = val; page.value = 1; loadData() }
-function openDialog(row?: any) { editId.value = row?.id || null; dialogTitle.value = row ? '编辑快讯' : '新增快讯'; form.value = row ? { ...row } : { target: 'all_student', status: 'draft', isPinned: false, sortOrder: 0, content: '' }; dialogVisible.value = true }
+function openPreview(row: any) { previewRow.value = row; previewVisible.value = true }
+function openDialog(row?: any) { editId.value = row?.id || null; dialogTitle.value = row ? '编辑快讯' : '新增快讯'; form.value = row ? { ...row } : { title: '', target: 'all_student', status: 'draft', isPinned: false, sortOrder: 0, content: '' }; dialogVisible.value = true }
 async function handleSave() { try { if (editId.value) await api.fetchUpdateNews(editId.value, form.value); else await api.fetchCreateNews(form.value); dialogVisible.value = false; loadData() } catch {} }
-async function handleDelete(row: any) { await ElMessageBox.confirm('确认删除该快讯？', '提示'); await api.fetchDeleteNews(row.id); loadData() }
+async function handleDelete(row: any) { await ElMessageBox.confirm('确认删除该快讯？', '提示'); try { await api.fetchDeleteNews(row.id); loadData() } catch {} }
 onMounted(loadData)
 </script>
