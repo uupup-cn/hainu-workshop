@@ -3,6 +3,7 @@ import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import { errorHandler } from './middlewares/error.middleware';
 import { rateLimitGeneral } from './middlewares/rate-limit.middleware';
+import { operationLogMiddleware } from './middlewares/log.middleware';
 import { config } from './config';
 
 const app = new Koa();
@@ -19,6 +20,7 @@ app.use(cors({
 }));
 app.use(bodyParser({ jsonLimit: '8mb' })); // 8MB 支持 base64 图片上传
 app.use(rateLimitGeneral);
+app.use(operationLogMiddleware); // 操作日志：记录 admin POST/PUT/DELETE 操作
 
 // 路由
 // 模板集成路由必须先挂载：其字面量路径（如 /notifications/admin）需优先于用户端参数路由（/notifications/:id）
