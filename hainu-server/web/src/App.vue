@@ -49,19 +49,54 @@
     <nav class="tabbar">
       <router-link v-for="t in tabItems" :key="t.path" :to="t.path" class="tab"><span class="tab-icon">{{ t.icon }}</span><span>{{ t.label }}</span></router-link>
     </nav>
+
+    <!-- 悬浮反馈按钮 + 弹窗 -->
+    <button v-if="userStore.isLoggedIn" class="feedback-fab" title="意见反馈" @click="fbVisible = true">💬</button>
+    <div v-if="fbVisible" class="fb-mask" @click.self="fbVisible = false">
+      <div class="fb-dialog card">
+        <h3 class="card-title">意见反馈</h3>
+        <textarea v-model="fbContent" class="input fb-textarea" rows="4" maxlength="500" placeholder="告诉我们你的建议或遇到的问题（500 字内）"></textarea>
+        <input v-model="fbContact" class="input" style="margin-top: 8px" placeholder="联系方式（选填）" />
+        <div class="fb-actions">
+          <button class="btn btn-plain btn-sm" @click="fbVisible = false">取消</button>
+          <button class="btn btn-sm" :disabled="!fbContent.trim() || fbSubmitting" @click="submitFeedback">{{ fbSubmitting ? '提交中…' : '提交反馈' }}</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from './store/user'
-import { authApi, userApi, systemApi } from './api'
+import { authApi, userApi, systemApi, profileApi } from './api'
 
 const userStore = useUserStore()
 const router = useRouter()
 const loginForm = reactive({ uid: '', password: '' })
 const loginLoading = ref(false)
 const loginError = ref('')
+
+// 悬浮反馈
+const fbVisible = ref(false)
+const fbContent = ref('')
+const fbContact = ref('')
+const fbSubmitting = ref(false)
+async function submitFeedback() {
+  if (!fbContent.value.trim()) return
+  fbSubmitting.value = true
+  try {
+    await profileApi.feedback({ content: fbContent.value, contact: fbContact.value || undefined })
+    alert('反馈已提交，感谢你的建议')
+    fbVisible.value = false
+    fbContent.value = ''
+    fbContact.value = ''
+  } catch (e: any) {
+    alert(e?.message || '提交失败，请稍后重试')
+  } finally {
+    fbSubmitting.value = false
+  }
+}
 
 // 身份差异化底部 Tab：新生第二栏进新生专区，在校生进校园服务
 const tabItems = computed(() => {
@@ -145,4 +180,17 @@ async function loadProfile() {
   .tab-icon { font-size: 20px; line-height: 24px; }
   .tab.router-link-active { color: var(--primary-500); font-weight: 500; }
 }
+
+/* 悬浮反馈按钮 */
+.feedback-fab {
+  position: fixed; right: 20px; bottom: 80px; z-index: 30;
+  width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--primary-500); color: #fff; font-size: 20px;
+  box-shadow: var(--shadow-float); transition: transform 0.2s, background 0.2s;
+}
+.feedback-fab:hover { background: var(--primary-700); transform: scale(1.1); }
+.fb-mask { position: fixed; inset: 0; z-index: 50; background: rgba(17, 24, 39, 0.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.fb-dialog { width: 400px; max-width: 100%; margin: 0; }
+.fb-textarea { display: block; width: 100%; resize: vertical; }
+.fb-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 </style>
