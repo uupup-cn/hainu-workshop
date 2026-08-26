@@ -398,6 +398,9 @@ function assertApiPermission(config: ExtendedAxiosRequestConfig) {
     return
   }
 
+  // 超级管理员放行所有接口
+  if (userStore.info?.roles?.includes('super-admin')) return
+
   if (apiPermissions.includes(permissionCode)) {
     return
   }
