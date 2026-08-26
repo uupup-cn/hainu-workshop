@@ -439,3 +439,23 @@
 - 同时补充了帖子管理/表白墙管理的文章管理样式重构（统计卡片+搜索栏+预览/编辑/下线/置顶/删除）
 
 **文件**：`server/src/services/admin/community.service.ts`、`server/src/controllers/admin/community.controller.ts`、`admin/src/views/community/alumni/posts/index.vue`、`admin/src/views/community/alumni/confession/index.vue`、`admin/src/api/community.ts`
+
+---
+
+### 33. 监控/日志页面白屏 + 日志中间件未挂载
+
+**现象**：管理后台系统监控下所有页面（监控概览/服务器监控/缓存监控/操作日志/登录日志）全部白屏；日志数据库表为空。
+
+**根因**（三个叠加）：
+1. **前端 assertApiPermission 拦截请求**：模板的权限预校验在请求拦截器里检查 `apiPermissions.includes(permissionCode)`，即使 super-admin 放行也可能因 roles 字段未正确存储而失效，导致监控/日志 API 请求被前端拦截，从未发到后端
+2. **模板自定义组件渲染失败**：ArtPageHero/ArtCountTo/ArtSvgIcon 等组件依赖链复杂，在当前环境下渲染失败导致白屏
+3. **日志中间件未挂载**：log.middleware.ts 已写好但从未在 app.ts/auth.routes.ts 中引用，登录日志和操作日志从未写入数据库
+
+**解决方案**：
+1. 移除 logs/monitor/files/feedback/notifications API 的 permissionCode，请求直接发出不做事端权限预校验
+2. 用纯 Element Plus 组件重写监控概览/服务器监控/缓存监控/操作日志/登录日志 5 个页面
+3. app.ts 挂载 operationLogMiddleware（全局），auth.routes.ts 在 /login 和 /admin/login 挂载 loginLogMiddleware
+4. loginLogMiddleware 改为 try-finally 确保异常时也能写日志；兼容用户登录(uid)和管理员登录(username)
+5. Nginx 配置 admin 静态资源 no-cache 防止浏览器缓存旧 JS
+
+**文件**：`admin/src/api/{logs,monitor,files,feedback,notifications}.ts`、`admin/src/views/monitor/{index,server,cache}/index.vue`、`admin/src/views/system/{operation-log,login-log}/index.vue`、`admin/src/utils/http/index.ts`、`server/src/app.ts`、`server/src/routes/auth.routes.ts`、`server/src/middlewares/log.middleware.ts`、`deploy/nginx.conf`
