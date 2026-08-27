@@ -615,7 +615,7 @@ model Section {
   sectionNumber Int
   startTime     String   @db.VarChar(10)
   endTime       String   @db.VarChar(10)
-  period        String   @db.VarChar(10)
+  period        String   @default("morning") @db.VarChar(10)
   sortOrder     Int      @default(0)
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
@@ -885,14 +885,17 @@ model File {
 // ========== 日志与监控 ==========
 
 model UserFeedback {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  content   String   @db.Text
-  contact   String?  @db.VarChar(100)
-  status    String   @default("pending") @db.VarChar(20)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  type             String   @default("OTHER") @db.VarChar(20) // BUG/FEATURE/UX/PERFORMANCE/OTHER
+  title            String?  @db.VarChar(100)
+  content          String   @db.Text
+  expectedBehavior String?  @db.VarChar(500)
+  contact          String?  @db.VarChar(100)
+  status           String   @default("pending") @db.VarChar(20)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
 
   @@map("user_feedback")
 }

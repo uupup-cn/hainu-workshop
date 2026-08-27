@@ -872,7 +872,7 @@ const FEEDBACK_TO_TEMPLATE: Record<string, string> = { pending: 'NEW', handled: 
 const FEEDBACK_FROM_TEMPLATE: Record<string, string> = { NEW: 'pending', TRIAGING: 'pending', PLANNED: 'pending', IN_PROGRESS: 'pending', RESOLVED: 'handled', CLOSED: 'handled' };
 
 function mapFeedback(f: any, uid: string | null) {
-  return { id: f.id, feedbackNo: 'FB-' + String(f.id).padStart(4, '0'), type: 'OTHER', status: FEEDBACK_TO_TEMPLATE[f.status] || 'NEW', priority: 'LOW', title: (f.content || '').slice(0, 20), content: f.content, expectedBehavior: null, contactName: uid || '', contact: f.contact || '', pageTitle: '', pagePath: '', pageUrl: '', browser: '', os: '', deviceType: '', userAgent: '', ip: '', extra: null, handledRemark: null, handledAt: null, createdAt: f.createdAt, updatedAt: f.updatedAt, submitter: { id: f.userId, username: uid || '' }, handler: f.status === 'handled' ? { id: 1, username: 'admin' } : null, reply: null };
+  return { id: f.id, feedbackNo: 'FB-' + String(f.id).padStart(4, '0'), type: f.type || 'OTHER', status: FEEDBACK_TO_TEMPLATE[f.status] || 'NEW', priority: 'LOW', title: f.title || (f.content || '').slice(0, 20), content: f.content, expectedBehavior: f.expectedBehavior || null, contactName: uid || '', contact: f.contact || '', pageTitle: '', pagePath: '', pageUrl: '', browser: '', os: '', deviceType: '', userAgent: '', ip: '', extra: null, handledRemark: null, handledAt: null, createdAt: f.createdAt, updatedAt: f.updatedAt, submitter: { id: f.userId, username: uid || '' }, handler: f.status === 'handled' ? { id: 1, username: 'admin' } : null, reply: null };
 }
 
 export async function getFeedbackList(query: any) {

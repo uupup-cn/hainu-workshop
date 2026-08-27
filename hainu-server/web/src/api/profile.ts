@@ -16,7 +16,7 @@ export const profileApi = {
   notifications: (page = 1, size = 20) => api.get('/notifications', { params: { page, size } }) as Promise<any>,
   readNotification: (id: number) => api.put(`/notifications/${id}/read`) as Promise<any>,
   unreadCount: () => api.get('/notifications/unread-count') as Promise<any>,
-  feedback: (data: { content: string; contact?: string }) => api.post('/user/feedback', data) as Promise<any>,
+  feedback: (data: { content: string; contact?: string; type?: string; title?: string; expectedBehavior?: string }) => api.post('/user/feedback', data) as Promise<any>,
   feedbackList: (page = 1, size = 20) => api.get('/user/feedback', { params: { page, size } }) as Promise<any>,
   uploadImage: (filename: string, base64: string) =>
     api.post('/upload/image', { filename, base64 }) as Promise<any>,

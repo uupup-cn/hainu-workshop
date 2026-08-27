@@ -51,15 +51,29 @@
     </nav>
 
     <!-- 悬浮反馈按钮 + 弹窗 -->
-    <button v-if="userStore.isLoggedIn" class="feedback-fab" title="意见反馈" @click="fbVisible = true">💬</button>
+    <button v-if="userStore.isLoggedIn" class="feedback-fab" title="问题反馈" @click="fbVisible = true">💬</button>
     <div v-if="fbVisible" class="fb-mask" @click.self="fbVisible = false">
       <div class="fb-dialog card">
-        <h3 class="card-title">意见反馈</h3>
-        <textarea v-model="fbContent" class="input fb-textarea" rows="4" maxlength="500" placeholder="告诉我们你的建议或遇到的问题（500 字内）"></textarea>
-        <input v-model="fbContact" class="input" style="margin-top: 8px" placeholder="联系方式（选填）" />
+        <h3 class="card-title">问题反馈</h3>
+        <label class="fb-label">问题类型 *</label>
+        <select v-model="fbForm.type" class="select fb-select">
+          <option value="BUG">功能异常</option>
+          <option value="FEATURE">功能建议</option>
+          <option value="UX">体验问题</option>
+          <option value="PERFORMANCE">性能问题</option>
+          <option value="OTHER">其他</option>
+        </select>
+        <label class="fb-label">问题标题 *</label>
+        <input v-model="fbForm.title" class="input" maxlength="50" placeholder="简要描述问题（50 字内）" />
+        <label class="fb-label">问题描述 *</label>
+        <textarea v-model="fbForm.content" class="input fb-textarea" rows="4" maxlength="500" placeholder="详细描述你遇到的问题或疑惑（500 字内）"></textarea>
+        <label class="fb-label">期望结果（选填）</label>
+        <input v-model="fbForm.expectedBehavior" class="input" maxlength="200" placeholder="你期望的正确表现是什么" />
+        <label class="fb-label">联系方式（选填）</label>
+        <input v-model="fbForm.contact" class="input" placeholder="QQ / 微信 / 邮箱，方便回访" />
         <div class="fb-actions">
           <button class="btn btn-plain btn-sm" @click="fbVisible = false">取消</button>
-          <button class="btn btn-sm" :disabled="!fbContent.trim() || fbSubmitting" @click="submitFeedback">{{ fbSubmitting ? '提交中…' : '提交反馈' }}</button>
+          <button class="btn btn-sm" :disabled="!fbForm.content.trim() || !fbForm.title.trim() || fbSubmitting" @click="submitFeedback">{{ fbSubmitting ? '提交中…' : '提交反馈' }}</button>
         </div>
       </div>
     </div>
@@ -79,18 +93,16 @@ const loginError = ref('')
 
 // 悬浮反馈
 const fbVisible = ref(false)
-const fbContent = ref('')
-const fbContact = ref('')
 const fbSubmitting = ref(false)
+const fbForm = reactive({ type: 'BUG', title: '', content: '', expectedBehavior: '', contact: '' })
 async function submitFeedback() {
-  if (!fbContent.value.trim()) return
+  if (!fbForm.content.trim() || !fbForm.title.trim()) return
   fbSubmitting.value = true
   try {
-    await profileApi.feedback({ content: fbContent.value, contact: fbContact.value || undefined })
+    await profileApi.feedback({ content: fbForm.content, contact: fbForm.contact || undefined, type: fbForm.type, title: fbForm.title, expectedBehavior: fbForm.expectedBehavior || undefined })
     alert('反馈已提交，感谢你的建议')
     fbVisible.value = false
-    fbContent.value = ''
-    fbContact.value = ''
+    Object.assign(fbForm, { type: 'BUG', title: '', content: '', expectedBehavior: '', contact: '' })
   } catch (e: any) {
     alert(e?.message || '提交失败，请稍后重试')
   } finally {
@@ -190,7 +202,10 @@ async function loadProfile() {
 }
 .feedback-fab:hover { background: var(--primary-700); transform: scale(1.1); }
 .fb-mask { position: fixed; inset: 0; z-index: 50; background: rgba(17, 24, 39, 0.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
-.fb-dialog { width: 400px; max-width: 100%; margin: 0; }
+.fb-dialog { width: 460px; max-width: 100%; max-height: 85vh; overflow-y: auto; margin: 0; }
 .fb-textarea { display: block; width: 100%; resize: vertical; }
-.fb-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.fb-select { display: block; width: 100%; }
+.fb-label { display: block; margin: 10px 0 4px; font-size: 13px; color: var(--neutral-600); }
+.fb-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
 </style>
