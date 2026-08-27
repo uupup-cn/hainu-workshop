@@ -200,6 +200,16 @@ web/src/
 - 假期模式：启动时读取 /system/settings 的 campus_mode，holiday 时先进入启动页（sessionStorage 记忆已通过）
 - 测评类工具为题库无关的维度得分协议（见 PRD §3.6.7），网页端内置示例题库，正式题库接入后替换
 
+**网页端重构（v2.3，2026-08-27）：**
+> 网页端采用独立设计语言与全屏官网式布局，不再"复用小程序模块结构/同一套 Tokens"。详见 [docs/ui-design/records/09-web-design-system.md](../../ui-design/records/09-web-design-system.md)。
+
+- 三专区 IA：访客首页 `/`（全屏沉浸 Hero + 全模块展示）、新生专区 `/freshman`、在校生专区 `/student`；顶部导航仅 首页/新生专区/在校生专区 三入口；登录后按身份自动跳专区，首页可回访。
+- 全屏官网式布局：全幅 Hero → 全宽幻灯片 → 全宽功能矩阵 → 双专区大卡 → 全宽 CTA → 深色页脚；区块 100% 宽铺满、内容居中限宽 1200px。
+- 四大组件库：`src/components/{base,icons,patterns,zone}/`（AppButton/AppDialog/AppPillTabs/AppCarousel/AppStaggerReveal/AppSection/PetMascot/ModuleShowcase/ZoneHero 等）+ `useToast`/`useAuth` 组合式。
+- 设计系统：`src/styles/{tokens,base,utilities}.css`，深海蓝 + 阳光金 + 热带青 + 幻紫 token 体系，Sora + Noto Sans SC 字体。
+- 图标：统一 Lucide（`lucide-vue-next`），界面全程禁用 emoji。
+- 目录结构变更：新增 `components/`、`composables/`、`layouts/`、`styles/`、`views/VisitorHome.vue`、`views/zones/`；原 `Home.vue` 由 `VisitorHome.vue` 取代。
+
 ### 2.4 小程序端项目目录结构（微信原生框架）
 
 ```

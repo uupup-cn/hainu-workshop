@@ -19,7 +19,7 @@
 - 主色面积 ≤ 25%；薄荷绿 ≤ 10%；橙色 ≤ 5%
 - 图标：线描 24×24，1.5px，默认 `text-secondary`
 - 所有数字（时间/价格/节次/UID）使用 `tnum` 等宽
-- 跨端一致：小程序与网页端独立开发、不复用代码，但视觉设计风格保持一致（参考同一套 Design Tokens 和线框）
+- 跨端：小程序与网页端独立开发、不复用代码。小程序沿用本设计系统；网页端自 v2.3（2026-08-27）起采用独立设计语言（见 [records/09-web-design-system.md](records/09-web-design-system.md)），原"视觉设计风格保持一致"约束对网页端不再适用
 
 ---
 
@@ -37,6 +37,7 @@
 | [07-wireframes-batch-06.md](records/07-wireframes-batch-06.md) | 第六批线框 · 账号/设置 | ✅ 已完成 |
 | [component-review.md](component-review.md) | 组件审查结论与最终组件清单（28 个） | ✅ 已执行 |
 | [08-confession-moments-style.md](records/08-confession-moments-style.md) | 表白墙微信朋友圈样式设计规范 | ✅ 已确认 |
+| [09-web-design-system.md](records/09-web-design-system.md) | 网页端独立设计系统（v2.3） | ✅ 已确认 |
 
 ## 二、线框进度
 
@@ -125,6 +126,7 @@
 
 - [x] 第六批：账号/设置页面线框
 - [x] 已确认剔除：一卡通 / 空教室查询/ 成绩进度
+- [x] 网页端前台重构为全屏官网式三专区架构（独立设计语言，见 records/09-web-design-system.md）
 - [ ] 输出最终「设计系统规范」归档到 docs
 - [ ] 前端代码按组件库落地（小程序端）
 
