@@ -184,6 +184,42 @@
             formattedExtra
           }}</pre>
         </div>
+
+        <!-- 处理标注表单 -->
+        <div class="mt-6 border-t border-[var(--art-border-dashed)] pt-4">
+          <div class="mb-3 text-sm font-medium text-g-700">处理标注</div>
+          <ElForm label-position="top">
+            <ElFormItem label="处理状态">
+              <ElRadioGroup v-model="statusForm.status">
+                <ElRadioButton label="NEW">待处理</ElRadioButton>
+                <ElRadioButton label="TRIAGING">分析中</ElRadioButton>
+                <ElRadioButton label="PLANNED">已规划</ElRadioButton>
+                <ElRadioButton label="IN_PROGRESS">处理中</ElRadioButton>
+                <ElRadioButton label="RESOLVED">已解决</ElRadioButton>
+                <ElRadioButton label="CLOSED">已关闭</ElRadioButton>
+              </ElRadioGroup>
+            </ElFormItem>
+            <ElFormItem label="优先级">
+              <ElRadioGroup v-model="statusForm.priority">
+                <ElRadioButton label="LOW">低</ElRadioButton>
+                <ElRadioButton label="MEDIUM">中</ElRadioButton>
+                <ElRadioButton label="HIGH">高</ElRadioButton>
+                <ElRadioButton label="URGENT">紧急</ElRadioButton>
+              </ElRadioGroup>
+            </ElFormItem>
+            <ElFormItem label="处理备注">
+              <ElInput
+                v-model="statusForm.handledRemark"
+                type="textarea"
+                :rows="3"
+                maxlength="1000"
+                show-word-limit
+                placeholder="记录问题分析结果、处理动作或暂不处理原因"
+              />
+            </ElFormItem>
+            <ElButton type="primary" :loading="statusSubmitting" @click="handleUpdateStatusFromDrawer">保存处理结果</ElButton>
+          </ElForm>
+        </div>
       </div>
     </ElDrawer>
 
@@ -450,7 +486,7 @@
                 type: 'view',
                 onClick: () => handleView(row.id)
               }),
-              hasApiPermission(ApiPermissionCode.FEEDBACK.STATUS_UPDATE)
+              true
                 ? h(ArtButtonTable, {
                     type: 'edit',
                     onClick: () => openStatusDialog(row)
@@ -644,6 +680,19 @@
       if (detailVisible.value) {
         await handleView(currentRowId.value)
       }
+    } finally {
+      statusSubmitting.value = false
+    }
+  }
+
+  // 从详情抽屉提交处理结果（复用 statusForm，详情打开时已同步 currentRowId）
+  async function handleUpdateStatusFromDrawer() {
+    if (!currentRowId.value) currentRowId.value = detail.value?.id
+    if (!currentRowId.value) return
+    statusSubmitting.value = true
+    try {
+      await fetchUpdateFeedbackStatus(currentRowId.value, statusForm)
+      await Promise.all([refreshData(), loadOverview(), handleView(currentRowId.value)])
     } finally {
       statusSubmitting.value = false
     }
