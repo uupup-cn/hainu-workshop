@@ -5,16 +5,12 @@
     <div v-else-if="campuses.length === 0" class="empty">暂无地图数据</div>
     <template v-else>
       <!-- 校区 Tab -->
-      <div class="tabs">
-        <button v-for="c in campuses" :key="c.id" class="tab" :class="{ active: activeCampus === c.campus }" @click="switchCampus(c.campus)">
-          {{ c.campus }}
-        </button>
-      </div>
+      <AppPillTabs :items="campuses" label-key="campus" value-key="campus" :model-value="activeCampus" wrap @update:model-value="(v) => switchCampus(String(v))" />
 
       <!-- 海甸校区：720 全景 -->
       <div v-if="isHaidian" class="pano-wrap">
         <iframe :src="panoramaUrl" allowfullscreen class="pano" title="海甸校区全景地图"></iframe>
-        <a class="open-link" :href="panoramaUrl" target="_blank" rel="noopener">新窗口打开全景 ↗</a>
+        <a class="open-link" :href="panoramaUrl" target="_blank" rel="noopener">新窗口打开全景 <LucideIcon name="arrow-right" :size="14" /></a>
       </div>
       <!-- 其他校区：静态地图图片 -->
       <template v-else>
@@ -27,7 +23,7 @@
 
       <!-- 地点标注 -->
       <div class="card">
-        <h3 class="card-title">📍 地点标注</h3>
+        <h3 class="card-title"><LucideIcon name="module-map" :size="20" /> 地点标注</h3>
         <div v-if="detailLoading" class="loading">加载中…</div>
         <div v-else-if="markers.length === 0" class="empty">暂无标注点</div>
         <div v-for="m in markers" :key="m.id" class="marker-item">
@@ -44,6 +40,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { wiseApi } from '../../api'
+import { LucideIcon } from '@/components/icons'
+import { AppPillTabs } from '@/components/base'
 
 /** 海甸校区 720 全景地址 */
 const PANORAMA_URL = 'https://www.720yun.com/t/9cvkbhfegpl?scene_id=130130450'
@@ -86,9 +84,6 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.tab { padding: 6px 16px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .pano-wrap { margin-bottom: 16px; }
 .pano { width: 100%; height: 60vh; border: none; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
 .open-link { display: inline-block; margin-top: 8px; font-size: 13px; }

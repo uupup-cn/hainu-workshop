@@ -4,18 +4,14 @@
     <div v-if="loading" class="loading">加载中…</div>
     <template v-else>
       <!-- 视图切换 -->
-      <div class="tabs">
-        <button class="tab" :class="{ active: tab === 'schedule' }" @click="tab = 'schedule'">班车时刻</button>
-        <button class="tab" :class="{ active: tab === 'station' }" @click="tab = 'station'">车站信息</button>
-        <button class="tab" :class="{ active: tab === 'guide' }" @click="tab = 'guide'">乘车指南</button>
-      </div>
+      <AppPillTabs :items="busTabs" label-key="label" value-key="value" :model-value="tab" @update:model-value="tab = String($event)" />
 
       <div v-if="tab === 'schedule'" class="card">
         <div v-if="schedules.length === 0" class="empty">暂无班车时刻</div>
         <div v-for="s in schedules" :key="s.id" class="list-item">
           <div>
             <div class="line">{{ s.lineName }} <span class="tag tag-mint">{{ s.departureTime }}</span></div>
-            <div class="route">{{ s.departurePlace }} → {{ s.destination }}</div>
+            <div class="route">{{ s.departurePlace }} <LucideIcon name="arrow-right" :size="14" /> {{ s.destination }}</div>
             <div v-if="s.notes" class="notes">{{ s.notes }}</div>
           </div>
         </div>
@@ -42,9 +38,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { wiseApi } from '../api'
+import { LucideIcon } from '@/components/icons'
+import { AppPillTabs } from '@/components/base'
 
 const loading = ref(true)
 const tab = ref('schedule')
+const busTabs = [
+  { label: '班车时刻', value: 'schedule' },
+  { label: '车站信息', value: 'station' },
+  { label: '乘车指南', value: 'guide' },
+]
 const schedules = ref<any[]>([])
 const stations = ref<any[]>([])
 const guide = ref<any>(null)
@@ -61,11 +64,8 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-.tab { padding: 6px 16px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .line { font-size: 15px; font-weight: 500; color: var(--neutral-900); }
-.route { font-size: 13px; color: var(--neutral-600); margin-top: 2px; }
+.route { font-size: 13px; color: var(--neutral-600); margin-top: 2px; display: inline-flex; align-items: center; gap: 4px; }
 .notes { font-size: 12px; color: var(--neutral-500); margin-top: 2px; }
 .content { white-space: pre-wrap; color: var(--neutral-700); }
 </style>

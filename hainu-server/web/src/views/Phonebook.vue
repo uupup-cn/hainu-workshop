@@ -5,9 +5,7 @@
     <div v-else-if="categories.length === 0" class="empty">暂无电话数据</div>
     <template v-else>
       <!-- 校区分类切换 -->
-      <div class="tabs">
-        <button v-for="cat in categories" :key="cat.id" class="tab" :class="{ active: activeCat?.id === cat.id }" @click="switchCat(cat)">{{ cat.categoryName }}</button>
-      </div>
+      <AppPillTabs :items="categories" label-key="categoryName" value-key="id" :model-value="activeCat?.id" wrap @update:model-value="(v) => { const c = categories.find((x) => x.id === v); if (c) switchCat(c) }" />
       <div class="card">
         <div v-if="entries.length === 0" class="empty">该分类下暂无条目</div>
         <div v-for="e in entries" :key="e.id" class="list-item">
@@ -24,6 +22,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { wiseApi } from '../api'
+import { AppPillTabs } from '@/components/base'
 
 const loading = ref(true)
 const categories = ref<any[]>([])
@@ -51,9 +50,6 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.tab { padding: 6px 16px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .name { font-size: 15px; font-weight: 500; color: var(--neutral-900); }
 .desc { font-size: 12px; color: var(--neutral-500); }
 </style>

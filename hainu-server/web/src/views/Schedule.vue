@@ -3,9 +3,9 @@
     <div class="page-header">
       <h2 class="page-title">我的课表</h2>
       <div v-if="userStore.isLoggedIn" class="header-ops">
-        <button class="btn btn-sm" @click="openAdd">＋ 添加课程</button>
-        <button class="btn btn-sm btn-plain" @click="openShare">🔗 分享课表</button>
-        <button class="btn btn-sm btn-plain" @click="openReplicate">📋 复刻课表</button>
+        <button class="btn btn-sm" @click="openAdd"><LucideIcon name="add" :size="18" /> 添加课程</button>
+        <button class="btn btn-sm btn-plain" @click="openShare"><LucideIcon name="share" :size="18" /> 分享课表</button>
+        <button class="btn btn-sm btn-plain" @click="openReplicate"><LucideIcon name="copy" :size="18" /> 复刻课表</button>
       </div>
       <button v-else class="btn btn-sm" @click="userStore.openLoginDialog()">登录后查看完整课表</button>
     </div>
@@ -34,95 +34,84 @@
     </div>
 
     <!-- 添加 / 编辑课程弹窗 -->
-    <div v-if="courseVisible" class="dialog-mask" @click.self="closeCourseDialog">
-      <div class="dialog">
-        <h3 class="dialog-title">{{ editing ? '编辑课程' : '添加课程' }}</h3>
-        <div class="form-row"><label>课程名 *</label><input v-model="form.courseName" class="input" maxlength="100" placeholder="如：高等数学" /></div>
-        <div class="form-row"><label>教师</label><input v-model="form.teacher" class="input" maxlength="50" placeholder="选填" /></div>
-        <div class="form-row"><label>上课地点</label><input v-model="form.location" class="input" maxlength="100" placeholder="如：3教-201（选填）" /></div>
-        <div class="form-row"><label>周次</label><input v-model="form.weeks" class="input" maxlength="50" placeholder="如：1-16（选填）" /></div>
-        <div class="form-row"><label>星期 *</label>
-          <select v-model="form.dayOfWeek" class="select">
-            <option v-for="d in 7" :key="d" :value="d">{{ weekName(d) }}</option>
-          </select>
-        </div>
-        <div class="form-grid">
-          <div class="form-row"><label>开始节次 *</label><input v-model.number="form.startSection" class="input num" type="number" min="1" max="12" /></div>
-          <div class="form-row"><label>结束节次 *</label><input v-model.number="form.endSection" class="input num" type="number" min="1" max="12" /></div>
-        </div>
-        <div class="form-row"><label>颜色</label>
-          <div class="colors">
-            <span v-for="(col, i) in colors" :key="col" class="color-dot" :class="{ active: form.colorId === i + 1 }" :style="{ background: col }" @click="form.colorId = i + 1"></span>
-          </div>
-        </div>
-        <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
-        <!-- 时间冲突提示 -->
-        <div v-if="conflicts.length" class="conflict">
-          <div class="conflict-tip">⚠ 与以下课程时间冲突：</div>
-          <div v-for="c in conflicts" :key="c.id" class="conflict-item">
-            {{ c.courseName }} · {{ weekName(c.dayOfWeek) }} 第{{ c.startSection }}-{{ c.endSection }}节
-          </div>
-        </div>
-        <div class="dialog-actions">
-          <button v-if="editing" class="btn btn-sm btn-danger del" :disabled="submitting" @click="removeCourse">删除课程</button>
-          <span class="spacer"></span>
-          <button class="btn btn-sm btn-plain" :disabled="submitting" @click="closeCourseDialog">取消</button>
-          <button v-if="conflicts.length" class="btn btn-sm" :disabled="submitting" @click="submitCourse(true)">{{ submitting ? '处理中…' : '覆盖冲突课程' }}</button>
-          <button v-else class="btn btn-sm" :disabled="submitting" @click="submitCourse(false)">{{ submitting ? '保存中…' : editing ? '保存' : '添加' }}</button>
+    <AppDialog :visible="courseVisible" @update:visible="(v) => { if (!v) closeCourseDialog() }" :title="editing ? '编辑课程' : '添加课程'">
+      <div class="form-row"><label>课程名 *</label><input v-model="form.courseName" class="input" maxlength="100" placeholder="如：高等数学" /></div>
+      <div class="form-row"><label>教师</label><input v-model="form.teacher" class="input" maxlength="50" placeholder="选填" /></div>
+      <div class="form-row"><label>上课地点</label><input v-model="form.location" class="input" maxlength="100" placeholder="如：3教-201（选填）" /></div>
+      <div class="form-row"><label>周次</label><input v-model="form.weeks" class="input" maxlength="50" placeholder="如：1-16（选填）" /></div>
+      <div class="form-row"><label>星期 *</label>
+        <select v-model="form.dayOfWeek" class="select">
+          <option v-for="d in 7" :key="d" :value="d">{{ weekName(d) }}</option>
+        </select>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label>开始节次 *</label><input v-model.number="form.startSection" class="input num" type="number" min="1" max="12" /></div>
+        <div class="form-row"><label>结束节次 *</label><input v-model.number="form.endSection" class="input num" type="number" min="1" max="12" /></div>
+      </div>
+      <div class="form-row"><label>颜色</label>
+        <div class="colors">
+          <span v-for="(col, i) in colors" :key="col" class="color-dot" :class="{ active: form.colorId === i + 1 }" :style="{ background: col }" @click="form.colorId = i + 1"></span>
         </div>
       </div>
-    </div>
+      <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
+      <!-- 时间冲突提示 -->
+      <div v-if="conflicts.length" class="conflict">
+        <div class="conflict-tip"><LucideIcon name="warning" :size="16" /> 与以下课程时间冲突：</div>
+        <div v-for="c in conflicts" :key="c.id" class="conflict-item">
+          {{ c.courseName }} · {{ weekName(c.dayOfWeek) }} 第{{ c.startSection }}-{{ c.endSection }}节
+        </div>
+      </div>
+      <template #footer>
+        <button v-if="editing" class="btn btn-sm btn-danger del" :disabled="submitting" @click="removeCourse">删除课程</button>
+        <button class="btn btn-sm btn-plain" :disabled="submitting" @click="closeCourseDialog">取消</button>
+        <button v-if="conflicts.length" class="btn btn-sm" :disabled="submitting" @click="submitCourse(true)">{{ submitting ? '处理中…' : '覆盖冲突课程' }}</button>
+        <button v-else class="btn btn-sm" :disabled="submitting" @click="submitCourse(false)">{{ submitting ? '保存中…' : editing ? '保存' : '添加' }}</button>
+      </template>
+    </AppDialog>
 
     <!-- 分享课表弹窗 -->
-    <div v-if="shareVisible" class="dialog-mask" @click.self="shareVisible = false">
-      <div class="dialog">
-        <h3 class="dialog-title">分享课表</h3>
-        <div v-if="shareLoading" class="loading">生成中…</div>
-        <template v-else>
-          <div class="share-code num">{{ shareCode }}</div>
-          <p class="share-tip">将分享码发给同身份的同学，对方可一键复刻你的课表快照</p>
-          <p class="share-tip">有效期 15 天 · 每人最多 3 个生效分享码</p>
-          <div class="dialog-actions">
-            <button class="btn btn-sm btn-plain" @click="shareVisible = false">关闭</button>
-            <button class="btn btn-sm" @click="copyShareCode">复制</button>
-          </div>
-        </template>
-      </div>
-    </div>
+    <AppDialog :visible="shareVisible" @update:visible="shareVisible = $event" title="分享课表">
+      <div v-if="shareLoading" class="loading">生成中…</div>
+      <template v-else>
+        <div class="share-code num">{{ shareCode }}</div>
+        <p class="share-tip">将分享码发给同身份的同学，对方可一键复刻你的课表快照</p>
+        <p class="share-tip">有效期 15 天 · 每人最多 3 个生效分享码</p>
+      </template>
+      <template #footer>
+        <button class="btn btn-sm btn-plain" @click="shareVisible = false">关闭</button>
+        <button class="btn btn-sm" :disabled="shareLoading" @click="copyShareCode">复制</button>
+      </template>
+    </AppDialog>
 
     <!-- 复刻课表弹窗 -->
-    <div v-if="replicateVisible" class="dialog-mask" @click.self="replicateVisible = false">
-      <div class="dialog">
-        <h3 class="dialog-title">复刻课表</h3>
-        <div class="form-row"><label>分享码 *</label><input v-model="replicateCode" class="input num" maxlength="8" placeholder="如：A1B2C3" @keyup.enter="submitReplicate" /></div>
-        <p class="share-tip">输入同学分享的课表分享码，复刻其课表快照（身份需一致）</p>
-        <p v-if="replicateError" class="dialog-error">{{ replicateError }}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-sm btn-plain" :disabled="replicating" @click="replicateVisible = false">取消</button>
-          <button class="btn btn-sm" :disabled="replicating" @click="submitReplicate">{{ replicating ? '复刻中…' : '开始复刻' }}</button>
-        </div>
-      </div>
-    </div>
+    <AppDialog :visible="replicateVisible" @update:visible="replicateVisible = $event" title="复刻课表">
+      <div class="form-row"><label>分享码 *</label><input v-model="replicateCode" class="input num" maxlength="8" placeholder="如：A1B2C3" @keyup.enter="submitReplicate" /></div>
+      <p class="share-tip">输入同学分享的课表分享码，复刻其课表快照（身份需一致）</p>
+      <p v-if="replicateError" class="dialog-error">{{ replicateError }}</p>
+      <template #footer>
+        <button class="btn btn-sm btn-plain" :disabled="replicating" @click="replicateVisible = false">取消</button>
+        <button class="btn btn-sm" :disabled="replicating" @click="submitReplicate">{{ replicating ? '复刻中…' : '开始复刻' }}</button>
+      </template>
+    </AppDialog>
 
-    <div v-if="toast" class="toast">{{ toast }}</div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useUserStore } from '../store/user'
 import { courseApi, courseApi2 } from '../api'
+import { useToast } from '@/composables/useToast'
+import { AppDialog } from '@/components/base'
+import { LucideIcon } from '@/components/icons'
 
 const userStore = useUserStore()
 const loading = ref(false)
 const courses = ref<any[]>([])
 const colors = ['#4A90D9', '#52C41A', '#FA8C16', '#722ED1', '#F5222D', '#13C2C2', '#EB2F96', '#8C8C8C']
 
-const toast = ref('')
-let toastTimer: ReturnType<typeof setTimeout> | undefined
+const toast = useToast()
 function showToast(msg: string) {
-  toast.value = msg
-  clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => (toast.value = ''), 2500)
+  toast.show(msg)
 }
 
 const maxSection = computed(() => Math.max(5, ...courses.value.map((c) => c.endSection || c.startSection || 0)))

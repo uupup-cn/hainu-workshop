@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <button class="btn btn-plain btn-sm back" @click="goBack">← 返回</button>
+    <button class="btn btn-plain btn-sm back" @click="goBack">
+      <LucideIcon name="arrow-left" :size="16" />
+      返回
+    </button>
     <div v-if="loading" class="loading">加载中…</div>
     <div v-else-if="error" class="empty">{{ error }}</div>
     <div v-else-if="detail" class="card">
@@ -13,6 +16,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { freshmanApi } from '../../api'
+import { LucideIcon } from '@/components/icons'
 
 const route = useRoute()
 const router = useRouter()

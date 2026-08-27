@@ -15,17 +15,17 @@
         <a v-if="shareUrl" :href="shareUrl" target="_blank" rel="noopener" class="share-link">打开分享页</a>
       </div>
     </div>
-    <p v-if="error" class="error">⚠ {{ error }}</p>
+    <p v-if="error" class="error"><LucideIcon name="warning" :size="16" /> {{ error }}</p>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { toolsApi } from '../../../api'
 import { useTool } from '../composables/use-tool'
+import { LucideIcon } from '@/components/icons'
 
 const props = defineProps<{ tool: any }>()
-const { loading, toast, showToast, guard, shareResult } = useTool(props.tool?.toolKey || 'calculator')
+const { loading, showToast, guard, shareResult } = useTool(props.tool?.toolKey || 'calculator')
 
 const expression = ref('')
 const result = ref<any>(null)
@@ -37,7 +37,7 @@ const keys = [
   { label: '7', insert: '7' }, { label: '8', insert: '8' }, { label: '9', insert: '9' }, { label: '÷', insert: '/' }, { label: '(', insert: '(' },
   { label: '4', insert: '4' }, { label: '5', insert: '5' }, { label: '6', insert: '6' }, { label: '×', insert: '*' }, { label: ')', insert: ')' },
   { label: '1', insert: '1' }, { label: '2', insert: '2' }, { label: '3', insert: '3' }, { label: '-', insert: '-' }, { label: '^', insert: '^' },
-  { label: '0', insert: '0' }, { label: '.', insert: '.' }, { label: '%', insert: '%' }, { label: '+', insert: '+' }, { label: '⌫', insert: '' },
+  { label: '0', insert: '0' }, { label: '.', insert: '.' }, { label: '%', insert: '%' }, { label: '+', insert: '+' }, { label: 'Del', insert: '' },
   { label: 'sin(', insert: 'sin(' }, { label: 'cos(', insert: 'cos(' }, { label: 'tan(', insert: 'tan(' }, { label: 'sqrt(', insert: 'sqrt(' }, { label: 'log(', insert: 'log(' },
   { label: 'pi', insert: 'pi' }, { label: 'e', insert: 'e' }, { label: 'abs(', insert: 'abs(' }, { label: 'exp(', insert: 'exp(' }, { label: '清空', insert: '' , clear: true },
 ]

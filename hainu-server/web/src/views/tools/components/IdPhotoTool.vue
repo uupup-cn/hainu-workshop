@@ -23,21 +23,21 @@
     <div v-show="preview" class="crop-result">
       <canvas ref="canvasRef" class="preview"></canvas>
       <div class="crop-actions">
-        <button class="btn" @click="download">⬇ 下载照片</button>
+        <button class="btn" @click="download"><LucideIcon name="download" :size="18" /> 下载照片</button>
         <span class="tip">按规格比例居中裁剪（cover），请上传正面清晰照片效果更佳</span>
       </div>
     </div>
     <div v-if="!preview" class="empty hint">选择本地照片后自动裁剪为所选规格</div>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { toolsApi } from '../../../api'
 import { useTool } from '../composables/use-tool'
+import { LucideIcon } from '@/components/icons'
 
 const props = defineProps<{ tool: any }>()
-const { toast, showToast, guard, call } = useTool(props.tool?.toolKey || 'id-photo')
+const { showToast, guard, call } = useTool(props.tool?.toolKey || 'id-photo')
 
 const size = ref('one')
 const spec = ref<any>(null)

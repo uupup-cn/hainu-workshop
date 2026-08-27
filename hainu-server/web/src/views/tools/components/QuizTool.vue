@@ -62,7 +62,6 @@
       <button class="btn btn-sm" :disabled="loading" @click="restart">再测一次</button>
     </div>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
@@ -78,7 +77,7 @@ const props = defineProps<{
   mapScores: (answers: number[]) => Record<string, number>
 }>()
 
-const { loading, toast, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey)
+const { loading, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey)
 
 /** 5 档同意度：-2 ~ +2 */
 const OPTS = [

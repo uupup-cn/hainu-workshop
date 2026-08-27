@@ -5,9 +5,7 @@
     <div v-else-if="list.length === 0" class="empty">暂无内容</div>
     <template v-else>
       <!-- 条目切换 -->
-      <div class="tabs">
-        <button v-for="item in list" :key="item.id" class="tab" :class="{ active: active?.id === item.id }" @click="active = item">{{ item.entryTitle }}</button>
-      </div>
+      <AppPillTabs :items="list" label-key="entryTitle" value-key="id" :model-value="active?.id" wrap @update:model-value="(v) => (active = list.find((i) => i.id === v))" />
       <div class="card">
         <h3 class="card-title">{{ active?.entryTitle }}</h3>
         <div class="content">{{ active?.content }}</div>
@@ -19,6 +17,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { wiseApi } from '../api'
+import { AppPillTabs } from '@/components/base'
 
 const loading = ref(true)
 const list = ref<any[]>([])
@@ -36,9 +35,6 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.tab { padding: 6px 16px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .content { white-space: pre-wrap; color: var(--neutral-700); }
 .images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
 .images img { width: 100%; border-radius: var(--radius-md); aspect-ratio: 4/3; object-fit: cover; }

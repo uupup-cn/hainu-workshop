@@ -5,7 +5,7 @@
       <select v-model.number="gridSize" class="select" @change="restart">
         <option v-for="n in 6" :key="n" :value="n + 4">{{ n + 4 }} × {{ n + 4 }}</option>
       </select>
-      <span class="timer num">⏱ {{ (elapsed / 1000).toFixed(1) }}s</span>
+      <span class="timer num"><LucideIcon name="tool-timer" :size="16" /> {{ (elapsed / 1000).toFixed(1) }}s</span>
       <span class="next num">下一个：{{ nextNum }}</span>
     </div>
     <p class="rule">按 1 → {{ gridSize * gridSize }} 的顺序依次点击，点错会闪红，计时从首次点击开始</p>
@@ -28,18 +28,18 @@
         <button class="btn btn-sm btn-plain" :disabled="loading" @click="doShare">{{ shareUrl ? '重新生成分享链接' : '生成分享链接' }}</button>
         <a v-if="shareUrl" :href="shareUrl" target="_blank" rel="noopener" class="share-link">打开分享页</a>
       </div>
-      <button class="btn again" :disabled="loading" @click="restart">🔄 再来一局</button>
+      <button class="btn again" :disabled="loading" @click="restart"><LucideIcon name="refresh" :size="18" /> 再来一局</button>
     </div>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref, computed, onUnmounted, onMounted } from 'vue'
 import { toolsApi } from '../../../api'
 import { useTool } from '../composables/use-tool'
+import { LucideIcon } from '@/components/icons'
 
 const props = defineProps<{ tool: any }>()
-const { loading, toast, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey || 'schulte')
+const { loading, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey || 'schulte')
 
 const gridSize = ref(5)
 const cells = ref<number[]>([])

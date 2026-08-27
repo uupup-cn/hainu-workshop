@@ -6,20 +6,16 @@
     <div v-else-if="categories.length === 0" class="empty">暂无常见问题</div>
     <template v-else>
       <!-- 搜索框 -->
-      <input v-model.trim="keyword" class="input search" placeholder="🔍 搜索问题关键词，如：快递 / 军训 / 一卡通" />
+      <input v-model.trim="keyword" class="input search" placeholder="搜索问题关键词，如：快递 / 军训 / 一卡通" />
       <!-- 分类横向 Tab -->
-      <div class="tabs">
-        <button v-for="cat in categories" :key="cat.id" class="tab" :class="{ active: activeId === cat.id }" @click="activeId = cat.id">
-          {{ cat.categoryName }}
-        </button>
-      </div>
+      <AppPillTabs :items="categories" label-key="categoryName" value-key="id" :model-value="activeId" @update:model-value="activeId = Number($event)" />
       <!-- 问题手风琴 -->
       <div class="card">
         <div v-if="questions.length === 0" class="empty">{{ keyword ? '没有找到相关问题' : '该分类下暂无问题' }}</div>
         <div v-for="q in questions" :key="q.id" class="faq-item">
           <button class="faq-q" @click="toggle(q.id)">
             <span class="q-text">{{ q.question }}</span>
-            <span class="arrow" :class="{ open: expandedId === q.id }">▾</span>
+            <LucideIcon name="arrow-down" :size="16" :class="['arrow', { open: expandedId === q.id }]" />
           </button>
           <div v-if="expandedId === q.id" class="faq-a">{{ q.answer }}</div>
         </div>
@@ -30,6 +26,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { freshmanApi } from '../../api'
+import { LucideIcon } from '@/components/icons'
+import { AppPillTabs } from '@/components/base'
 
 const loading = ref(true)
 const error = ref('')
@@ -62,9 +60,6 @@ onMounted(async () => {
 </script>
 <style scoped>
 .search { width: 100%; margin-bottom: 12px; }
-.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
-.tab { flex-shrink: 0; padding: 6px 16px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .faq-item { border-bottom: 1px solid var(--neutral-100); }
 .faq-item:last-child { border-bottom: none; }
 .faq-q { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 0; border: none; background: none; cursor: pointer; text-align: left; font-size: 15px; font-weight: 500; color: var(--neutral-900); }

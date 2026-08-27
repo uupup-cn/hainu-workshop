@@ -13,7 +13,10 @@
       </span>
       <span v-if="options.length === 0" class="opts-empty">还没有选项，先添加几个吧</span>
     </div>
-    <button class="btn spin" :disabled="loading || options.length < 2" @click="spin">{{ loading ? '转动中…' : '🎯 开转' }}</button>
+    <button class="btn spin" :disabled="loading || options.length < 2" @click="spin">
+      <template v-if="loading">转动中…</template>
+      <template v-else><LucideIcon name="tool-wheel" :size="18" /> 开转</template>
+    </button>
 
     <!-- 抽中结果 -->
     <div v-if="picked" class="picked" :class="{ rolling: loading }">
@@ -31,15 +34,15 @@
       <div v-for="(h, i) in history" :key="i" class="history-item num">{{ i + 1 }}. {{ h }}</div>
     </div>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { toolsApi } from '../../../api'
 import { useTool } from '../composables/use-tool'
+import { LucideIcon } from '@/components/icons'
 
 const props = defineProps<{ tool: any }>()
-const { loading, toast, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey || 'wheel')
+const { loading, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey || 'wheel')
 
 const draft = ref('')
 const options = ref<string[]>(['第一食堂', '第二食堂', '第三食堂', '点外卖'])

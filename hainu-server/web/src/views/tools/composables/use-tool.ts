@@ -1,20 +1,19 @@
 /**
- * 工具组件通用逻辑 — 登录拦截 / loading / 轻提示 / 分享链接
+ * 工具组件通用逻辑 — 登录拦截 / loading / 轻提示（useToast 单例）/ 分享链接
+ * 去重：原先每个工具组件各自维护 toast ref + .toast 样式，现统一委托 useToast
  */
 import { ref } from 'vue'
 import { useUserStore } from '../../../store/user'
+import { useToast, type ToastVariant } from '@/composables/useToast'
 import { toolsApi } from '../../../api'
 
 export function useTool(toolKey: string) {
   const userStore = useUserStore()
   const loading = ref(false)
-  const toast = ref('')
-  let toastTimer: ReturnType<typeof setTimeout> | undefined
+  const toast = useToast()
 
-  function showToast(msg: string) {
-    toast.value = msg
-    clearTimeout(toastTimer)
-    toastTimer = setTimeout(() => (toast.value = ''), 2500)
+  function showToast(msg: string, variant: ToastVariant = 'info') {
+    toast.show(msg, variant)
   }
 
   /** 调用前登录校验：未登录弹登录窗并返回 false */
@@ -33,7 +32,7 @@ export function useTool(toolKey: string) {
       const res = await fn()
       return (res?.data ?? res) as T
     } catch (e: any) {
-      showToast(e?.message || '操作失败，请稍后重试')
+      showToast(e?.message || '操作失败，请稍后重试', 'danger')
       return null
     } finally {
       loading.value = false
@@ -47,10 +46,10 @@ export function useTool(toolKey: string) {
       const res = await toolsApi.share(toolKey, { shareType: 'link', resultData })
       return res?.data?.shareUrl || res?.data?.share_url || ''
     } catch (e: any) {
-      showToast(e?.message || '生成分享链接失败')
+      showToast(e?.message || '生成分享链接失败', 'danger')
       return ''
     }
   }
 
-  return { loading, toast, showToast, guard, call, shareResult }
+  return { loading, showToast, guard, call, shareResult }
 }

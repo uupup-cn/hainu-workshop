@@ -2,10 +2,10 @@
   <div class="container">
     <div class="page-header">
       <div class="title-wrap">
-        <button class="back" @click="router.push('/tools')">←</button>
+        <button class="back" @click="router.push('/tools')"><LucideIcon name="arrow-left" :size="16" /></button>
         <span v-if="toolIcon" class="tool-icon" :class="{ img: isImg }">
           <img v-if="isImg" :src="toolIcon" alt="" />
-          <template v-else>{{ toolIcon }}</template>
+          <LucideIcon v-else :name="iconForTool(key)" :size="22" />
         </span>
         <h2 class="page-title">{{ tool?.toolName || key }}</h2>
       </div>
@@ -14,7 +14,7 @@
 
     <!-- 未登录 -->
     <div v-if="!userStore.isLoggedIn" class="card center">
-      <div class="lead-icon">🔒</div>
+      <div class="lead-icon"><LucideIcon name="lock" :size="44" /></div>
       <p class="lead-tip">登录后即可使用该工具</p>
       <button class="btn" @click="userStore.openLoginDialog()">登录</button>
     </div>
@@ -25,7 +25,7 @@
     <div v-else-if="notFound" class="card">
       <div class="empty">
         工具不存在或已下线
-        <div class="back-row"><a @click="router.push('/tools')">← 返回工具箱</a></div>
+        <div class="back-row"><a @click="router.push('/tools')"><LucideIcon name="arrow-left" :size="14" /> 返回工具箱</a></div>
       </div>
     </div>
 
@@ -41,6 +41,8 @@ import { useRoute, useRouter } from 'vue-router'
 import type { Component } from 'vue'
 import { useUserStore } from '../../store/user'
 import { toolsApi } from '../../api'
+import { LucideIcon } from '@/components/icons'
+import { iconForTool } from './tool-icons'
 import { QUIZ_CONFIGS } from './quiz-config'
 import DiceTool from './components/DiceTool.vue'
 import CalculatorTool from './components/CalculatorTool.vue'
@@ -107,7 +109,7 @@ watch(key, load, { immediate: true })
 .tool-icon { font-size: 22px; line-height: 28px; }
 .tool-icon.img img { width: 22px; height: 22px; object-fit: contain; border-radius: var(--radius-sm); }
 .center { text-align: center; padding: 40px 20px; }
-.lead-icon { font-size: 44px; line-height: 56px; }
+.lead-icon { font-size: 44px; line-height: 56px; color: var(--amber-500); }
 .lead-tip { color: var(--neutral-500); margin: 8px 0 16px; }
 .desc { margin: 0 0 12px; font-size: 13px; color: var(--neutral-500); }
 .back-row { margin-top: 12px; }

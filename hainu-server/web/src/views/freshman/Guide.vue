@@ -7,7 +7,7 @@
       <div v-for="item in list" :key="item.id" class="card guide-card" @click="goDetail(item.entryKey)">
         <h3 class="card-title">{{ item.entryTitle }}</h3>
         <p class="summary">{{ brief(item) }}</p>
-        <span class="link">查看详情 →</span>
+        <span class="link">查看详情 <LucideIcon name="arrow-right" :size="14" /></span>
       </div>
     </div>
   </div>
@@ -16,6 +16,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { freshmanApi } from '../../api'
+import { LucideIcon } from '@/components/icons'
 
 const router = useRouter()
 const loading = ref(true)
@@ -40,6 +41,6 @@ onMounted(async () => {
 .guide-card { cursor: pointer; transition: box-shadow 0.2s; }
 .guide-card:hover { box-shadow: var(--shadow-float); }
 .summary { margin: 0 0 8px; color: var(--neutral-500); font-size: 13px; line-height: 20px; }
-.link { font-size: 13px; color: var(--primary-500); }
+.link { font-size: 13px; color: var(--primary-500); display: inline-flex; align-items: center; gap: 2px; }
 @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 </style>

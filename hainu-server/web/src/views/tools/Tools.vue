@@ -2,12 +2,12 @@
   <div class="container">
     <div class="page-header">
       <h2 class="page-title">工具箱</h2>
-      <span class="tag tag-mint">🎉 所有工具当前免费</span>
+      <span class="tag tag-mint"><LucideIcon name="fantasy-sparkles" :size="14" /> 所有工具当前免费</span>
     </div>
 
     <!-- 未登录引导 -->
     <div v-if="!userStore.isLoggedIn" class="card center">
-      <div class="lead-icon">🧰</div>
+      <div class="lead-icon"><LucideIcon name="module-tools" :size="44" /></div>
       <p class="lead-tip">登录后即可使用骰子、计算器、证件照、人格测试等全部工具</p>
       <button class="btn" @click="userStore.openLoginDialog()">登录使用工具箱</button>
     </div>
@@ -21,7 +21,7 @@
           <div v-for="t in g.tools" :key="t.id" class="card cell" @click="router.push('/tools/' + t.toolKey)">
             <span class="cell-icon" :class="{ img: isImg(t.icon) }">
               <img v-if="isImg(t.icon)" :src="t.icon" alt="" />
-              <template v-else>{{ t.icon || '🧩' }}</template>
+              <LucideIcon v-else :name="iconForTool(t.toolKey)" :size="28" />
             </span>
             <span class="cell-label">{{ t.toolName }}</span>
             <span class="cell-desc">{{ t.description || '点击使用' }}</span>
@@ -36,6 +36,8 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../store/user'
 import { toolsApi } from '../../api'
+import { LucideIcon } from '@/components/icons'
+import { iconForTool } from './tool-icons'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -64,7 +66,7 @@ onMounted(async () => {
 </script>
 <style scoped>
 .center { text-align: center; padding: 40px 20px; }
-.lead-icon { font-size: 44px; line-height: 56px; }
+.lead-icon { font-size: 44px; line-height: 56px; color: var(--amber-500); }
 .lead-tip { color: var(--neutral-500); margin: 8px 0 16px; }
 .cat { margin-bottom: 20px; }
 .cat-title { font-size: 16px; font-weight: 600; color: var(--neutral-800); margin: 0 0 10px; }

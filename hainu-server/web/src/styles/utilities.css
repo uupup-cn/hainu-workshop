@@ -1,0 +1,171 @@
+/**
+ * 工具类 — 兼容旧全局类（迁移期保留）
+ * P5 逐页替换为 App* 组件后清理本文件。
+ * 所有类仅引用 token。
+ */
+
+/* 布局 */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-8);
+}
+
+/* 卡片 */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--sh-card);
+  transition: box-shadow var(--dur-base) var(--ease-out);
+}
+.card-title {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-h3);
+  line-height: var(--lh-h3);
+  margin: 0 0 var(--space-3);
+  color: var(--fg-1);
+}
+
+/* 按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  cursor: pointer;
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--fs-button);
+  font-weight: var(--fw-button);
+  line-height: var(--lh-button);
+  border: none;
+  border-radius: var(--r-md);
+  background: var(--ocean-500);
+  color: var(--fg-on-primary);
+  transition: background var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.btn:hover {
+  background: var(--ocean-700);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-plain {
+  background: var(--ocean-50);
+  color: var(--ocean-500);
+}
+.btn-plain:hover {
+  background: var(--ocean-100);
+}
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--fs-caption);
+}
+.btn:disabled {
+  background: var(--neutral-300);
+  color: var(--neutral-500);
+  cursor: not-allowed;
+}
+
+/* 输入框 */
+.input,
+.select {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-body);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--r-md);
+  outline: none;
+  background: var(--bg-card);
+  color: var(--fg-1);
+  transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.input:focus,
+.select:focus {
+  border-color: var(--ocean-500);
+  box-shadow: 0 0 0 3px var(--ocean-50);
+}
+
+/* 标签 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-label);
+  line-height: var(--lh-label);
+  border-radius: var(--r-full);
+  background: var(--ocean-50);
+  color: var(--ocean-500);
+}
+.tag-mint {
+  background: var(--teal-50);
+  color: var(--teal-600);
+}
+.tag-orange {
+  background: var(--amber-50);
+  color: var(--amber-600);
+}
+.tag-danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* 列表项 */
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--neutral-100);
+}
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* 空状态 / 加载 */
+.empty {
+  padding: var(--space-12) 0;
+  text-align: center;
+  color: var(--fg-3);
+  font-size: var(--fs-body);
+}
+.loading {
+  padding: var(--space-12) 0;
+  text-align: center;
+  color: var(--fg-3);
+}
+
+/* 分页条 */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+/* 页面标题区 */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.page-title {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-h2);
+  line-height: var(--lh-h2);
+  margin: 0;
+}
+
+/* 手机端：页面容器贴边、底部留出 TabBar 高度 */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-3) var(--space-3) calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  }
+  .card {
+    padding: var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+}

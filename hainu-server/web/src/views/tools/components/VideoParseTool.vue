@@ -6,26 +6,29 @@
         <option v-if="lines.length === 0" :value="0">暂无可用线路</option>
         <option v-for="l in lines" :key="l.id" :value="l.id">{{ l.lineName }}</option>
       </select>
-      <button class="btn" :disabled="loading || !lineId" @click="parse">{{ loading ? '解析中…' : '▶ 解析' }}</button>
+      <button class="btn" :disabled="loading || !lineId" @click="parse">
+        <template v-if="loading">解析中…</template>
+        <template v-else><LucideIcon name="tool-play" :size="18" /> 解析</template>
+      </button>
     </div>
-    <p v-if="error" class="error">⚠ {{ error }}</p>
+    <p v-if="error" class="error"><LucideIcon name="warning" :size="16" /> {{ error }}</p>
 
     <div v-if="parseUrl" class="result">
       <div class="line-tip">解析线路：{{ lineName }} · 如播放异常请更换线路重试</div>
-      <a class="btn open-btn" :href="parseUrl" target="_blank" rel="noopener">🔗 打开播放页（新窗口）</a>
+      <a class="btn open-btn" :href="parseUrl" target="_blank" rel="noopener"><LucideIcon name="arrow-right" :size="16" /> 打开播放页（新窗口）</a>
       <iframe :src="parseUrl" class="player" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" referrerpolicy="no-referrer" allowfullscreen></iframe>
       <div class="iframe-tip">部分平台禁止嵌入播放，打不开时请点击上方「打开播放页」</div>
     </div>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { toolsApi } from '../../../api'
 import { useTool } from '../composables/use-tool'
+import { LucideIcon } from '@/components/icons'
 
 const props = defineProps<{ tool: any }>()
-const { loading, toast, guard, call } = useTool(props.tool?.toolKey || 'video-parse')
+const { loading, guard, call } = useTool(props.tool?.toolKey || 'video-parse')
 
 const videoUrl = ref('')
 const lineId = ref(0)

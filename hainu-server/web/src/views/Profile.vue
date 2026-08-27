@@ -25,9 +25,7 @@
       </div>
 
       <!-- 功能 Tab -->
-      <div class="tabs">
-        <button v-for="t in tabs" :key="t.key" class="tab" :class="{ active: tab === t.key }" @click="switchTab(t.key)">{{ t.label }}</button>
-      </div>
+      <AppPillTabs :items="tabs" label-key="label" value-key="key" :model-value="tab" wrap @update:model-value="(v) => switchTab(String(v))" />
 
       <!-- 资料编辑 -->
       <div v-if="tab === 'info'" class="card">
@@ -82,7 +80,7 @@
           <button v-else class="btn" :disabled="authLoading" @click="submitAuth">{{ authLoading ? '提交中…' : '提交认证申请' }}</button>
         </template>
         <p v-else-if="info?.authStatus === 'pending'" class="row-desc">认证申请审核中，请耐心等待管理员审核</p>
-        <p v-else class="row-desc">你已完成学生认证 🎉 认证后可使用积分与发布功能</p>
+        <p v-else class="row-desc">你已完成学生认证 <LucideIcon name="fantasy-sparkles" :size="16" /> 认证后可使用积分与发布功能</p>
       </div>
 
       <!-- 通知中心 -->
@@ -118,6 +116,8 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../store/user'
 import { profileApi } from '../api'
+import { LucideIcon } from '@/components/icons'
+import { AppPillTabs } from '@/components/base'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -235,7 +235,7 @@ async function sendFeedback() {
 
 async function handleLogout() {
   userStore.logout()
-  router.push('/home')
+  router.push('/')
 }
 
 onMounted(async () => {
@@ -254,9 +254,6 @@ onMounted(async () => {
 .nickname { font-size: 18px; font-weight: 600; color: var(--neutral-900); }
 .uid { font-size: 12px; color: var(--neutral-500); }
 .badges { margin-left: auto; display: flex; gap: 8px; }
-.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.tab { padding: 6px 16px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .form-row label { width: 80px; flex-shrink: 0; color: var(--neutral-600); font-size: 14px; }
 .form-row .input { flex: 1; }

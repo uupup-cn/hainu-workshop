@@ -20,7 +20,7 @@
       <div v-for="it in items" :key="it.id" class="card goods-card">
         <div class="goods-imgs">
           <img v-if="cover(it)" :src="cover(it)" alt="" />
-          <span v-else class="placeholder">📦</span>
+          <span v-else class="placeholder"><LucideIcon name="life-express" :size="28" /></span>
         </div>
         <div class="goods-body">
           <div class="goods-title">{{ it.title }}</div>
@@ -42,81 +42,74 @@
     </div>
 
     <!-- 发布商品弹窗 -->
-    <div v-if="publishVisible" class="dialog-mask" @click.self="publishVisible = false">
-      <div class="dialog">
-        <h3 class="dialog-title">发布商品</h3>
-        <div class="form-row"><label>标题 *</label><input v-model="form.title" class="input" maxlength="100" placeholder="商品标题" /></div>
-        <div class="form-grid">
-          <div class="form-row"><label>价格 *</label><input v-model="form.price" class="input" type="number" min="0" step="0.01" placeholder="0.00" /></div>
-          <div class="form-row"><label>分类 *</label>
-            <select v-model="form.categoryId" class="select">
-              <option :value="undefined">请选择分类</option>
-              <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.categoryName }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row"><label>联系方式 *</label><input v-model="form.contact" class="input" maxlength="100" placeholder="微信 / QQ / 手机号" /></div>
-        <div class="form-row"><label>描述</label><textarea v-model="form.description" class="input" rows="3" maxlength="2000" placeholder="商品描述（选填）"></textarea></div>
-        <div class="form-row"><label>图片链接（选填）</label>
-          <div v-for="(img, i) in form.images" :key="i" class="img-row">
-            <input v-model="img.url" class="input" placeholder="https://…（图片 URL）" />
-            <button class="btn btn-sm btn-plain" @click="form.images.splice(i, 1)">删除</button>
-          </div>
-          <button class="btn btn-sm btn-plain" @click="form.images.push({ url: '' })">+ 添加图片</button>
-        </div>
-        <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-sm btn-plain" @click="publishVisible = false">取消</button>
-          <button class="btn btn-sm" :disabled="submitting" @click="submitPublish">{{ submitting ? '发布中…' : '发布' }}</button>
+    <AppDialog :visible="publishVisible" @update:visible="publishVisible = $event" title="发布商品">
+      <div class="form-row"><label>标题 *</label><input v-model="form.title" class="input" maxlength="100" placeholder="商品标题" /></div>
+      <div class="form-grid">
+        <div class="form-row"><label>价格 *</label><input v-model="form.price" class="input" type="number" min="0" step="0.01" placeholder="0.00" /></div>
+        <div class="form-row"><label>分类 *</label>
+          <select v-model="form.categoryId" class="select">
+            <option :value="undefined">请选择分类</option>
+            <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.categoryName }}</option>
+          </select>
         </div>
       </div>
-    </div>
+      <div class="form-row"><label>联系方式 *</label><input v-model="form.contact" class="input" maxlength="100" placeholder="微信 / QQ / 手机号" /></div>
+      <div class="form-row"><label>描述</label><textarea v-model="form.description" class="input" rows="3" maxlength="2000" placeholder="商品描述（选填）"></textarea></div>
+      <div class="form-row"><label>图片链接（选填）</label>
+        <div v-for="(img, i) in form.images" :key="i" class="img-row">
+          <input v-model="img.url" class="input" placeholder="https://…（图片 URL）" />
+          <button class="btn btn-sm btn-plain" @click="form.images.splice(i, 1)">删除</button>
+        </div>
+        <button class="btn btn-sm btn-plain" @click="form.images.push({ url: '' })">+ 添加图片</button>
+      </div>
+      <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
+      <template #footer>
+        <button class="btn btn-sm btn-plain" @click="publishVisible = false">取消</button>
+        <button class="btn btn-sm" :disabled="submitting" @click="submitPublish">{{ submitting ? '发布中…' : '发布' }}</button>
+      </template>
+    </AppDialog>
 
     <!-- 我的发布弹窗 -->
-    <div v-if="mineVisible" class="dialog-mask" @click.self="mineVisible = false">
-      <div class="dialog wide">
-        <h3 class="dialog-title">我的发布</h3>
-        <div v-if="mineLoading" class="loading">加载中…</div>
-        <div v-else-if="mineItems.length === 0" class="empty">还没有发布过商品</div>
-        <div v-else class="mine-list">
-          <div v-for="m in mineItems" :key="m.id" class="mine-item">
-            <div class="mine-info">
-              <div class="mine-title">{{ m.title }}</div>
-              <div class="mine-meta num"><span class="price num">￥{{ m.price }}</span> · {{ formatTime(m.publishedAt) }}</div>
-            </div>
-            <span class="tag" :class="statusTag(m.status).cls">{{ statusTag(m.status).text }}</span>
-            <div class="mine-ops">
-              <button v-if="m.status === 'active'" class="btn btn-sm btn-plain" @click="offItem(m)">下架</button>
-              <button v-else-if="!expired(m)" class="btn btn-sm btn-plain" @click="relistItem(m)">重新上架</button>
-              <button class="btn btn-sm btn-danger" @click="removeItem(m)">删除</button>
-            </div>
+    <AppDialog :visible="mineVisible" @update:visible="mineVisible = $event" title="我的发布" wide>
+      <div v-if="mineLoading" class="loading">加载中…</div>
+      <div v-else-if="mineItems.length === 0" class="empty">还没有发布过商品</div>
+      <div v-else class="mine-list">
+        <div v-for="m in mineItems" :key="m.id" class="mine-item">
+          <div class="mine-info">
+            <div class="mine-title">{{ m.title }}</div>
+            <div class="mine-meta num"><span class="price num">￥{{ m.price }}</span> · {{ formatTime(m.publishedAt) }}</div>
+          </div>
+          <span class="tag" :class="statusTag(m.status).cls">{{ statusTag(m.status).text }}</span>
+          <div class="mine-ops">
+            <button v-if="m.status === 'active'" class="btn btn-sm btn-plain" @click="offItem(m)">下架</button>
+            <button v-else-if="!expired(m)" class="btn btn-sm btn-plain" @click="relistItem(m)">重新上架</button>
+            <button class="btn btn-sm btn-danger" @click="removeItem(m)">删除</button>
           </div>
         </div>
       </div>
-    </div>
+    </AppDialog>
 
     <!-- 举报弹窗 -->
-    <div v-if="reportVisible" class="dialog-mask" @click.self="reportVisible = false">
-      <div class="dialog">
-        <h3 class="dialog-title">举报商品</h3>
-        <p class="report-target">{{ reportTarget?.title }}</p>
-        <label v-for="r in REASONS" :key="r" class="radio"><input type="radio" :value="r" v-model="reportReason" />{{ r }}</label>
-        <textarea v-model="reportDetail" class="input report-detail" rows="2" maxlength="200" placeholder="补充说明（选填）"></textarea>
-        <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-sm btn-plain" @click="reportVisible = false">取消</button>
-          <button class="btn btn-sm" @click="submitReport">提交举报</button>
-        </div>
-      </div>
-    </div>
+    <AppDialog :visible="reportVisible" @update:visible="reportVisible = $event" title="举报商品">
+      <p class="report-target">{{ reportTarget?.title }}</p>
+      <label v-for="r in REASONS" :key="r" class="radio"><input type="radio" :value="r" v-model="reportReason" />{{ r }}</label>
+      <textarea v-model="reportDetail" class="input report-detail" rows="2" maxlength="200" placeholder="补充说明（选填）"></textarea>
+      <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
+      <template #footer>
+        <button class="btn btn-sm btn-plain" @click="reportVisible = false">取消</button>
+        <button class="btn btn-sm" @click="submitReport">提交举报</button>
+      </template>
+    </AppDialog>
 
-    <div v-if="toast" class="toast">{{ toast }}</div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { marketplaceApi } from '../api'
 import { useUserStore } from '../store/user'
+import { useToast } from '@/composables/useToast'
+import { AppDialog } from '@/components/base'
+import { LucideIcon } from '@/components/icons'
 
 const userStore = useUserStore()
 const REASONS = ['垃圾广告', '人身攻击', '色情低俗', '虚假信息', '其他']
@@ -129,12 +122,9 @@ const keyword = ref('')
 const page = ref(1)
 const hasMore = ref(false)
 
-const toast = ref('')
-let toastTimer: ReturnType<typeof setTimeout> | undefined
+const toast = useToast()
 function showToast(msg: string) {
-  toast.value = msg
-  clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => (toast.value = ''), 2500)
+  toast.show(msg)
 }
 function formatTime(t?: string) { return t ? new Date(t).toLocaleString('zh-CN', { hour12: false }) : '' }
 

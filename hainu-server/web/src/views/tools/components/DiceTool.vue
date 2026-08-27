@@ -5,12 +5,15 @@
       <select v-model="count" class="select">
         <option v-for="n in 10" :key="n" :value="n">{{ n }} 个</option>
       </select>
-      <button class="btn" :disabled="loading" @click="roll">{{ loading ? '投掷中…' : '🎲 掷一下' }}</button>
+      <button class="btn" :disabled="loading" @click="roll">
+        <template v-if="loading">投掷中…</template>
+        <template v-else><LucideIcon name="tool-dice" :size="18" /> 掷一下</template>
+      </button>
     </div>
 
     <div v-if="result" class="result">
       <div class="dice-list">
-        <div v-for="(v, i) in result.rolls" :key="i" class="die num"><span class="die-face">🎲</span>{{ v }}</div>
+        <div v-for="(v, i) in result.rolls" :key="i" class="die num"><span class="die-face"><LucideIcon name="tool-dice" :size="36" /></span>{{ v }}</div>
       </div>
       <div class="total num">总和：<b>{{ result.total }}</b></div>
       <div class="share-row">
@@ -20,15 +23,15 @@
     </div>
     <p v-if="error" class="error">{{ error }}</p>
   </div>
-  <div v-if="toast" class="toast">{{ toast }}</div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { toolsApi } from '../../../api'
 import { useTool } from '../composables/use-tool'
+import { LucideIcon } from '@/components/icons'
 
 const props = defineProps<{ tool: any }>()
-const { loading, toast, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey || 'dice')
+const { loading, showToast, guard, call, shareResult } = useTool(props.tool?.toolKey || 'dice')
 
 const count = ref(1)
 const result = ref<any>(null)

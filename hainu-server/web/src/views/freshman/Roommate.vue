@@ -4,7 +4,7 @@
 
     <!-- 未登录引导 -->
     <div v-if="!userStore.isLoggedIn" class="card login-guide">
-      <div class="login-icon">👦</div>
+      <div class="login-icon"><LucideIcon name="action-profile" :size="48" /></div>
       <p class="login-tip">登录后即可发布找房信息，寻找同宿舍室友与同专业同学</p>
       <button class="btn" @click="userStore.openLoginDialog()">立即登录</button>
     </div>
@@ -12,13 +12,10 @@
     <template v-else>
       <!-- 功能状态 -->
       <div v-if="statusLoaded && status && !status.isOpen" class="card notice">
-        ⏰ 找室友功能当前未开放（{{ fmtDate(status.startDate) }} ~ {{ fmtDate(status.endDate) }}），可先浏览已发布的信息
+        <LucideIcon name="clock" :size="16" /> 找室友功能当前未开放（{{ fmtDate(status.startDate) }} ~ {{ fmtDate(status.endDate) }}），可先浏览已发布的信息
       </div>
 
-      <div class="tabs">
-        <button class="tab" :class="{ active: tab === 'hall' }" @click="switchTab('hall')">信息大厅</button>
-        <button class="tab" :class="{ active: tab === 'mine' }" @click="switchTab('mine')">我的信息</button>
-      </div>
+      <AppPillTabs :items="roommateTabs" label-key="label" value-key="value" :model-value="tab" @update:model-value="(v) => switchTab(String(v) as 'hall' | 'mine')" />
 
       <!-- 信息大厅 -->
       <template v-if="tab === 'hall'">
@@ -68,7 +65,7 @@
       </template>
 
       <!-- 发布按钮 -->
-      <button class="fab" @click="openDialog(!!myPost)">＋ 发布</button>
+      <button class="fab" @click="openDialog(!!myPost)"><LucideIcon name="add" :size="20" /> 发布</button>
     </template>
 
     <!-- 发布 / 修改 弹窗 -->
@@ -123,14 +120,14 @@
         <div v-if="matchLoading" class="loading">匹配中…</div>
         <template v-else>
           <template v-if="matchData.roommateMatches.length">
-            <h4 class="section-title">🏠 可能的室友（{{ matchData.roommateMatches.length }}）</h4>
+            <h4 class="section-title"><LucideIcon name="nav-home" :size="18" /> 可能的室友（{{ matchData.roommateMatches.length }}）</h4>
             <div v-for="p in matchData.roommateMatches" :key="p.id" class="match-card">
               <div class="name">{{ p.name }}<span v-if="p.campusName" class="tag">{{ p.campusName }}</span></div>
               <div class="sub">{{ p.buildingName }} {{ p.roomNumber }} · {{ p.contact }}</div>
             </div>
           </template>
           <template v-if="matchData.majorMatches.length">
-            <h4 class="section-title">🎓 同专业同学（{{ matchData.majorMatches.length }}）</h4>
+            <h4 class="section-title"><LucideIcon name="zone-freshman" :size="18" /> 同专业同学（{{ matchData.majorMatches.length }}）</h4>
             <div v-for="p in matchData.majorMatches" :key="p.id" class="match-card">
               <div class="name">{{ p.name }}<span v-if="p.majorName" class="tag tag-orange">{{ p.majorName }}</span></div>
               <div class="sub">{{ p.departmentName }} · {{ p.contact }}</div>
@@ -150,6 +147,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { roommateApi } from '../../api'
 import { useUserStore } from '../../store/user'
+import { LucideIcon } from '@/components/icons'
+import { AppPillTabs } from '@/components/base'
 
 const userStore = useUserStore()
 
@@ -160,6 +159,10 @@ const campuses = ref<any[]>([])
 
 /* ---------- 信息大厅 ---------- */
 const tab = ref<'hall' | 'mine'>('hall')
+const roommateTabs = [
+  { label: '信息大厅', value: 'hall' },
+  { label: '我的信息', value: 'mine' },
+]
 const hallLoaded = ref(false)
 const hallLoading = ref(false)
 const posts = ref<any[]>([])
@@ -404,9 +407,6 @@ onMounted(async () => {
 .login-icon { font-size: 48px; line-height: 1; }
 .login-tip { margin: 12px 0 20px; color: var(--neutral-500); }
 .notice { background: var(--warning-bg); color: var(--orange-500); font-size: 13px; }
-.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-.tab { padding: 6px 20px; border: 1px solid var(--neutral-200); background: var(--neutral-0); border-radius: var(--radius-full); color: var(--neutral-600); font-size: 14px; cursor: pointer; }
-.tab.active { background: var(--primary-500); border-color: var(--primary-500); color: #fff; }
 .post-head { display: flex; align-items: center; gap: 12px; }
 .avatar { width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-full); background: var(--primary-50); color: var(--primary-500); font-size: 18px; font-weight: 600; }
 .name { font-size: 15px; font-weight: 600; color: var(--neutral-900); display: flex; align-items: center; gap: 8px; }

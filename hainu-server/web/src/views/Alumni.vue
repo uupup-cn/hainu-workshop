@@ -29,8 +29,8 @@
         <div class="post-content" :ref="refContent(p.id)" :class="{ clamp: isClamped(p.id) }">{{ p.content }}</div>
         <a v-if="clampable.has(p.id)" class="expand" @click="toggleExpand(p.id)">{{ expanded.has(p.id) ? '收起' : '展开全文' }}</a>
         <div class="post-footer">
-          <button class="op" :class="{ liked: likedIds.has(p.id) }" @click="toggleLike(p)">❤️ <span class="num">{{ p.likeCount || 0 }}</span></button>
-          <button class="op" :class="{ on: openComments.has(p.id) }" @click="toggleComments(p)">💬 <span class="num">{{ p.commentCount || 0 }}</span></button>
+          <button class="op" :class="{ liked: likedIds.has(p.id) }" @click="toggleLike(p)"><LucideIcon name="like" :size="16" /> <span class="num">{{ p.likeCount || 0 }}</span></button>
+          <button class="op" :class="{ on: openComments.has(p.id) }" @click="toggleComments(p)"><LucideIcon name="comment" :size="16" /> <span class="num">{{ p.commentCount || 0 }}</span></button>
           <a v-if="userStore.isLoggedIn" class="op report" @click="openReport(p)">举报</a>
         </div>
 
@@ -52,7 +52,7 @@
             </div>
             <div class="comment-input">
               <div v-if="replyTo && replyTo.postId === p.id" class="replying">
-                回复 @{{ replyTo.name }}<a class="cancel" @click="cancelReply">✕ 取消</a>
+                回复 @{{ replyTo.name }}<a class="cancel" @click="cancelReply"><LucideIcon name="close" :size="14" /> 取消</a>
               </div>
               <div class="ci-row">
                 <input v-model="commentDraft[p.id]" class="input" maxlength="500" placeholder="友善评论，理性发言…" @keyup.enter="submitComment(p)" />
@@ -68,48 +68,44 @@
     </template>
 
     <!-- 发帖弹窗 -->
-    <div v-if="pubVisible" class="dialog-mask" @click.self="pubVisible = false">
-      <div class="dialog">
-        <h3 class="dialog-title">{{ type === 'confession' ? '发布表白' : '发布帖子' }}</h3>
-        <div class="form-row" v-if="type === 'post'"><label>版块</label>
-          <select v-model="form.sectionId" class="select">
-            <option :value="undefined">不选择版块</option>
-            <option v-for="s in sections" :key="s.id" :value="s.id">{{ s.sectionName }}</option>
-          </select>
-        </div>
-        <div class="form-row"><label>标题</label><input v-model="form.title" class="input" maxlength="200" placeholder="标题（选填）" /></div>
-        <div class="form-row"><label>内容 *</label><textarea v-model="form.content" class="input" rows="5" maxlength="5000" placeholder="分享你的想法…"></textarea></div>
-        <label class="radio"><input type="checkbox" v-model="form.isAnonymous" />匿名发布</label>
-        <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-sm btn-plain" @click="pubVisible = false">取消</button>
-          <button class="btn btn-sm" :disabled="submitting" @click="submitPublish">{{ submitting ? '发布中…' : '发布' }}</button>
-        </div>
+    <AppDialog :visible="pubVisible" @update:visible="pubVisible = $event" :title="type === 'confession' ? '发布表白' : '发布帖子'">
+      <div class="form-row" v-if="type === 'post'"><label>版块</label>
+        <select v-model="form.sectionId" class="select">
+          <option :value="undefined">不选择版块</option>
+          <option v-for="s in sections" :key="s.id" :value="s.id">{{ s.sectionName }}</option>
+        </select>
       </div>
-    </div>
+      <div class="form-row"><label>标题</label><input v-model="form.title" class="input" maxlength="200" placeholder="标题（选填）" /></div>
+      <div class="form-row"><label>内容 *</label><textarea v-model="form.content" class="input" rows="5" maxlength="5000" placeholder="分享你的想法…"></textarea></div>
+      <label class="radio"><input type="checkbox" v-model="form.isAnonymous" />匿名发布</label>
+      <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
+      <template #footer>
+        <button class="btn btn-sm btn-plain" @click="pubVisible = false">取消</button>
+        <button class="btn btn-sm" :disabled="submitting" @click="submitPublish">{{ submitting ? '发布中…' : '发布' }}</button>
+      </template>
+    </AppDialog>
 
     <!-- 举报弹窗 -->
-    <div v-if="reportVisible" class="dialog-mask" @click.self="reportVisible = false">
-      <div class="dialog">
-        <h3 class="dialog-title">举报内容</h3>
-        <p class="report-target">{{ reportTarget?.title || reportTarget?.content?.slice(0, 40) }}</p>
-        <label v-for="r in REASONS" :key="r" class="radio"><input type="radio" :value="r" v-model="reportReason" />{{ r }}</label>
-        <textarea v-model="reportDetail" class="input report-detail" rows="2" maxlength="200" placeholder="补充说明（选填）"></textarea>
-        <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-sm btn-plain" @click="reportVisible = false">取消</button>
-          <button class="btn btn-sm" @click="submitReport">提交举报</button>
-        </div>
-      </div>
-    </div>
+    <AppDialog :visible="reportVisible" @update:visible="reportVisible = $event" title="举报内容">
+      <p class="report-target">{{ reportTarget?.title || reportTarget?.content?.slice(0, 40) }}</p>
+      <label v-for="r in REASONS" :key="r" class="radio"><input type="radio" :value="r" v-model="reportReason" />{{ r }}</label>
+      <textarea v-model="reportDetail" class="input report-detail" rows="2" maxlength="200" placeholder="补充说明（选填）"></textarea>
+      <p v-if="dialogError" class="dialog-error">{{ dialogError }}</p>
+      <template #footer>
+        <button class="btn btn-sm btn-plain" @click="reportVisible = false">取消</button>
+        <button class="btn btn-sm" @click="submitReport">提交举报</button>
+      </template>
+    </AppDialog>
 
-    <div v-if="toast" class="toast">{{ toast }}</div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, reactive, nextTick, onMounted } from 'vue'
 import { alumniApi } from '../api'
 import { useUserStore } from '../store/user'
+import { useToast } from '@/composables/useToast'
+import { AppDialog } from '@/components/base'
+import { LucideIcon } from '@/components/icons'
 
 const userStore = useUserStore()
 const REASONS = ['垃圾广告', '人身攻击', '色情低俗', '虚假信息', '其他']
@@ -123,12 +119,9 @@ const list = ref<any[]>([])
 const page = ref(1)
 const hasMore = ref(false)
 
-const toast = ref('')
-let toastTimer: ReturnType<typeof setTimeout> | undefined
+const toast = useToast()
 function showToast(msg: string) {
-  toast.value = msg
-  clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => (toast.value = ''), 2500)
+  toast.show(msg)
 }
 function formatTime(t?: string) { return t ? new Date(t).toLocaleString('zh-CN', { hour12: false }) : '' }
 
